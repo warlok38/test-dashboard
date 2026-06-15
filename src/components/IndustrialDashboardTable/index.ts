@@ -1,0 +1,1 @@
+export { IndustrialDashboardTable } from './IndustrialDashboardTable'

@@ -1,0 +1,171 @@
+.dashboard {
+  min-width: 74rem;
+  height: 100%;
+  padding: var(--space-5);
+  background: var(--palette-bg-elevated);
+}
+
+.table :global(.ant-table) {
+  --dashboard-grid-border: #eceff1;
+
+  color: var(--color-text-default);
+  background: var(--palette-bg-elevated);
+}
+
+.table :global(.ant-table-container) {
+  border-color: var(--dashboard-grid-border);
+  border-radius: var(--radius-5);
+}
+
+.table :global(.ant-table-thead > tr > th) {
+  height: 3rem;
+  padding: 0.625rem 1rem;
+  background: var(--color-bg-default);
+  border-color: var(--dashboard-grid-border);
+  border-bottom-color: var(--dashboard-grid-border);
+  border-inline-end-color: var(--dashboard-grid-border);
+}
+
+.table :global(.ant-table-tbody > tr > td) {
+  height: 7.875rem;
+  padding: 0;
+  vertical-align: top;
+  border-color: var(--dashboard-grid-border);
+  border-bottom-color: var(--dashboard-grid-border);
+  border-inline-end-color: var(--dashboard-grid-border);
+}
+
+.table :global(.ant-table-tbody > tr:hover > td) {
+  background: var(--palette-bg-elevated);
+}
+
+.table :global(.ant-table-tbody > tr:last-child > td:empty),
+.table :global(.ant-table-tbody > tr:last-child > td:has(.emptyCell)) {
+  border-bottom-color: transparent;
+}
+
+.stageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.stageTitle {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text-default);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.planBadge {
+  flex: 0 0 auto;
+  padding: 0.1875rem 0.4375rem;
+  border-radius: var(--radius-5);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.planDanger {
+  color: #e84b3c;
+  background: #fde8e5;
+}
+
+.planWarning {
+  color: #e59a00;
+  background: #fff3cf;
+}
+
+.planSuccess {
+  color: #188a3b;
+  background: #e3f5e8;
+}
+
+.planNeutral {
+  color: var(--color-text-muted);
+  background: #f2f4f5;
+}
+
+.metricCell {
+  position: relative;
+  min-height: 7.875rem;
+  padding: 1rem 1rem 1.125rem;
+}
+
+.emptyCell {
+  min-height: 7.875rem;
+}
+
+.metricTitle {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.metricValue {
+  margin-top: var(--space-2);
+  color: var(--metric-color);
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+.metricMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.2;
+}
+
+.deltaBadge {
+  padding: 0.25rem 0.4375rem;
+  border-radius: var(--radius-5);
+  color: var(--metric-color);
+  font-weight: 700;
+  background: var(--metric-bg);
+}
+
+.metricProgress {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  left: 1rem;
+  height: 0.125rem;
+  background: #dfe5e8;
+}
+
+.metricProgress span {
+  display: block;
+  height: 100%;
+  background: var(--metric-color);
+}
+
+.metricSuccess {
+  --metric-color: #188a3b;
+  --metric-bg: #e3f5e8;
+}
+
+.metricDanger {
+  --metric-color: #e84b3c;
+  --metric-bg: #fde8e5;
+}
+
+.metricNeutral {
+  --metric-color: var(--color-text-muted);
+  --metric-bg: #f2f4f5;
+}

@@ -1,4 +1,5 @@
 export * from './Header'
+export * from './IndustrialDashboardTable'
 export * from './Layout'
 export * from './Sidebar'
 export * from './ThemeSwitch'
