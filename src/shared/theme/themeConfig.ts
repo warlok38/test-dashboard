@@ -3,6 +3,7 @@ import type { ThemeConfig } from 'antd'
 /** Светлая тема — только то, что раньше задавали через `providers` без полного набора seed-токенов. */
 export const themeConfig: ThemeConfig = {
   token: {
+    fontFamily: 'var(--font-montserrat), Arial, Helvetica, sans-serif',
     colorPrimary: '#fab529',
     colorLink: '#fab529',
     colorInfo: '#fab529',
@@ -25,6 +26,7 @@ export const themeConfig: ThemeConfig = {
 /** Тёмная тема — согласована с блоком `html[data-theme='dark']` в palette.css */
 export const darkThemeConfig: ThemeConfig = {
   token: {
+    fontFamily: 'var(--font-montserrat), Arial, Helvetica, sans-serif',
     colorPrimary: '#f0b24a',
     colorLink: '#f0b24a',
     colorInfo: '#f0b24a',
