@@ -1,0 +1,66 @@
+:root {
+  --palette-neutral-000: #ffffff;
+  --palette-neutral-900: #2f2f2f;
+  --palette-neutral-800: #838383;
+  --palette-neutral-950: #1c1c1c;
+
+  /* Основной жёлтый (Ant colorPrimary) */
+  --palette-accent-primary: #fab529;
+  --palette-accent-primary-hover: #e9a919;
+  /** Текст на сплошной жёлтой кнопке (фиксируется для любой темы) */
+  --palette-accent-on-solid: #1c1c1c;
+  --palette-accent-soft: #fab52929;
+  --palette-accent-wash: #fab52914;
+
+  /*
+   * «Брендовые» переменные: тёмный хром верхней панели и выезжающего меню SideBar,
+   * если решат снова подключить сайдбар.
+   */
+  --palette-brand-500: #414141;
+  --palette-brand-600: #353535;
+  --palette-brand-700: #292929;
+
+  /* Полоса Header2: тёмная под светлый текст и акценты навигации */
+  --palette-header-secondary-strip: #3c3c3c;
+
+  /* Нейтральные поверхности */
+  --palette-surface-100: #f2f1ee;
+  --palette-surface-page-start: #ddd8ce;
+  --palette-surface-page-end: #faf8f3;
+
+  --palette-overlay-interactive-hover: #29292914;
+  --palette-border-interactive: #29292938;
+  --palette-border-soft: #d8d4ca;
+  --palette-bg-elevated: #ffffff;
+}
+
+/*
+ * Тёмная тема: глубокий графит в нейтральной гамме и тёплый янтарный акцент.
+ * Фон ниже средней яркости без «чистого чёрного», текст — тёплая светлая шкала.
+ */
+html[data-theme='dark'] {
+  --palette-neutral-000: #ffffff;
+  --palette-neutral-900: #e9e3d8;
+  --palette-neutral-800: #b7ada0;
+  --palette-neutral-950: #fcf8ef;
+
+  --palette-accent-primary: #f0b24a;
+  --palette-accent-primary-hover: #ffca69;
+  --palette-accent-soft: #f0b24a2e;
+  --palette-accent-wash: #f0b24a17;
+
+  --palette-brand-500: #313131;
+  --palette-brand-600: #272727;
+  --palette-brand-700: #1f1f1f;
+
+  --palette-header-secondary-strip: #2b2b2b;
+
+  --palette-surface-100: #171717;
+  --palette-surface-page-start: #0d0d0d;
+  --palette-surface-page-end: #1b1b1b;
+
+  --palette-overlay-interactive-hover: #e9e3d80f;
+  --palette-border-interactive: #e9e3d833;
+  --palette-border-soft: #3a3a3a;
+  --palette-bg-elevated: #222222;
+}

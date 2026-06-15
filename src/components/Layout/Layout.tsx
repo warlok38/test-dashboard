@@ -1,0 +1,18 @@
+import { ReactNode } from 'react'
+import styles from './Layout.module.css'
+
+type LayoutProps = {
+  children: ReactNode
+}
+
+export function Layout({ children }: LayoutProps) {
+  return (
+    <div className={styles.layout}>
+      <section className={styles.contentArea}>
+        <div className={styles.contentColumn}>
+          <main className={styles.mainContent}>{children}</main>
+        </div>
+      </section>
+    </div>
+  )
+}
