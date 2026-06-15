@@ -1,9 +1,19 @@
+'use client'
+
+import { useSidebar } from '../Sidebar'
 import styles from './Header.module.css'
 
 export function Header() {
+  const { openMobileSidebar } = useSidebar()
+
   return (
     <header className={styles.header}>
-      <button type="button" className={styles.menuButton} aria-label="Открыть меню">
+      <button
+        type="button"
+        className={styles.menuButton}
+        onClick={openMobileSidebar}
+        aria-label="Открыть меню"
+      >
         <span />
         <span />
         <span />

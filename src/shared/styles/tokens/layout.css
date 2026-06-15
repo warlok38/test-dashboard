@@ -10,9 +10,9 @@
 
   --radius-pill: 999rem;
 
-  --layout-header-height: 2.5rem;
-  --layout-sidebar-width-collapsed: 2.5rem;
-  --layout-sidebar-width-expanded: 20rem;
+  --layout-header-height: 3.75rem;
+  --layout-sidebar-width-collapsed: 4rem;
+  --layout-sidebar-width-expanded: 15rem;
 
   --layout-max-width-assistant: 100rem;
   --layout-max-width-assistant-chat: 52rem;
