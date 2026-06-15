@@ -1,4 +1,6 @@
 import { ReactNode } from 'react'
+import { Header } from '../Header'
+import { Sidebar } from '../Sidebar'
 import styles from './Layout.module.css'
 
 type LayoutProps = {
@@ -8,7 +10,9 @@ type LayoutProps = {
 export function Layout({ children }: LayoutProps) {
   return (
     <div className={styles.layout}>
+      <Header />
       <section className={styles.contentArea}>
+        <Sidebar />
         <div className={styles.contentColumn}>
           <main className={styles.mainContent}>{children}</main>
         </div>
