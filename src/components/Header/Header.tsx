@@ -21,7 +21,6 @@ export function Header() {
 
       <div className={styles.titleGroup}>
         <span className={styles.title}>COOL DASHBOARD</span>
-        <span className={styles.subtitle}>Production Monitor</span>
       </div>
 
       <div className={styles.actions} aria-label="Действия панели" />

@@ -1,5 +1,6 @@
 import {
   BarChartOutlined,
+  HomeOutlined,
   LineChartOutlined,
   PartitionOutlined,
   SettingOutlined
@@ -15,6 +16,11 @@ export type SidebarItem = {
 export const SIDEBAR_ITEMS: SidebarItem[] = [
   {
     href: '/',
+    label: 'Главная',
+    icon: HomeOutlined
+  },
+  {
+    href: '/production-stages',
     label: 'Сводка по стадиям',
     icon: BarChartOutlined
   },

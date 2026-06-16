@@ -1,0 +1,20 @@
+.home {
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-8);
+  background: var(--palette-bg-elevated);
+}
+
+.title {
+  color: var(--color-text-strong);
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+@media (--screen-small) {
+  .home {
+    padding: var(--space-4);
+  }
+}

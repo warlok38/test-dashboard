@@ -1,4 +1,5 @@
 import './globals.css'
+import { AntdRegistry } from '@ant-design/nextjs-registry'
 import { Montserrat } from 'next/font/google'
 import { Providers } from './providers'
 import { Layout } from '@/components'
@@ -17,9 +18,11 @@ export default function RootLayout({
   return (
     <html lang="ru" className={montserrat.variable}>
       <body className={montserrat.className}>
-        <Providers>
-          <Layout>{children}</Layout>
-        </Providers>
+        <AntdRegistry>
+          <Providers>
+            <Layout>{children}</Layout>
+          </Providers>
+        </AntdRegistry>
       </body>
     </html>
   )

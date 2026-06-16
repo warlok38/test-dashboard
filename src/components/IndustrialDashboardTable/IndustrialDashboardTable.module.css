@@ -1,6 +1,7 @@
 .dashboard {
   min-width: 74rem;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   padding: var(--space-5);
   background: var(--palette-bg-elevated);
 }

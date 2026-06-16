@@ -11,6 +11,12 @@
 - Prefer TypeScript-safe solutions over `any`, casts, or suppressed errors.
 - Do not introduce new dependencies unless they clearly reduce complexity.
 
+## Decision discipline
+
+- If project instructions recommend a specific library, framework component, or pattern, use it by default.
+- If you believe a custom implementation or different pattern is better, explain the tradeoff and ask for confirmation before implementing it.
+- Do not silently bypass existing project preferences for convenience, speed, or minor visual control.
+
 ## Next.js / React
 
 - Use client components only when interactivity, browser APIs, hooks, or Ant Design components require them.

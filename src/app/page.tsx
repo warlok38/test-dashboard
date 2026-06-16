@@ -1,5 +1,13 @@
-import { IndustrialDashboardTable } from '@/components'
+import { ContentHeader, homeBreadcrumbIcon } from '@/components'
+import styles from './page.module.css'
 
 export default function Home() {
-  return <IndustrialDashboardTable />
+  return (
+    <>
+      <ContentHeader breadcrumbs={[{ label: 'Главная', icon: homeBreadcrumbIcon }]} />
+      <section className={styles.home}>
+        <h1 className={styles.title}>Главная</h1>
+      </section>
+    </>
+  )
 }
