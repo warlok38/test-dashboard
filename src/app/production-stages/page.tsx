@@ -1,4 +1,9 @@
-import { ContentHeader, homeBreadcrumbIcon, IndustrialDashboardTable } from '@/components'
+import {
+  ContentHeader,
+  DateRangeFilter,
+  homeBreadcrumbIcon,
+  IndustrialDashboardTable
+} from '@/components'
 
 export default function ProductionStagesPage() {
   return (
@@ -8,6 +13,7 @@ export default function ProductionStagesPage() {
           { label: 'Главная', href: '/', icon: homeBreadcrumbIcon },
           { label: 'Сводка по стадиям производства' }
         ]}
+        actions={<DateRangeFilter />}
       />
       <IndustrialDashboardTable />
     </>

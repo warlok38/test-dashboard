@@ -1,4 +1,5 @@
 export * from './ContentHeader'
+export * from './DateRangeFilter'
 export * from './Header'
 export * from './IndustrialDashboardTable'
 export * from './Layout'

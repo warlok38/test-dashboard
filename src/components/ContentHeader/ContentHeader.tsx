@@ -1,7 +1,7 @@
 import { HomeOutlined } from '@ant-design/icons'
 import { Breadcrumb, type BreadcrumbProps } from 'antd'
 import Link from 'next/link'
-import { type ReactNode } from 'react'
+import { Suspense, type ReactNode } from 'react'
 
 import styles from './ContentHeader.module.css'
 
@@ -13,6 +13,7 @@ export type ContentHeaderBreadcrumb = {
 
 type ContentHeaderProps = {
   breadcrumbs: ContentHeaderBreadcrumb[]
+  actions?: ReactNode
 }
 
 function renderBreadcrumbContent(item: ContentHeaderBreadcrumb) {
@@ -24,7 +25,7 @@ function renderBreadcrumbContent(item: ContentHeaderBreadcrumb) {
   )
 }
 
-export function ContentHeader({ breadcrumbs }: ContentHeaderProps) {
+export function ContentHeader({ breadcrumbs, actions }: ContentHeaderProps) {
   const items: BreadcrumbProps['items'] = breadcrumbs.map((item, index) => {
     const isCurrent = index === breadcrumbs.length - 1
     const content = renderBreadcrumbContent(item)
@@ -46,7 +47,12 @@ export function ContentHeader({ breadcrumbs }: ContentHeaderProps) {
 
   return (
     <header className={styles.header}>
-      <Breadcrumb items={items} />
+      <Breadcrumb className={styles.breadcrumbs} items={items} />
+      {actions && (
+        <div className={styles.actions}>
+          <Suspense fallback={null}>{actions}</Suspense>
+        </div>
+      )}
     </header>
   )
 }
