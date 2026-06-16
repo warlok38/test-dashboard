@@ -1,4 +1,5 @@
 .sidebar {
+  box-sizing: content-box;
   position: relative;
   z-index: 2;
   flex: 0 0 var(--layout-sidebar-width-expanded);
@@ -240,11 +241,9 @@
 }
 
 .footer {
-  flex: 0 0 var(--layout-header-height);
-  min-height: var(--layout-header-height);
   display: flex;
   align-items: center;
-  padding: var(--space-0) var(--space-4);
+  padding: var(--space-1);
   border-top: var(--border-width-hairline) solid var(--color-border-interactive);
 }
 
@@ -253,8 +252,8 @@
   min-height: 2.25rem;
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-0) var(--space-0);
+  justify-content: center;
+  gap: var(--space-2);
   border: 0;
   border-radius: var(--radius-5);
   color: var(--color-text-muted);
@@ -295,7 +294,6 @@
 
 .sidebarCollapsed .footer {
   justify-content: center;
-  padding: var(--space-0);
 }
 
 .sidebarCollapsed .collapseButton {
