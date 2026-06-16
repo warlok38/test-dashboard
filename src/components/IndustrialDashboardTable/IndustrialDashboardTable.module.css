@@ -29,7 +29,7 @@
 
 .table :global(.ant-table-tbody > tr > td) {
   height: 7.875rem;
-  padding: 0;
+  padding: 0 !important;
   vertical-align: top;
   border-color: var(--dashboard-grid-border);
   border-bottom-color: var(--dashboard-grid-border);
@@ -51,6 +51,22 @@
   justify-content: space-between;
   gap: var(--space-3);
   min-width: 0;
+}
+
+.stageHeaderLink {
+  margin: -0.625rem -1rem;
+  padding: 0.625rem 1rem;
+  color: inherit;
+  transition:
+    color 160ms ease,
+    background 160ms ease;
+}
+
+.stageHeaderLink:hover,
+.stageHeaderLink:focus-visible {
+  color: var(--color-text-strong);
+  background: var(--palette-accent-wash);
+  outline: none;
 }
 
 .stageTitle {
@@ -98,6 +114,47 @@
   position: relative;
   min-height: 7.875rem;
   padding: 1rem 1rem 1.125rem;
+}
+
+.metricLink {
+  display: block;
+  width: 100%;
+  min-height: 7.875rem;
+  color: inherit;
+  outline: none;
+  background: transparent;
+  transition: background 160ms ease;
+}
+
+.metricLink .metricCell {
+  padding-right: 2.25rem;
+}
+
+.metricLink:hover,
+.metricLink:focus-visible {
+  background: var(--palette-accent-wash);
+}
+
+.metricArrow {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--palette-accent-primary-hover);
+  font-size: var(--font-size-xs);
+  opacity: 0;
+  transform: translateX(-0.25rem);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.metricLink:hover .metricArrow,
+.metricLink:focus-visible .metricArrow {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .emptyCell {

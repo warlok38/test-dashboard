@@ -6,6 +6,7 @@ export type DashboardMetric = {
   value: number | null
   plan: number | null
   delta: number | null
+  detailRoute?: string
   valueFractionDigits?: number
   planFractionDigits?: number
   deltaFractionDigits?: number
@@ -15,6 +16,7 @@ export type DashboardMetric = {
 export type DashboardStage = {
   id: string
   title: string
+  detailRoute?: string
   plan: {
     completed: number
     total: number
@@ -26,6 +28,7 @@ export const industrialDashboardStages: DashboardStage[] = [
   {
     id: 'mining',
     title: 'Добыча',
+    detailRoute: '/production-stages/mining',
     plan: {
       completed: 2,
       total: 4
@@ -37,6 +40,7 @@ export const industrialDashboardStages: DashboardStage[] = [
         value: 312.8,
         plan: 298.5,
         delta: 4.8,
+        detailRoute: '/production-stages/mining/rock-mass',
         valueFractionDigits: 1,
         planFractionDigits: 1,
         status: 'success'
@@ -67,6 +71,7 @@ export const industrialDashboardStages: DashboardStage[] = [
         value: 276.3,
         plan: 268.9,
         delta: 2.7,
+        detailRoute: '/production-stages/mining/overburden',
         valueFractionDigits: 1,
         planFractionDigits: 1,
         status: 'success'

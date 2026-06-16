@@ -1,8 +1,11 @@
 'use client'
 
+import { ArrowRightOutlined } from '@ant-design/icons'
 import { Table } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import classNames from 'classnames'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 import {
   industrialDashboardStages,
@@ -99,19 +102,36 @@ function getMetricProgressPercent(metric: DashboardMetric, status: DashboardMetr
   return Math.max(0, Math.min((metric.value / metric.plan) * 100, 100))
 }
 
-function renderStageHeader(stage: DashboardStage) {
+function renderStageHeader(stage: DashboardStage, queryString: string) {
   const progress = getStagePlanProgress(stage)
   const planText = progress.total === 0 ? '0/0' : `${progress.completed}/${progress.total}`
-
-  return (
-    <div className={styles.stageHeader}>
+  const content = (
+    <>
       <span className={styles.stageTitle}>{stage.title}</span>
       <span className={classNames(styles.planBadge, getPlanClassName(progress))}>{planText}</span>
-    </div>
+    </>
+  )
+
+  if (!stage.detailRoute) {
+    return <div className={styles.stageHeader}>{content}</div>
+  }
+
+  return (
+    <Link
+      className={classNames(styles.stageHeader, styles.stageHeaderLink)}
+      href={getHrefWithQuery(stage.detailRoute, queryString)}
+      aria-label={`Открыть страницу стадии: ${stage.title}`}
+    >
+      {content}
+    </Link>
   )
 }
 
-function renderMetric(metric?: DashboardMetric) {
+function getHrefWithQuery(href: string, queryString: string) {
+  return queryString ? `${href}?${queryString}` : href
+}
+
+function renderMetric(metric: DashboardMetric | undefined, queryString: string) {
   if (!metric) {
     return <div className={styles.emptyCell} aria-hidden="true" />
   }
@@ -119,8 +139,14 @@ function renderMetric(metric?: DashboardMetric) {
   const status = getMetricStatus(metric)
   const progressPercent = getMetricProgressPercent(metric, status)
 
-  return (
+  const hasDetailRoute = Boolean(metric.detailRoute)
+  const content = (
     <div className={classNames(styles.metricCell, getMetricClassName(status))}>
+      {hasDetailRoute && (
+        <span className={styles.metricArrow} aria-hidden="true">
+          <ArrowRightOutlined />
+        </span>
+      )}
       <div className={styles.metricTitle}>{metric.title}</div>
       <div className={styles.metricValue}>
         {formatNullableNumber(metric.value, metric.valueFractionDigits)}
@@ -140,6 +166,20 @@ function renderMetric(metric?: DashboardMetric) {
       )}
     </div>
   )
+
+  if (!hasDetailRoute || !metric.detailRoute) {
+    return content
+  }
+
+  return (
+    <Link
+      className={styles.metricLink}
+      href={getHrefWithQuery(metric.detailRoute, queryString)}
+      aria-label={`Открыть детализацию: ${metric.title}`}
+    >
+      {content}
+    </Link>
+  )
 }
 
 function getRows(stages: DashboardStage[]): DashboardRow[] {
@@ -155,17 +195,19 @@ function getRows(stages: DashboardStage[]): DashboardRow[] {
   }))
 }
 
-const columns: ColumnsType<DashboardRow> = industrialDashboardStages.map((stage) => ({
-  key: stage.id,
-  dataIndex: ['metrics', stage.id],
-  title: renderStageHeader(stage),
-  render: renderMetric,
-  width: 240
-}))
-
 const rows = getRows(industrialDashboardStages)
 
 export function IndustrialDashboardTable() {
+  const searchParams = useSearchParams()
+  const queryString = searchParams.toString()
+  const columns: ColumnsType<DashboardRow> = industrialDashboardStages.map((stage) => ({
+    key: stage.id,
+    dataIndex: ['metrics', stage.id],
+    title: renderStageHeader(stage, queryString),
+    render: (metric: DashboardMetric | undefined) => renderMetric(metric, queryString),
+    width: 240
+  }))
+
   return (
     <section className={styles.dashboard} aria-label="Сводка производственных показателей">
       <Table<DashboardRow>

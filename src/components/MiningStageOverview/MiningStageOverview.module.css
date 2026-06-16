@@ -1,0 +1,130 @@
+.overview {
+  min-width: 74rem;
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-5);
+  background: var(--palette-bg-elevated);
+}
+
+.legend {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.factLegend,
+.planLegend {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.factLegend::before,
+.planLegend::before {
+  content: '';
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  background: var(--legend-color);
+}
+
+.factLegend {
+  --legend-color: #fab529;
+}
+
+.planLegend {
+  --legend-color: #5d605d;
+}
+
+.metricList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.metricRow {
+  display: grid;
+  grid-template-columns: 14rem minmax(0, 1fr);
+  gap: var(--space-5);
+  min-height: 12rem;
+  padding-bottom: var(--space-5);
+  border-bottom: var(--border-width-hairline) solid var(--palette-border-soft);
+}
+
+.metricRow:last-child {
+  border-bottom: 0;
+}
+
+.metricSummary {
+  min-width: 0;
+}
+
+.metricTitle {
+  color: var(--color-text-strong);
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.metricTitle span {
+  color: var(--color-text-default);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  text-transform: none;
+}
+
+.summaryChart {
+  height: 7.5rem;
+  margin-top: var(--space-3);
+}
+
+.summaryValues {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-6);
+  color: var(--color-text-default);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+
+.trendChart {
+  min-width: 0;
+  height: 12rem;
+}
+
+.chartPlaceholder {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-5);
+  background: var(--palette-accent-wash);
+}
+
+@media (--screen-medium) {
+  .overview {
+    min-width: 0;
+  }
+
+  .metricRow {
+    grid-template-columns: 12rem minmax(0, 1fr);
+  }
+}
+
+@media (--screen-small) {
+  .overview {
+    min-width: 0;
+  }
+
+  .legend {
+    justify-content: flex-start;
+  }
+
+  .metricRow {
+    grid-template-columns: 1fr;
+  }
+}
