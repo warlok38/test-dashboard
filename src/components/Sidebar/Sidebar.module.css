@@ -27,8 +27,12 @@
 }
 
 .drawer :global(.ant-drawer-body) {
-  padding: 0;
+  padding: 0 !important;
   overflow: hidden;
+}
+
+.drawer :global(.ant-drawer-section > .ant-drawer-body) {
+  padding: 0 !important;
 }
 
 .sidebarCollapsed {
@@ -121,58 +125,113 @@
   background: var(--color-bg-interactive-hover);
 }
 
-.nav {
-  display: flex;
-  flex-direction: column;
+.menu {
+  flex: 0 0 auto;
   padding: var(--space-4) var(--space-0);
+  color: var(--color-text-default);
+  background: transparent;
+  border-inline-end: 0 !important;
 }
 
-.navItem {
-  position: relative;
+.menu :global(.ant-menu) {
+  color: var(--color-text-default);
+  background: transparent;
+}
+
+.menu :global(.ant-menu-item),
+.menu :global(.ant-menu-submenu-title) {
   min-height: 2.5rem;
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-0) var(--space-5);
+  margin: 0;
+  border-radius: 0;
   color: var(--color-text-default);
   font-size: var(--font-size-sm);
   font-weight: 500;
-  line-height: 1.2;
+  line-height: 2.5rem;
+}
+
+.menu :global(.ant-menu-item a) {
+  color: inherit;
+}
+
+.menu :global(.ant-menu-item:hover),
+.menu :global(.ant-menu-submenu-title:hover) {
+  color: var(--color-text-strong) !important;
+  background: var(--palette-accent-wash) !important;
+}
+
+.menu :global(.ant-menu-submenu-open > .ant-menu-submenu-title) {
+  color: var(--color-text-strong);
+  font-weight: 700;
+}
+
+.menu :global(.ant-menu-item-selected) {
+  color: var(--palette-accent-on-solid) !important;
+  background: var(--palette-accent-primary) !important;
+  font-weight: 700;
+}
+
+.menu :global(.ant-menu-item-selected:hover) {
+  color: var(--palette-accent-on-solid) !important;
+  background: var(--palette-accent-primary-hover) !important;
+}
+
+.menu :global(.ant-menu-submenu-selected > .ant-menu-submenu-title) {
+  color: var(--palette-accent-primary-hover);
+  font-weight: 700;
+}
+
+.menu :global(.ant-menu-submenu-arrow),
+.menu :global(.ant-menu-item-icon),
+.menu :global(.ant-menu-submenu-title .anticon) {
+  color: currentColor;
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-0);
+}
+
+.railItem {
+  width: 100%;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-default);
   text-decoration: none;
-  white-space: nowrap;
+}
+
+.railItem :global(.anticon) {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-5);
+  font-size: var(--font-size-base);
   transition:
     color 160ms ease,
     background 160ms ease;
 }
 
-.navItem:hover {
+.railItem:hover :global(.anticon),
+.railItem:focus-visible :global(.anticon) {
   color: var(--color-text-strong);
   background: var(--palette-accent-wash);
 }
 
-.navItemActive {
+.railItem:focus-visible {
+  outline: none;
+}
+
+.railItemActive :global(.anticon),
+.railItemActive:hover :global(.anticon),
+.railItemActive:focus-visible :global(.anticon) {
   color: var(--palette-accent-on-solid);
   background: var(--palette-accent-primary);
-  font-weight: 700;
-}
-
-.navItemActive:hover {
-  color: var(--palette-accent-on-solid);
-  background: var(--palette-accent-primary-hover);
-}
-
-.navItem :global(.anticon) {
-  flex: 0 0 1.25rem;
-  width: 1.25rem;
-  display: inline-flex;
-  justify-content: center;
-  font-size: var(--font-size-base);
-}
-
-.navLabel {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .spacer {
@@ -230,15 +289,8 @@
 }
 
 .sidebarCollapsed .brand,
-.sidebarCollapsed .navLabel,
 .sidebarCollapsed .collapseLabel {
   display: none;
-}
-
-.sidebarCollapsed .navItem {
-  justify-content: center;
-  gap: 0;
-  padding: var(--space-0);
 }
 
 .sidebarCollapsed .footer {
@@ -263,7 +315,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .sidebar,
-  .navItem {
+  .menu :global(.ant-menu-item),
+  .menu :global(.ant-menu-submenu-title),
+  .railItem :global(.anticon) {
     transition: none;
   }
 }
