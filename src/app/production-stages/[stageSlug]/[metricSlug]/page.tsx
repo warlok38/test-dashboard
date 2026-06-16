@@ -29,6 +29,28 @@ function getProductionStagesHref(searchParams?: ProductionMetricDetailPageProps[
   return query ? `/production-stages?${query}` : '/production-stages'
 }
 
+function getProductionStageHref(
+  stageSlug: string,
+  searchParams?: ProductionMetricDetailPageProps['searchParams']
+) {
+  const params = new URLSearchParams()
+  const dateFrom = searchParams?.dateFrom
+  const dateTo = searchParams?.dateTo
+
+  if (typeof dateFrom === 'string') {
+    params.set('dateFrom', dateFrom)
+  }
+
+  if (typeof dateTo === 'string') {
+    params.set('dateTo', dateTo)
+  }
+
+  const query = params.toString()
+  const href = `/production-stages/${stageSlug}`
+
+  return query ? `${href}?${query}` : href
+}
+
 export default function ProductionMetricDetailPage({
   params,
   searchParams
@@ -45,7 +67,10 @@ export default function ProductionMetricDetailPage({
         breadcrumbs={[
           { label: 'Главная', href: '/', icon: homeBreadcrumbIcon },
           { label: 'Сводка по стадиям', href: getProductionStagesHref(searchParams) },
-          { label: detail.stageTitle },
+          {
+            label: detail.stageTitle,
+            href: getProductionStageHref(params.stageSlug, searchParams)
+          },
           { label: detail.metricTitle }
         ]}
       />

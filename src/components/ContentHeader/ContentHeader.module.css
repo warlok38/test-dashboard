@@ -10,55 +10,11 @@
   border-bottom: var(--border-width-hairline) solid var(--color-border-interactive);
 }
 
-.breadcrumbs {
-  min-width: 0;
-}
-
 .actions {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: var(--space-3);
-}
-
-.content,
-.current {
-  min-width: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.link {
-  min-width: 0;
-  display: inline-flex;
-  align-items: center;
-  color: var(--color-text-muted);
-  transition: color 160ms ease;
-}
-
-.link:hover {
-  color: var(--color-text-default);
-}
-
-.current {
-  color: var(--color-text-strong);
-  font-weight: 600;
-}
-
-.icon {
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  color: currentColor;
-  font-size: var(--font-size-sm);
-}
-
-.label {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 @media (--screen-small) {
