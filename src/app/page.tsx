@@ -6,6 +6,7 @@ export default function Home() {
     <>
       <ContentHeader
         breadcrumbs={[{ label: 'Главная', icon: homeBreadcrumbIcon }]}
+        showBusinessUnitFilter={false}
         showDateFilter={false}
       />
       <section className={styles.home}>

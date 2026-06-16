@@ -3,6 +3,7 @@ import { Breadcrumb, type BreadcrumbProps } from 'antd'
 import Link from 'next/link'
 import { Suspense, type ReactNode } from 'react'
 
+import { BusinessUnitFilter } from '../BusinessUnitFilter'
 import { DateRangeFilter } from '../DateRangeFilter'
 import styles from './ContentHeader.module.css'
 
@@ -15,6 +16,7 @@ export type ContentHeaderBreadcrumb = {
 type ContentHeaderProps = {
   breadcrumbs: ContentHeaderBreadcrumb[]
   actions?: ReactNode
+  showBusinessUnitFilter?: boolean
   showDateFilter?: boolean
 }
 
@@ -27,8 +29,20 @@ function renderBreadcrumbContent(item: ContentHeaderBreadcrumb) {
   )
 }
 
-export function ContentHeader({ breadcrumbs, actions, showDateFilter = true }: ContentHeaderProps) {
-  const resolvedActions = actions ?? (showDateFilter ? <DateRangeFilter /> : null)
+export function ContentHeader({
+  breadcrumbs,
+  actions,
+  showBusinessUnitFilter = true,
+  showDateFilter = true
+}: ContentHeaderProps) {
+  const defaultActions =
+    showBusinessUnitFilter || showDateFilter ? (
+      <>
+        {showBusinessUnitFilter && <BusinessUnitFilter />}
+        {showDateFilter && <DateRangeFilter />}
+      </>
+    ) : null
+  const resolvedActions = actions ?? defaultActions
   const items: BreadcrumbProps['items'] = breadcrumbs.map((item, index) => {
     const isCurrent = index === breadcrumbs.length - 1
     const content = renderBreadcrumbContent(item)

@@ -20,3 +20,5 @@ export type {
   MiningStageMetricKind,
   MiningStagePoint
 } from './miningStageOverview'
+export { businessUnits, isBusinessUnitValue } from './businessUnits'
+export type { BusinessUnitOption, BusinessUnitValue } from './businessUnits'
