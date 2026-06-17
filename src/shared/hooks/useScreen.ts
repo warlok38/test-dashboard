@@ -29,7 +29,7 @@ const getCurrentState = (): ScreenState => {
 }
 
 export const useScreen = (): ScreenState => {
-  const [screen, setScreen] = useState<ScreenState>(getCurrentState)
+  const [screen, setScreen] = useState<ScreenState>(getDefaultState)
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -41,14 +41,7 @@ export const useScreen = (): ScreenState => {
     const mediumQuery = window.matchMedia(mediaQueries.medium)
     const largeQuery = window.matchMedia(mediaQueries.large)
 
-    const updateScreen = () => {
-      setScreen({
-        isSmallScreen: mobileQuery.matches,
-        isTabletScreen: tabletQuery.matches,
-        isMediumScreen: mediumQuery.matches,
-        isLargeScreen: largeQuery.matches
-      })
-    }
+    const updateScreen = () => setScreen(getCurrentState())
 
     updateScreen()
     mobileQuery.addEventListener('change', updateScreen)

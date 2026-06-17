@@ -230,6 +230,7 @@
 
 .mobileDashboard {
   flex: 0 0 auto;
+  display: none;
   min-width: 0;
   min-height: 100%;
   padding: var(--space-3) var(--space-3) var(--space-5);
@@ -564,5 +565,15 @@
     right: 0.625rem;
     bottom: 0.625rem;
     left: 0.625rem;
+  }
+}
+
+@media (--screen-small) {
+  .dashboard {
+    display: none;
+  }
+
+  .mobileDashboard {
+    display: block;
   }
 }

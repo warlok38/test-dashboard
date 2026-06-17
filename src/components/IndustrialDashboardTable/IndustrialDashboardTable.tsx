@@ -317,7 +317,7 @@ function renderMobileDashboard(queryString: string) {
 
 export function IndustrialDashboardTable() {
   const searchParams = useSearchParams()
-  const { isSmallScreen, isTabletScreen, isMediumScreen } = useScreen()
+  const { isTabletScreen, isMediumScreen } = useScreen()
   const queryString = searchParams.toString()
   const columnWidth = getColumnWidth(isTabletScreen, isMediumScreen)
   const columns: ColumnsType<DashboardRow> = industrialDashboardStages.map((stage) => ({
@@ -328,21 +328,20 @@ export function IndustrialDashboardTable() {
     width: columnWidth
   }))
 
-  if (isSmallScreen) {
-    return renderMobileDashboard(queryString)
-  }
-
   return (
-    <section className={styles.dashboard} aria-label="Сводка производственных показателей">
-      <Table<DashboardRow>
-        className={styles.table}
-        columns={columns}
-        dataSource={rows}
-        pagination={false}
-        bordered
-        tableLayout="fixed"
-        scroll={{ x: 'max-content' }}
-      />
-    </section>
+    <>
+      <section className={styles.dashboard} aria-label="Сводка производственных показателей">
+        <Table<DashboardRow>
+          className={styles.table}
+          columns={columns}
+          dataSource={rows}
+          pagination={false}
+          bordered
+          tableLayout="fixed"
+          scroll={{ x: 'max-content' }}
+        />
+      </section>
+      {renderMobileDashboard(queryString)}
+    </>
   )
 }

@@ -9,11 +9,11 @@
   overflow: hidden;
 }
 
-.breadcrumbs :global(.ant-breadcrumb li:not(:last-child)) {
+.breadcrumbs :global(ol > li:not(:last-child)) {
   flex: 0 0 auto;
 }
 
-.breadcrumbs :global(.ant-breadcrumb li:last-child) {
+.breadcrumbs :global(ol > li:last-child) {
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
@@ -22,12 +22,10 @@
 .breadcrumbs :global(.ant-breadcrumb-link),
 .breadcrumbs :global(.ant-breadcrumb-link > span) {
   min-width: 0;
-  overflow: hidden;
 }
 
 .content,
 .current {
-  max-width: 100%;
   min-width: 0;
   display: inline-flex;
   align-items: center;
@@ -36,7 +34,6 @@
 
 .link,
 .inactive {
-  max-width: 100%;
   min-width: 0;
   display: inline-flex;
   align-items: center;
@@ -58,7 +55,7 @@
 
 .mobileBreadcrumbs {
   min-width: 0;
-  display: inline-flex;
+  display: none;
   align-items: center;
   gap: var(--space-2);
   overflow: hidden;
@@ -117,9 +114,23 @@
 }
 
 .label {
-  max-width: 100%;
+  min-width: auto;
+  white-space: nowrap;
+}
+
+.current .label {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+@media (--screen-small) {
+  .breadcrumbs {
+    display: none;
+  }
+
+  .mobileBreadcrumbs {
+    display: inline-flex;
+  }
 }

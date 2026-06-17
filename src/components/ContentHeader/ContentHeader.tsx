@@ -5,7 +5,6 @@ import { Badge, Button, Drawer } from 'antd'
 import { useSearchParams } from 'next/navigation'
 import { Suspense, useState, type ReactNode } from 'react'
 
-import { useScreen } from '@/shared/hooks/useScreen'
 import { Breadcrumbs, type BreadcrumbItem } from '@/shared/ui'
 
 import { BusinessUnitFilter } from '../BusinessUnitFilter'
@@ -46,6 +45,7 @@ function MobileFilterActions({ children }: MobileFilterActionsProps) {
         placement="right"
         size="default"
         open={isOpen}
+        push={false}
         onClose={() => setIsOpen(false)}
       >
         <div className={styles.drawerActions}>{children}</div>
@@ -60,27 +60,33 @@ export function ContentHeader({
   showBusinessUnitFilter = true,
   showDateFilter = true
 }: ContentHeaderProps) {
-  const { isSmallScreen } = useScreen()
-  const defaultActions =
-    showBusinessUnitFilter || showDateFilter ? (
+  const hasDefaultActions = showBusinessUnitFilter || showDateFilter
+  const renderDefaultActions = () =>
+    hasDefaultActions ? (
       <>
         {showBusinessUnitFilter && <BusinessUnitFilter />}
         {showDateFilter && <DateRangeFilter />}
       </>
     ) : null
-  const resolvedActions = actions ?? defaultActions
-  const shouldUseMobileFilterDrawer =
-    isSmallScreen && !actions && (showBusinessUnitFilter || showDateFilter)
+  const resolvedActions = actions ?? renderDefaultActions()
+  const shouldRenderResponsiveDefaultActions = !actions && hasDefaultActions
 
   return (
     <header className={styles.header}>
       <Breadcrumbs items={breadcrumbs} />
-      {resolvedActions && shouldUseMobileFilterDrawer && (
-        <Suspense fallback={null}>
-          <MobileFilterActions>{resolvedActions}</MobileFilterActions>
-        </Suspense>
+      {shouldRenderResponsiveDefaultActions && (
+        <>
+          <div className={styles.mobileActions}>
+            <Suspense fallback={null}>
+              <MobileFilterActions>{renderDefaultActions()}</MobileFilterActions>
+            </Suspense>
+          </div>
+          <div className={styles.actions}>
+            <Suspense fallback={null}>{renderDefaultActions()}</Suspense>
+          </div>
+        </>
       )}
-      {resolvedActions && !shouldUseMobileFilterDrawer && (
+      {resolvedActions && !shouldRenderResponsiveDefaultActions && (
         <div className={styles.actions}>
           <Suspense fallback={null}>{resolvedActions}</Suspense>
         </div>

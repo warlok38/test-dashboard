@@ -17,6 +17,11 @@
   gap: var(--space-3);
 }
 
+.mobileActions {
+  flex: 0 0 auto;
+  display: none;
+}
+
 .filterBadge {
   flex: 0 0 auto;
 }
@@ -104,5 +109,13 @@
     flex: 1 1 auto;
     min-width: 0;
     max-width: calc(100% - 9.75rem);
+  }
+
+  .actions {
+    display: none;
+  }
+
+  .mobileActions {
+    display: block;
   }
 }

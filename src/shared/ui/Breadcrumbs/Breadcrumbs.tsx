@@ -87,14 +87,9 @@ function MobileBreadcrumbs({ items }: BreadcrumbsProps) {
 }
 
 export function Breadcrumbs({ items: breadcrumbs }: BreadcrumbsProps) {
-  const { isSmallScreen, isTabletScreen } = useScreen()
+  const { isTabletScreen } = useScreen()
 
-  if (isSmallScreen) {
-    return <MobileBreadcrumbs items={breadcrumbs} />
-  }
-
-  const isCompactScreen = isSmallScreen || isTabletScreen
-  const breadcrumbLimit = isCompactScreen
+  const breadcrumbLimit = isTabletScreen
     ? COMPACT_SCREEN_BREADCRUMB_LIMIT
     : LARGE_SCREEN_BREADCRUMB_LIMIT
   const shouldCollapse = breadcrumbs.length > breadcrumbLimit
@@ -137,5 +132,10 @@ export function Breadcrumbs({ items: breadcrumbs }: BreadcrumbsProps) {
     })
   }
 
-  return <AntBreadcrumb className={styles.breadcrumbs} items={items} />
+  return (
+    <>
+      <AntBreadcrumb className={styles.breadcrumbs} items={items} />
+      <MobileBreadcrumbs items={breadcrumbs} />
+    </>
+  )
 }
