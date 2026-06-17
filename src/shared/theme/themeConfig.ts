@@ -1,9 +1,20 @@
 import type { ThemeConfig } from 'antd'
 
-/** Светлая тема — только то, что раньше задавали через `providers` без полного набора seed-токенов. */
+import { componentOverrides, darkComponentOverrides } from './overrides'
+
+type ThemeToken = NonNullable<ThemeConfig['token']>
+
+const sharedToken: ThemeToken = {
+  fontFamily: 'var(--font-montserrat), Arial, Helvetica, sans-serif',
+  borderRadiusXS: 5,
+  borderRadiusSM: 5,
+  borderRadius: 5,
+  borderRadiusLG: 5
+}
+
 export const themeConfig: ThemeConfig = {
   token: {
-    fontFamily: 'var(--font-montserrat), Arial, Helvetica, sans-serif',
+    ...sharedToken,
     colorPrimary: '#fab529',
     colorLink: '#fab529',
     colorInfo: '#fab529',
@@ -12,28 +23,20 @@ export const themeConfig: ThemeConfig = {
     colorTextSecondary: '#575757',
     colorBorder: '#29292938',
     colorSplit: '#2929291f',
-    borderRadiusXS: 5,
-    borderRadiusSM: 5,
-    borderRadius: 5,
-    borderRadiusLG: 5,
     colorBgLayout: '#f2f1ee',
     colorBgContainer: '#ffffff',
     colorBgElevated: '#ffffff',
     controlItemBgActive: '#fab52929'
-  }
+  },
+  components: componentOverrides
 }
 
-/** Тёмная тема — согласована с блоком `html[data-theme='dark']` в palette.css */
 export const darkThemeConfig: ThemeConfig = {
   token: {
-    fontFamily: 'var(--font-montserrat), Arial, Helvetica, sans-serif',
+    ...sharedToken,
     colorPrimary: '#f0b24a',
     colorLink: '#f0b24a',
     colorInfo: '#f0b24a',
-    borderRadiusXS: 5,
-    borderRadiusSM: 5,
-    borderRadius: 5,
-    borderRadiusLG: 5,
     colorBgLayout: '#1b1b1b',
     colorBgContainer: '#171717',
     colorBgElevated: '#222222',
@@ -45,5 +48,6 @@ export const darkThemeConfig: ThemeConfig = {
     colorBgSpotlight: 'rgba(0, 0, 0, 0.45)',
     controlItemBgActive: '#f0b24a2e',
     colorSuccess: '#49aa19'
-  }
+  },
+  components: darkComponentOverrides
 }

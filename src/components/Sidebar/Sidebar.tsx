@@ -162,6 +162,7 @@ function SidebarContent({ collapsed = false, variant = 'desktop' }: SidebarConte
           openKeys={openKeys}
           selectedKeys={selectedKey ? [selectedKey] : []}
           onOpenChange={setOpenKeys}
+          inlineIndent={12}
         />
       )}
 
