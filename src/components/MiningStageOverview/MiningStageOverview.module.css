@@ -105,7 +105,7 @@
   background: var(--palette-accent-wash);
 }
 
-@media (--screen-medium) {
+@media (--screen-tablet), (--screen-medium) {
   .overview {
     min-width: 0;
   }

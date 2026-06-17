@@ -17,6 +17,7 @@ type SidebarContextValue = {
   isCollapsed: boolean
   isMobileOpen: boolean
   isSmallScreen: boolean
+  isTabletScreen: boolean
   isMediumScreen: boolean
   isLargeScreen: boolean
   openMobileSidebar: () => void
@@ -31,10 +32,10 @@ type SidebarProviderProps = {
 }
 
 export function SidebarProvider({ children }: SidebarProviderProps) {
-  const { isSmallScreen, isMediumScreen, isLargeScreen } = useScreen()
+  const { isSmallScreen, isTabletScreen, isMediumScreen, isLargeScreen } = useScreen()
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
-  const wasMediumScreen = useRef(false)
+  const wasTabletScreen = useRef(false)
 
   useEffect(() => {
     if (!isSmallScreen) {
@@ -43,12 +44,12 @@ export function SidebarProvider({ children }: SidebarProviderProps) {
   }, [isSmallScreen])
 
   useEffect(() => {
-    if (isMediumScreen && !wasMediumScreen.current) {
+    if (isTabletScreen && !wasTabletScreen.current) {
       setIsCollapsed(true)
     }
 
-    wasMediumScreen.current = isMediumScreen
-  }, [isMediumScreen])
+    wasTabletScreen.current = isTabletScreen
+  }, [isTabletScreen])
 
   const openMobileSidebar = useCallback(() => {
     setIsMobileOpen(true)
@@ -67,6 +68,7 @@ export function SidebarProvider({ children }: SidebarProviderProps) {
       isCollapsed,
       isMobileOpen,
       isSmallScreen,
+      isTabletScreen,
       isMediumScreen,
       isLargeScreen,
       openMobileSidebar,
@@ -80,6 +82,7 @@ export function SidebarProvider({ children }: SidebarProviderProps) {
       isMediumScreen,
       isMobileOpen,
       isSmallScreen,
+      isTabletScreen,
       openMobileSidebar,
       toggleCollapsed
     ]

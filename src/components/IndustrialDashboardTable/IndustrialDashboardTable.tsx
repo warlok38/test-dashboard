@@ -1,7 +1,8 @@
 'use client'
 
 import { ArrowRightOutlined } from '@ant-design/icons'
-import { Table } from 'antd'
+import { Collapse, Table } from 'antd'
+import type { CollapseProps } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import classNames from 'classnames'
 import Link from 'next/link'
@@ -12,6 +13,7 @@ import {
   type DashboardMetric,
   type DashboardStage
 } from '@/shared/mocks'
+import { useScreen } from '@/shared/hooks/useScreen'
 import { formatNumber, formatPercent } from '@/shared/utils/formatNumber'
 import styles from './IndustrialDashboardTable.module.css'
 
@@ -197,16 +199,138 @@ function getRows(stages: DashboardStage[]): DashboardRow[] {
 
 const rows = getRows(industrialDashboardStages)
 
+const DESKTOP_COLUMN_WIDTH = 240
+const MEDIUM_COLUMN_WIDTH = 208
+const TABLET_COLUMN_WIDTH = 184
+
+function getColumnWidth(isTabletScreen: boolean, isMediumScreen: boolean) {
+  if (isTabletScreen) {
+    return TABLET_COLUMN_WIDTH
+  }
+
+  if (isMediumScreen) {
+    return MEDIUM_COLUMN_WIDTH
+  }
+
+  return DESKTOP_COLUMN_WIDTH
+}
+
+const defaultMobileActiveKeys = industrialDashboardStages.map((stage) => stage.id)
+
+function renderMobileStageLabel(stage: DashboardStage) {
+  const progress = getStagePlanProgress(stage)
+  const planText = progress.total === 0 ? '0/0' : `${progress.completed}/${progress.total}`
+
+  return (
+    <div className={styles.mobileStageHeader}>
+      <span className={styles.mobileStageTitle}>{stage.title}</span>
+      <span className={classNames(styles.planBadge, getPlanClassName(progress))}>{planText}</span>
+    </div>
+  )
+}
+
+function renderMobileStageExtra(stage: DashboardStage, queryString: string) {
+  if (!stage.detailRoute) {
+    return null
+  }
+
+  return (
+    <Link
+      className={styles.mobileStageLink}
+      href={getHrefWithQuery(stage.detailRoute, queryString)}
+      onClick={(event) => event.stopPropagation()}
+      aria-label={`Открыть страницу стадии: ${stage.title}`}
+    >
+      <ArrowRightOutlined />
+    </Link>
+  )
+}
+
+function renderMobileMetric(metric: DashboardMetric, queryString: string) {
+  const status = getMetricStatus(metric)
+  const progressPercent = getMetricProgressPercent(metric, status)
+  const content = (
+    <div className={classNames(styles.mobileMetric, getMetricClassName(status))}>
+      <div className={styles.mobileMetricMain}>
+        <div className={styles.mobileMetricTitle}>{metric.title}</div>
+        <div className={styles.mobileMetricValue}>
+          {formatNullableNumber(metric.value, metric.valueFractionDigits)}
+        </div>
+      </div>
+      <div className={styles.mobileMetricMeta}>
+        <span>План: {formatNullableNumber(metric.plan, metric.planFractionDigits)}</span>
+        {metric.delta !== null && metric.delta !== 0 && (
+          <span className={styles.deltaBadge}>
+            {formatPercent(metric.delta, metric.deltaFractionDigits)}
+          </span>
+        )}
+      </div>
+      {progressPercent !== null && (
+        <div className={styles.mobileMetricProgress} aria-hidden="true">
+          <span style={{ width: `${progressPercent}%` }} />
+        </div>
+      )}
+    </div>
+  )
+
+  if (!metric.detailRoute) {
+    return content
+  }
+
+  return (
+    <Link
+      key={metric.id}
+      className={styles.mobileMetricLink}
+      href={getHrefWithQuery(metric.detailRoute, queryString)}
+      aria-label={`Открыть детализацию: ${metric.title}`}
+    >
+      {content}
+    </Link>
+  )
+}
+
+function renderMobileDashboard(queryString: string) {
+  const items: CollapseProps['items'] = industrialDashboardStages.map((stage) => ({
+    key: stage.id,
+    label: renderMobileStageLabel(stage),
+    extra: renderMobileStageExtra(stage, queryString),
+    children: (
+      <div className={styles.mobileMetricList}>
+        {stage.metrics.map((metric) => (
+          <div key={metric.id}>{renderMobileMetric(metric, queryString)}</div>
+        ))}
+      </div>
+    )
+  }))
+
+  return (
+    <section className={styles.mobileDashboard} aria-label="Сводка производственных показателей">
+      <Collapse
+        className={styles.mobileStageList}
+        items={items}
+        defaultActiveKey={defaultMobileActiveKeys}
+        bordered={false}
+      />
+    </section>
+  )
+}
+
 export function IndustrialDashboardTable() {
   const searchParams = useSearchParams()
+  const { isSmallScreen, isTabletScreen, isMediumScreen } = useScreen()
   const queryString = searchParams.toString()
+  const columnWidth = getColumnWidth(isTabletScreen, isMediumScreen)
   const columns: ColumnsType<DashboardRow> = industrialDashboardStages.map((stage) => ({
     key: stage.id,
     dataIndex: ['metrics', stage.id],
     title: renderStageHeader(stage, queryString),
     render: (metric: DashboardMetric | undefined) => renderMetric(metric, queryString),
-    width: 240
+    width: columnWidth
   }))
+
+  if (isSmallScreen) {
+    return renderMobileDashboard(queryString)
+  }
 
   return (
     <section className={styles.dashboard} aria-label="Сводка производственных показателей">

@@ -17,24 +17,92 @@
   gap: var(--space-3);
 }
 
-@media (--screen-small) {
+.filterBadge {
+  flex: 0 0 auto;
+}
+
+.filterBadge :global(.ant-btn) {
+  max-width: 9.25rem;
+}
+
+.drawerActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.drawerActions :global(.ant-select),
+.drawerActions :global(.ant-picker-range) {
+  width: 100%;
+}
+
+@media (--screen-medium) {
   .header {
+    gap: var(--space-3);
+    padding: var(--space-0) var(--space-4);
+  }
+
+  .header > :global(.ant-breadcrumb) {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .actions {
+    gap: var(--space-2);
+  }
+
+  .actions :global(.ant-select) {
+    min-width: 13rem !important;
+  }
+
+  .actions :global(.ant-picker-range) {
+    width: 17.5rem;
+  }
+}
+
+@media (--screen-tablet) {
+  .header {
+    min-height: auto;
+    flex: 0 0 auto;
     flex-wrap: wrap;
     align-content: center;
-    padding: var(--space-0) var(--space-4);
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .header > :global(.ant-breadcrumb) {
+    width: 100%;
+    min-width: 0;
   }
 
   .actions {
     width: 100%;
-    flex-wrap: wrap;
+    gap: var(--space-2);
   }
 
   .actions :global(.ant-select) {
     flex: 1 1 12rem;
+    min-width: 12rem !important;
   }
 
   .actions :global(.ant-picker-range) {
     flex: 1 1 16rem;
     width: auto;
+  }
+}
+
+@media (--screen-small) {
+  .header {
+    min-height: var(--layout-header-height);
+    flex-wrap: nowrap;
+    align-content: normal;
+    gap: var(--space-3);
+    padding: var(--space-0) var(--space-4);
+  }
+
+  .header > :global(.ant-breadcrumb) {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: calc(100% - 9.75rem);
   }
 }

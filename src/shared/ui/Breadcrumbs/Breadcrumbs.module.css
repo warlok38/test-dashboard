@@ -1,9 +1,33 @@
 .breadcrumbs {
   min-width: 0;
+  overflow: hidden;
+}
+
+.breadcrumbs :global(ol) {
+  flex-wrap: nowrap;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.breadcrumbs :global(.ant-breadcrumb li:not(:last-child)) {
+  flex: 0 0 auto;
+}
+
+.breadcrumbs :global(.ant-breadcrumb li:last-child) {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.breadcrumbs :global(.ant-breadcrumb-link),
+.breadcrumbs :global(.ant-breadcrumb-link > span) {
+  min-width: 0;
+  overflow: hidden;
 }
 
 .content,
 .current {
+  max-width: 100%;
   min-width: 0;
   display: inline-flex;
   align-items: center;
@@ -12,6 +36,7 @@
 
 .link,
 .inactive {
+  max-width: 100%;
   min-width: 0;
   display: inline-flex;
   align-items: center;
@@ -31,6 +56,53 @@
   color: var(--color-text-muted);
 }
 
+.mobileBreadcrumbs {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  overflow: hidden;
+}
+
+.mobileHistoryButton {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 1.5rem;
+  padding: var(--space-0) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-5);
+  color: var(--color-text-muted);
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  line-height: 1;
+  transition:
+    color 160ms ease,
+    background 160ms ease;
+}
+
+.mobileHistoryButton:hover,
+.mobileHistoryButton:focus-visible {
+  color: var(--color-text-default);
+  background: var(--palette-accent-wash);
+  outline: none;
+}
+
+.mobileHistoryButton :global(.anticon) {
+  font-size: 0.625rem;
+}
+
+.mobileSeparator {
+  flex: 0 0 auto;
+  color: var(--color-text-muted);
+}
+
+.mobileHistoryDropdown {
+  margin-left: var(--space-2);
+}
+
 .current {
   color: var(--color-text-strong);
   font-weight: 600;
@@ -45,6 +117,7 @@
 }
 
 .label {
+  max-width: 100%;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;

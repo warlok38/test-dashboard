@@ -1,6 +1,7 @@
 'use client'
 
-import { Breadcrumb as AntBreadcrumb, type BreadcrumbProps } from 'antd'
+import { DownOutlined } from '@ant-design/icons'
+import { Breadcrumb as AntBreadcrumb, Dropdown, type BreadcrumbProps, type MenuProps } from 'antd'
 import Link from 'next/link'
 import { type ReactNode } from 'react'
 
@@ -18,8 +19,12 @@ type BreadcrumbsProps = {
   items: BreadcrumbItem[]
 }
 
+type AntBreadcrumbItem = NonNullable<BreadcrumbProps['items']>[number]
+type AntBreadcrumbMenuItems = NonNullable<NonNullable<AntBreadcrumbItem['menu']>['items']>
+
 const LARGE_SCREEN_BREADCRUMB_LIMIT = 5
 const COMPACT_SCREEN_BREADCRUMB_LIMIT = 3
+const MOBILE_HISTORY_LABEL = '...'
 
 function renderBreadcrumbContent(item: BreadcrumbItem) {
   return (
@@ -30,9 +35,65 @@ function renderBreadcrumbContent(item: BreadcrumbItem) {
   )
 }
 
+function getMenuItems(items: BreadcrumbItem[]): MenuProps['items'] {
+  return items.map((item, index) => ({
+    key: `${item.label}-${index}`,
+    label: item.href ? <Link href={item.href}>{item.label}</Link> : item.label
+  }))
+}
+
+function getBreadcrumbMenuItems(items: BreadcrumbItem[]): AntBreadcrumbMenuItems {
+  return items.map((item, index) => ({
+    key: `${item.label}-${index}`,
+    label: item.href ? <Link href={item.href}>{item.label}</Link> : item.label
+  }))
+}
+
+function MobileBreadcrumbs({ items }: BreadcrumbsProps) {
+  const currentBreadcrumb = items[items.length - 1]
+  const historyBreadcrumbs = items.slice(0, -1)
+
+  return (
+    <nav className={styles.mobileBreadcrumbs} aria-label="breadcrumb">
+      {historyBreadcrumbs.length > 0 && (
+        <>
+          <Dropdown
+            menu={{ items: getMenuItems(historyBreadcrumbs) }}
+            placement="bottomLeft"
+            trigger={['click']}
+            overlayClassName={styles.mobileHistoryDropdown}
+          >
+            <button
+              className={styles.mobileHistoryButton}
+              type="button"
+              aria-label="Открыть предыдущие разделы"
+            >
+              <span>{MOBILE_HISTORY_LABEL}</span>
+              <DownOutlined />
+            </button>
+          </Dropdown>
+          <span className={styles.mobileSeparator} aria-hidden="true">
+            /
+          </span>
+        </>
+      )}
+      {currentBreadcrumb && (
+        <span className={styles.current} aria-current="page">
+          {renderBreadcrumbContent(currentBreadcrumb)}
+        </span>
+      )}
+    </nav>
+  )
+}
+
 export function Breadcrumbs({ items: breadcrumbs }: BreadcrumbsProps) {
-  const { isSmallScreen, isMediumScreen } = useScreen()
-  const isCompactScreen = isSmallScreen || isMediumScreen
+  const { isSmallScreen, isTabletScreen } = useScreen()
+
+  if (isSmallScreen) {
+    return <MobileBreadcrumbs items={breadcrumbs} />
+  }
+
+  const isCompactScreen = isSmallScreen || isTabletScreen
   const breadcrumbLimit = isCompactScreen
     ? COMPACT_SCREEN_BREADCRUMB_LIMIT
     : LARGE_SCREEN_BREADCRUMB_LIMIT
@@ -71,10 +132,7 @@ export function Breadcrumbs({ items: breadcrumbs }: BreadcrumbsProps) {
       key: 'collapsed-breadcrumbs',
       title: <span className={styles.collapsed}>...</span>,
       menu: {
-        items: hiddenBreadcrumbs.map((item, index) => ({
-          key: `${item.label}-${index}`,
-          label: item.href ? <Link href={item.href}>{item.label}</Link> : item.label
-        }))
+        items: getBreadcrumbMenuItems(hiddenBreadcrumbs)
       }
     })
   }
