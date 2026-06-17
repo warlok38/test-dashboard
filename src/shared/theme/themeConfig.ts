@@ -34,20 +34,22 @@ export const themeConfig: ThemeConfig = {
 export const darkThemeConfig: ThemeConfig = {
   token: {
     ...sharedToken,
-    colorPrimary: '#f0b24a',
-    colorLink: '#f0b24a',
-    colorInfo: '#f0b24a',
-    colorBgLayout: '#1b1b1b',
-    colorBgContainer: '#171717',
-    colorBgElevated: '#222222',
-    colorText: '#e9e3d8',
-    colorTextHeading: '#fcf8ef',
-    colorTextSecondary: '#b7ada0',
-    colorBorder: '#e9e3d833',
-    colorSplit: '#e9e3d81f',
+    colorPrimary: '#fbbf24',
+    colorLink: '#fbbf24',
+    colorInfo: '#fbbf24',
+    colorBgLayout: '#171716',
+    colorBgContainer: '#1f1f1d',
+    colorBgElevated: '#1f1f1d',
+    colorText: '#e8dfd0',
+    colorTextHeading: '#f7f2e8',
+    colorTextSecondary: '#aaa196',
+    colorBorder: '#f7f2e824',
+    colorSplit: '#f7f2e814',
     colorBgSpotlight: 'rgba(0, 0, 0, 0.45)',
-    controlItemBgActive: '#f0b24a2e',
-    colorSuccess: '#49aa19'
+    controlItemBgActive: '#fbbf2426',
+    colorSuccess: '#65c97a',
+    colorError: '#ff6b57',
+    colorWarning: '#fbbf24'
   },
   components: darkComponentOverrides
 }

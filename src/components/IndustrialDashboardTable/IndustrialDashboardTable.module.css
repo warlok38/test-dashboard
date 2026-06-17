@@ -7,7 +7,7 @@
 }
 
 .table :global(.ant-table) {
-  --dashboard-grid-border: #eceff1;
+  --dashboard-grid-border: var(--palette-dashboard-grid-border);
 
   color: var(--color-text-default);
   background: var(--palette-bg-elevated);
@@ -91,23 +91,23 @@
 }
 
 .planDanger {
-  color: #e84b3c;
-  background: #fde8e5;
+  color: var(--palette-status-danger);
+  background: var(--palette-status-danger-bg);
 }
 
 .planWarning {
-  color: #e59a00;
-  background: #fff3cf;
+  color: var(--palette-status-warning);
+  background: var(--palette-status-warning-bg);
 }
 
 .planSuccess {
-  color: #188a3b;
-  background: #e3f5e8;
+  color: var(--palette-status-success);
+  background: var(--palette-status-success-bg);
 }
 
 .planNeutral {
   color: var(--color-text-muted);
-  background: #f2f4f5;
+  background: var(--palette-status-neutral-bg);
 }
 
 .metricCell {
@@ -204,7 +204,7 @@
   bottom: 1rem;
   left: 1rem;
   height: 0.125rem;
-  background: #dfe5e8;
+  background: var(--palette-dashboard-progress-track);
 }
 
 .metricProgress span {
@@ -214,16 +214,16 @@
 }
 
 .metricSuccess {
-  --metric-color: #188a3b;
-  --metric-bg: #e3f5e8;
+  --metric-color: var(--palette-status-success);
+  --metric-bg: var(--palette-status-success-bg);
 }
 
 .metricDanger {
-  --metric-color: #e84b3c;
-  --metric-bg: #fde8e5;
+  --metric-color: var(--palette-status-danger);
+  --metric-bg: var(--palette-status-danger-bg);
 }
 
 .metricNeutral {
   --metric-color: var(--color-text-muted);
-  --metric-bg: #f2f4f5;
+  --metric-bg: var(--palette-status-neutral-bg);
 }

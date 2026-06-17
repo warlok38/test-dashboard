@@ -1,0 +1,68 @@
+.settings {
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-8);
+  background: var(--palette-bg-elevated);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 44rem;
+}
+
+.title {
+  color: var(--color-text-strong);
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.settingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  min-height: 5rem;
+  padding: var(--space-5) var(--space-6);
+  border: var(--border-width-hairline) solid var(--color-border-interactive);
+  border-radius: var(--radius-8);
+  background: var(--color-bg-default);
+}
+
+.settingText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.settingTitle {
+  color: var(--color-text-strong);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+.settingDescription {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+  letter-spacing: 0;
+}
+
+@media (--screen-small) {
+  .settings {
+    padding: var(--space-4);
+  }
+
+  .settingRow {
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-4);
+  }
+}

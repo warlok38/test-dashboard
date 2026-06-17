@@ -32,6 +32,17 @@
   --palette-border-interactive: #29292938;
   --palette-border-soft: #d8d4ca;
   --palette-bg-elevated: #ffffff;
+
+  --palette-dashboard-grid-border: #eceff1;
+  --palette-dashboard-progress-track: #dfe5e8;
+
+  --palette-status-success: #188a3b;
+  --palette-status-success-bg: #e3f5e8;
+  --palette-status-danger: #e84b3c;
+  --palette-status-danger-bg: #fde8e5;
+  --palette-status-warning: #e59a00;
+  --palette-status-warning-bg: #fff3cf;
+  --palette-status-neutral-bg: #f2f4f5;
 }
 
 /*
@@ -40,27 +51,38 @@
  */
 html[data-theme='dark'] {
   --palette-neutral-000: #ffffff;
-  --palette-neutral-900: #e9e3d8;
-  --palette-neutral-800: #b7ada0;
-  --palette-neutral-950: #fcf8ef;
+  --palette-neutral-900: #e8dfd0;
+  --palette-neutral-800: #aaa196;
+  --palette-neutral-950: #f7f2e8;
 
-  --palette-accent-primary: #f0b24a;
-  --palette-accent-primary-hover: #ffca69;
-  --palette-accent-soft: #f0b24a2e;
-  --palette-accent-wash: #f0b24a17;
+  --palette-accent-primary: #fbbf24;
+  --palette-accent-primary-hover: #ffd166;
+  --palette-accent-soft: #fbbf2426;
+  --palette-accent-wash: #fbbf2414;
 
-  --palette-brand-500: #313131;
-  --palette-brand-600: #272727;
-  --palette-brand-700: #1f1f1f;
+  --palette-brand-500: #1f1f1d;
+  --palette-brand-600: #191918;
+  --palette-brand-700: #121211;
 
-  --palette-header-secondary-strip: #2b2b2b;
+  --palette-header-secondary-strip: #1f1f1d;
 
-  --palette-surface-100: #171717;
-  --palette-surface-page-start: #0d0d0d;
-  --palette-surface-page-end: #1b1b1b;
+  --palette-surface-100: #171716;
+  --palette-surface-page-start: #121211;
+  --palette-surface-page-end: #1f1f1d;
 
-  --palette-overlay-interactive-hover: #e9e3d80f;
-  --palette-border-interactive: #e9e3d833;
-  --palette-border-soft: #3a3a3a;
-  --palette-bg-elevated: #222222;
+  --palette-overlay-interactive-hover: #f7f2e80f;
+  --palette-border-interactive: #f7f2e824;
+  --palette-border-soft: #3a3832;
+  --palette-bg-elevated: #1f1f1d;
+
+  --palette-dashboard-grid-border: #34322c;
+  --palette-dashboard-progress-track: #3a3832;
+
+  --palette-status-success: #65c97a;
+  --palette-status-success-bg: #65c97a1f;
+  --palette-status-danger: #ff6b57;
+  --palette-status-danger-bg: #ff6b571f;
+  --palette-status-warning: #fbbf24;
+  --palette-status-warning-bg: #fbbf2424;
+  --palette-status-neutral-bg: #f7f2e814;
 }

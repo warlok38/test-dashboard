@@ -18,11 +18,14 @@ export const menuTheme: MenuTheme = {
 
 export const darkMenuTheme: MenuTheme = {
   ...menuTheme,
+  itemSelectedColor: 'var(--palette-accent-primary-hover)',
+  itemSelectedBg: 'var(--palette-accent-soft)',
+  subMenuItemSelectedColor: 'var(--palette-accent-primary-hover)',
   darkItemColor: 'var(--color-text-sidebar)',
   darkItemBg: 'transparent',
   darkSubMenuItemBg: 'transparent',
   darkItemHoverColor: 'var(--color-text-sidebar)',
   darkItemHoverBg: 'var(--color-bg-sidebar-hover)',
-  darkItemSelectedColor: 'var(--palette-accent-on-solid)',
-  darkItemSelectedBg: 'var(--palette-accent-primary)'
+  darkItemSelectedColor: 'var(--palette-accent-primary-hover)',
+  darkItemSelectedBg: 'var(--palette-accent-soft)'
 }
