@@ -1,0 +1,17 @@
+.desktopPicker {
+  display: contents;
+}
+
+.mobilePicker {
+  display: none;
+}
+
+@media (--screen-small) {
+  .desktopPicker {
+    display: none;
+  }
+
+  .mobilePicker {
+    display: contents;
+  }
+}
