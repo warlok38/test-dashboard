@@ -1,11 +1,11 @@
 import dayjs, { type Dayjs } from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 
+import { DATE_URL_FORMAT } from '@/shared/constants'
 import { type DateRangePickerValue } from '@/shared/ui'
 
 dayjs.extend(customParseFormat)
 
-export const DATE_FORMAT = 'DD-MM-YYYY'
 export const DATE_FROM_PARAM = 'dateFrom'
 export const DATE_TO_PARAM = 'dateTo'
 
@@ -28,11 +28,11 @@ export function parseUrlDate(value: string | null): Dayjs | null {
     return null
   }
 
-  const parsed = dayjs(value, DATE_FORMAT, true)
+  const parsed = dayjs(value, DATE_URL_FORMAT, true)
 
   return parsed.isValid() ? parsed : null
 }
 
 export function formatUrlDate(value: Dayjs) {
-  return value.format(DATE_FORMAT)
+  return value.format(DATE_URL_FORMAT)
 }

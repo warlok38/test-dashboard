@@ -15,6 +15,8 @@ import dayjs, { type Dayjs } from 'dayjs'
 import 'dayjs/locale/ru'
 import { useEffect, useState } from 'react'
 
+import { DATE_DISPLAY_FORMAT } from '@/shared/constants'
+
 import { type DateRangePickerProps, type DateRangePickerValue } from './DateRangePicker'
 import styles from './MobileDateRangePicker.module.css'
 
@@ -24,7 +26,7 @@ type DraftRange = [Dayjs | null, Dayjs | null]
 
 type Preset = NonNullable<DateRangePickerProps['presets']>[number]
 
-const DEFAULT_FORMAT = 'DD-MM-YYYY'
+const DEFAULT_FORMAT = DATE_DISPLAY_FORMAT
 const RANGE_SEPARATOR = '—'
 
 function resolveFormat(format: unknown): string {

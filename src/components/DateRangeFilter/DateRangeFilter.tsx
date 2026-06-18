@@ -1,8 +1,9 @@
 'use client'
 
 import { DateRangePicker, type DateRangePickerProps } from '@/shared/ui'
+import { DATE_DISPLAY_FORMAT } from '@/shared/constants'
 
-import { DATE_FORMAT, getMonthToDateRange, getTodayRange, getYearToDateRange } from './dateRange'
+import { getMonthToDateRange, getTodayRange, getYearToDateRange } from './dateRange'
 import { useDateRangeSearchParams } from './useDateRangeSearchParams'
 
 export function DateRangeFilter() {
@@ -17,7 +18,7 @@ export function DateRangeFilter() {
   return (
     <DateRangePicker
       allowClear
-      format={DATE_FORMAT}
+      format={DATE_DISPLAY_FORMAT}
       presets={presets}
       value={value}
       onChange={setDateRange}
