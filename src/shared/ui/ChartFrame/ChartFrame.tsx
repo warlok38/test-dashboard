@@ -42,7 +42,7 @@ export function ChartFrame({ className, children }: ChartFrameProps) {
   }, [])
 
   return (
-    <div ref={rootRef} className={className} aria-hidden="true">
+    <div ref={rootRef} className={className}>
       {size.width > 0 && size.height > 0 ? (
         cloneElement(children, {
           width: size.width,
