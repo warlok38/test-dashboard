@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import {
   Bar,
   BarChart,
@@ -8,13 +7,13 @@ import {
   ComposedChart,
   Line,
   LineChart,
-  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis
 } from 'recharts'
 
 import { type MiningStageMetric } from '@/shared/mocks'
+import { ChartFrame } from '@/shared/ui'
 import { formatNumber } from '@/shared/utils/formatNumber'
 
 import styles from './MiningStageOverview.module.css'
@@ -80,12 +79,6 @@ function renderTrendChart(metric: MiningStageMetric) {
 }
 
 export function MiningStageOverview({ metrics }: MiningStageOverviewProps) {
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
   return (
     <section className={styles.overview} aria-label="Обзор показателей добычи">
       <div className={styles.legend} aria-hidden="true">
@@ -100,34 +93,20 @@ export function MiningStageOverview({ metrics }: MiningStageOverviewProps) {
               <h2 className={styles.metricTitle}>
                 {metric.title} <span>{metric.unit}</span>
               </h2>
-              <div className={styles.summaryChart} aria-hidden="true">
-                {isMounted ? (
-                  <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-                    <BarChart data={[metric.summary]} barGap={6}>
-                      <YAxis hide domain={[0, 'dataMax + 20']} />
-                      <Bar dataKey="fact" fill={FACT_COLOR} radius={[3, 3, 0, 0]} />
-                      <Bar dataKey="plan" fill={PLAN_COLOR} radius={[3, 3, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className={styles.chartPlaceholder} />
-                )}
-              </div>
+              <ChartFrame className={styles.summaryChart}>
+                <BarChart data={[metric.summary]} barGap={6}>
+                  <YAxis hide domain={[0, 'dataMax + 20']} />
+                  <Bar dataKey="fact" fill={FACT_COLOR} radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="plan" fill={PLAN_COLOR} radius={[3, 3, 0, 0]} />
+                </BarChart>
+              </ChartFrame>
               <div className={styles.summaryValues}>
                 <span>{formatMetricNumber(metric.summary.fact)}</span>
                 <span>{formatMetricNumber(metric.summary.plan)}</span>
               </div>
             </div>
 
-            <div className={styles.trendChart}>
-              {isMounted ? (
-                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-                  {renderTrendChart(metric)}
-                </ResponsiveContainer>
-              ) : (
-                <div className={styles.chartPlaceholder} />
-              )}
-            </div>
+            <ChartFrame className={styles.trendChart}>{renderTrendChart(metric)}</ChartFrame>
           </article>
         ))}
       </div>

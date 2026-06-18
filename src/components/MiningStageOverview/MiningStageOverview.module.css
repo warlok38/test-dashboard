@@ -98,13 +98,6 @@
   height: 12rem;
 }
 
-.chartPlaceholder {
-  width: 100%;
-  height: 100%;
-  border-radius: var(--radius-5);
-  background: var(--palette-accent-wash);
-}
-
 @media (--screen-tablet), (--screen-medium) {
   .overview {
     min-width: 0;

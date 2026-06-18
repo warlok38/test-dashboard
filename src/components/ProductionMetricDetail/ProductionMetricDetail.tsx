@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import {
   Bar,
   BarChart,
@@ -9,13 +8,13 @@ import {
   ComposedChart,
   Legend,
   Line,
-  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis
 } from 'recharts'
 
 import { type ProductionMetricDetail as ProductionMetricDetailData } from '@/shared/mocks'
+import { ChartFrame } from '@/shared/ui'
 import { formatNumber, formatPercent } from '@/shared/utils/formatNumber'
 
 import styles from './ProductionMetricDetail.module.css'
@@ -40,12 +39,6 @@ function formatDetailNumber(value: number) {
 }
 
 export function ProductionMetricDetail({ detail }: ProductionMetricDetailProps) {
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
   return (
     <section className={styles.detail} aria-labelledby="metric-detail-title">
       <div className={styles.toolbar}>
@@ -65,19 +58,13 @@ export function ProductionMetricDetail({ detail }: ProductionMetricDetailProps) 
           return (
             <article className={styles.summaryCard} key={unit.slug}>
               <h2 className={styles.unitTitle}>{unit.title}</h2>
-              <div className={styles.summaryChart} aria-hidden="true">
-                {isMounted ? (
-                  <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-                    <BarChart data={[unit]} barGap={4}>
-                      <YAxis hide domain={[0, 'dataMax + 20']} />
-                      <Bar dataKey="fact" fill={FACT_COLOR} radius={[3, 3, 0, 0]} />
-                      <Bar dataKey="plan" fill={PLAN_COLOR} radius={[3, 3, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className={styles.chartPlaceholder} />
-                )}
-              </div>
+              <ChartFrame className={styles.summaryChart}>
+                <BarChart data={[unit]} barGap={4}>
+                  <YAxis hide domain={[0, 'dataMax + 20']} />
+                  <Bar dataKey="fact" fill={FACT_COLOR} radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="plan" fill={PLAN_COLOR} radius={[3, 3, 0, 0]} />
+                </BarChart>
+              </ChartFrame>
               <div className={styles.summaryValues}>
                 <span>{formatDetailNumber(unit.fact)}</span>
                 <span>{formatDetailNumber(unit.plan)}</span>
@@ -104,58 +91,49 @@ export function ProductionMetricDetail({ detail }: ProductionMetricDetailProps) 
           </div>
         </div>
 
-        <div className={styles.trendChart}>
-          {isMounted ? (
-            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-              <ComposedChart
-                data={detail.trend}
-                margin={{ top: 16, right: 12, left: 0, bottom: 0 }}
-              >
-                <CartesianGrid stroke="var(--palette-border-soft)" vertical={false} />
-                <XAxis
-                  dataKey="day"
-                  tickLine={false}
-                  axisLine={{ stroke: 'var(--palette-border-soft)' }}
-                  interval={0}
-                  height={36}
-                />
-                <YAxis
-                  tickLine={false}
-                  axisLine={false}
-                  width={44}
-                  tickFormatter={(value) => formatNumber(Number(value))}
-                />
-                <Tooltip
-                  formatter={(value, name) => [
-                    formatDetailNumber(Number(value)),
-                    name === 'fact' ? 'Факт' : 'План'
-                  ]}
-                  labelFormatter={(label, payload) => {
-                    const month = payload?.[0]?.payload?.month
+        <ChartFrame className={styles.trendChart}>
+          <ComposedChart data={detail.trend} margin={{ top: 16, right: 12, left: 0, bottom: 0 }}>
+            <CartesianGrid stroke="var(--palette-border-soft)" vertical={false} />
+            <XAxis
+              dataKey="day"
+              tickLine={false}
+              axisLine={{ stroke: 'var(--palette-border-soft)' }}
+              interval={0}
+              height={36}
+            />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              width={44}
+              tickFormatter={(value) => formatNumber(Number(value))}
+            />
+            <Tooltip
+              formatter={(value, name) => [
+                formatDetailNumber(Number(value)),
+                name === 'fact' ? 'Факт' : 'План'
+              ]}
+              labelFormatter={(label, payload) => {
+                const month = payload?.[0]?.payload?.month
 
-                    return month ? `${label} ${month}` : label
-                  }}
-                />
-                <Legend formatter={(value) => (value === 'fact' ? 'Факт' : 'План')} />
-                <Bar dataKey="fact" radius={[3, 3, 0, 0]}>
-                  {detail.trend.map((point) => (
-                    <Cell key={`${point.month}-${point.day}`} fill={FACT_COLOR} />
-                  ))}
-                </Bar>
-                <Line
-                  type="monotone"
-                  dataKey="plan"
-                  stroke={PLAN_COLOR}
-                  strokeWidth={2}
-                  dot={{ r: 3, fill: PLAN_COLOR }}
-                  activeDot={{ r: 5 }}
-                />
-              </ComposedChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className={styles.chartPlaceholder} />
-          )}
-        </div>
+                return month ? `${label} ${month}` : label
+              }}
+            />
+            <Legend formatter={(value) => (value === 'fact' ? 'Факт' : 'План')} />
+            <Bar dataKey="fact" radius={[3, 3, 0, 0]}>
+              {detail.trend.map((point) => (
+                <Cell key={`${point.month}-${point.day}`} fill={FACT_COLOR} />
+              ))}
+            </Bar>
+            <Line
+              type="monotone"
+              dataKey="plan"
+              stroke={PLAN_COLOR}
+              strokeWidth={2}
+              dot={{ r: 3, fill: PLAN_COLOR }}
+              activeDot={{ r: 5 }}
+            />
+          </ComposedChart>
+        </ChartFrame>
       </div>
     </section>
   )

@@ -61,7 +61,7 @@ function MobileBreadcrumbs({ items }: BreadcrumbsProps) {
             menu={{ items: getMenuItems(historyBreadcrumbs) }}
             placement="bottomLeft"
             trigger={['click']}
-            overlayClassName={styles.mobileHistoryDropdown}
+            classNames={{ root: styles.mobileHistoryDropdown }}
           >
             <button
               className={styles.mobileHistoryButton}
