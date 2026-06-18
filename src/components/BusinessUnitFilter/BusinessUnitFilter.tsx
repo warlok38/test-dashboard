@@ -14,6 +14,7 @@ export function BusinessUnitFilter() {
       allowClear
       mode="multiple"
       maxTagCount="responsive"
+      showSearch={{ optionFilterProp: 'label' }}
       options={businessUnits}
       placeholder="Все БЕ"
       value={value}
