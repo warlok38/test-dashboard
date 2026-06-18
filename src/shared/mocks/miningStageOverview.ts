@@ -12,6 +12,7 @@ export type MiningStageMetric = {
   title: string
   unit: string
   kind: MiningStageMetricKind
+  detailRoute?: string
   summary: {
     fact: number
     plan: number
@@ -91,6 +92,7 @@ export const miningStageMetrics: MiningStageMetric[] = [
     title: 'Горная масса',
     unit: 'тыс. м3',
     kind: 'bar-line',
+    detailRoute: '/production-stages/mining/rock-mass',
     summary: { fact: 259, plan: 242 },
     data: rockMassData
   },
@@ -177,6 +179,7 @@ export const miningStageMetrics: MiningStageMetric[] = [
     title: 'Вскрыша',
     unit: 'тыс. м3',
     kind: 'bar-line',
+    detailRoute: '/production-stages/mining/overburden',
     summary: { fact: 233, plan: 231 },
     data: overburdenData
   }

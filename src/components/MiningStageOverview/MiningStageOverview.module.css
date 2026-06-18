@@ -1,16 +1,24 @@
 .overview {
   min-width: 74rem;
-  flex: 1;
-  min-height: 0;
+  flex: 0 0 auto;
+  min-height: 100%;
   padding: var(--space-5);
   background: var(--palette-bg-elevated);
 }
 
+.overviewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: var(--space-4);
+}
+
 .legend {
   display: flex;
-  justify-content: flex-end;
+  flex: 0 0 auto;
+  align-items: center;
   gap: var(--space-4);
-  margin-bottom: var(--space-4);
+  min-height: 2rem;
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
   font-weight: 600;
@@ -40,84 +48,292 @@
   --legend-color: #5d605d;
 }
 
-.metricList {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-}
-
-.metricRow {
+.metricGrid {
   display: grid;
-  grid-template-columns: 14rem minmax(0, 1fr);
-  gap: var(--space-5);
-  min-height: 12rem;
-  padding-bottom: var(--space-5);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.metricCard {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: var(--border-width-hairline) solid var(--palette-border-soft);
+  border-left: var(--border-width-strong) solid var(--metric-color);
+  border-radius: var(--radius-5);
+  background: var(--color-bg-default);
+}
+
+.metricHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: 4.25rem;
+  padding: var(--space-4);
   border-bottom: var(--border-width-hairline) solid var(--palette-border-soft);
+  background: color-mix(in srgb, var(--metric-bg) 44%, transparent);
 }
 
-.metricRow:last-child {
-  border-bottom: 0;
-}
-
-.metricSummary {
+.metricTitleGroup {
   min-width: 0;
 }
 
 .metricTitle {
   color: var(--color-text-strong);
-  font-size: var(--font-size-2xl);
-  font-weight: 800;
-  line-height: 1.1;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  line-height: 1.2;
   letter-spacing: 0;
-  text-transform: uppercase;
 }
 
-.metricTitle span {
-  color: var(--color-text-default);
-  font-size: var(--font-size-base);
+.metricUnit {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
   font-weight: 500;
-  text-transform: none;
+  line-height: 1.2;
 }
 
-.summaryChart {
-  height: 7.5rem;
+.detailLink {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 2rem;
+  padding: 0.25rem 0.625rem;
+  border: var(--border-width-hairline) solid var(--color-border-interactive);
+  border-radius: var(--radius-5);
+  color: var(--palette-accent-primary-hover);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  line-height: 1;
+  background: var(--palette-bg-elevated);
+  outline: none;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease;
+}
+
+.detailLink:hover,
+.detailLink:focus-visible {
+  border-color: var(--palette-accent-primary-hover);
+  color: var(--palette-accent-primary-hover);
+  background: var(--palette-accent-wash);
+  box-shadow: 0 0 0 0.125rem var(--palette-accent-wash);
+}
+
+.metricBody {
+  display: grid;
+  grid-template-columns: minmax(13rem, 0.38fr) minmax(0, 1fr);
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+
+.summaryPanel {
+  min-width: 0;
+  padding-right: var(--space-4);
+  border-right: var(--border-width-hairline) solid var(--palette-border-soft);
+}
+
+.primaryStat span,
+.statRow span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.primaryStat strong {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--metric-color);
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.statRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
   margin-top: var(--space-3);
 }
 
-.summaryValues {
-  display: flex;
-  justify-content: center;
-  gap: var(--space-6);
-  color: var(--color-text-default);
+.statRow strong {
+  color: var(--color-text-strong);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.progressTrack {
+  overflow: hidden;
+  height: 0.1875rem;
+  margin-top: var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--palette-dashboard-progress-track);
+}
+
+.progressTrack span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--metric-color);
+}
+
+.summaryChart {
+  height: 5.5rem;
+  margin-top: var(--space-3);
+}
+
+.trendPanel {
+  min-width: 0;
+}
+
+.trendTitle {
+  color: var(--color-text-muted);
   font-size: var(--font-size-xs);
   font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
 }
 
 .trendChart {
   min-width: 0;
-  height: 12rem;
+  height: 13rem;
+  margin-top: var(--space-2);
 }
 
-@media (--screen-tablet), (--screen-medium) {
+.metricSuccess {
+  --metric-color: var(--palette-status-success);
+  --metric-bg: var(--palette-status-success-bg);
+}
+
+.metricDanger {
+  --metric-color: var(--palette-status-danger);
+  --metric-bg: var(--palette-status-danger-bg);
+}
+
+.metricNeutral {
+  --metric-color: var(--color-text-muted);
+  --metric-bg: var(--palette-status-neutral-bg);
+}
+
+@media (--screen-medium) {
   .overview {
     min-width: 0;
+    padding: var(--space-4);
   }
 
-  .metricRow {
-    grid-template-columns: 12rem minmax(0, 1fr);
+  .metricGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .metricBody {
+    grid-template-columns: minmax(12rem, 0.32fr) minmax(0, 1fr);
+  }
+}
+
+@media (--screen-tablet) {
+  .overview {
+    min-width: 0;
+    padding: var(--space-3);
+  }
+
+  .overviewHeader,
+  .metricHeader,
+  .metricBody {
+    gap: var(--space-3);
+  }
+
+  .metricGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .metricBody {
+    grid-template-columns: minmax(11rem, 0.34fr) minmax(0, 1fr);
+    padding: var(--space-3);
+  }
+
+  .summaryPanel {
+    padding-right: var(--space-3);
+  }
+
+  .trendChart {
+    height: 12rem;
   }
 }
 
 @media (--screen-small) {
   .overview {
     min-width: 0;
+    padding: var(--space-3) var(--space-3) var(--space-5);
+  }
+
+  .overviewHeader,
+  .metricHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .overviewHeader {
+    display: none;
   }
 
   .legend {
-    justify-content: flex-start;
+    min-height: 0;
   }
 
-  .metricRow {
+  .metricGrid {
     grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .metricHeader {
+    min-height: 0;
+    padding: var(--space-3);
+  }
+
+  .detailLink {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .metricBody {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryPanel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(7rem, 8.5rem);
+    align-items: end;
+    column-gap: var(--space-4);
+    padding-right: 0;
+    padding-bottom: var(--space-3);
+    border-right: 0;
+    border-bottom: var(--border-width-hairline) solid var(--palette-border-soft);
+  }
+
+  .primaryStat,
+  .statRow,
+  .progressTrack {
+    grid-column: 1;
+  }
+
+  .summaryChart {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    height: 5.5rem;
+    margin-top: 0;
+  }
+
+  .trendChart {
+    height: 13rem;
   }
 }

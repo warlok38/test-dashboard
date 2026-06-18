@@ -6,7 +6,14 @@ import styles from './ChartFrame.module.css'
 
 type ChartFrameProps = {
   className: string
-  children: ReactElement<{ height?: number; width?: number }>
+  children:
+    | ReactElement<{ height?: number; width?: number }>
+    | ((size: ChartFrameSize) => ReactElement<{ height?: number; width?: number }>)
+}
+
+type ChartFrameSize = {
+  width: number
+  height: number
 }
 
 const SKELETON_BARS = [36, 62, 48, 78, 54, 68, 42]
@@ -14,6 +21,7 @@ const SKELETON_BARS = [36, 62, 48, 78, 54, 68, 42]
 export function ChartFrame({ className, children }: ChartFrameProps) {
   const rootRef = useRef<HTMLDivElement | null>(null)
   const [size, setSize] = useState({ width: 0, height: 0 })
+  const hasMeasuredSize = size.width > 0 && size.height > 0
 
   useEffect(() => {
     const root = rootRef.current
@@ -41,14 +49,9 @@ export function ChartFrame({ className, children }: ChartFrameProps) {
     }
   }, [])
 
-  return (
-    <div ref={rootRef} className={className}>
-      {size.width > 0 && size.height > 0 ? (
-        cloneElement(children, {
-          width: size.width,
-          height: size.height
-        })
-      ) : (
+  const renderChart = () => {
+    if (!hasMeasuredSize) {
+      return (
         <div className={styles.skeleton}>
           <div className={styles.skeletonGrid} />
           <div className={styles.skeletonLine} />
@@ -58,7 +61,20 @@ export function ChartFrame({ className, children }: ChartFrameProps) {
             ))}
           </div>
         </div>
-      )}
+      )
+    }
+
+    const chart = typeof children === 'function' ? children(size) : children
+
+    return cloneElement(chart, {
+      width: size.width,
+      height: size.height
+    })
+  }
+
+  return (
+    <div ref={rootRef} className={className}>
+      {renderChart()}
     </div>
   )
 }
