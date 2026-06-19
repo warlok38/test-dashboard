@@ -4,7 +4,7 @@
   --color-text-strong: var(--palette-neutral-950);
   --color-text-inverse: var(--palette-neutral-000);
 
-  --color-bg-default: var(--palette-surface-100);
+  --color-bg-default: var(--palette-bg-elevated);
   --color-bg-page-start: var(--palette-surface-page-start);
   --color-bg-page-end: var(--palette-surface-page-end);
 
