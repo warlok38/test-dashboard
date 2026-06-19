@@ -1,0 +1,12 @@
+.surface {
+  flex: 1 0 auto;
+  width: fit-content;
+  min-width: 100%;
+  background: var(--palette-bg-elevated);
+}
+
+.surfaceConstrained {
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+}

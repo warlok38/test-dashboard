@@ -1,9 +1,6 @@
 .detail {
   min-width: 74rem;
-  flex: 1;
-  min-height: 0;
   padding: var(--space-5);
-  background: var(--palette-bg-elevated);
 }
 
 .title {

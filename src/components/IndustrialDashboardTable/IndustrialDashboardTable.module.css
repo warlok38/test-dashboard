@@ -1,9 +1,12 @@
 .dashboard {
-  min-width: 74rem;
-  flex: 1;
-  min-height: 0;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
   padding: var(--space-5);
-  background: var(--palette-bg-elevated);
+}
+
+.table {
+  width: 100%;
 }
 
 .table :global(.ant-table) {
@@ -229,12 +232,9 @@
 }
 
 .mobileDashboard {
-  flex: 0 0 auto;
   display: none;
   min-width: 0;
-  min-height: 100%;
   padding: var(--space-3) var(--space-3) var(--space-5);
-  background: var(--palette-bg-elevated);
 }
 
 .mobileStageList {
@@ -267,6 +267,16 @@
 .mobileStageList :global(.ant-collapse-header) {
   align-items: center !important;
   padding: var(--space-3) var(--space-4) !important;
+  background: var(--palette-status-neutral-bg);
+}
+
+.mobileStageList :global(.ant-collapse-header:hover),
+.mobileStageList :global(.ant-collapse-header:focus-visible) {
+  background: color-mix(
+    in srgb,
+    var(--palette-status-neutral-bg) 88%,
+    var(--palette-overlay-interactive-hover)
+  );
 }
 
 .mobileStageList :global(.ant-collapse-extra) {

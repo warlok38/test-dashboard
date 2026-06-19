@@ -1,8 +1,5 @@
 .settings {
-  flex: 1;
-  min-height: 0;
   padding: var(--space-8);
-  background: var(--palette-bg-elevated);
 }
 
 .content {

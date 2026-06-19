@@ -1,4 +1,4 @@
-import { ContentHeader, homeBreadcrumbIcon } from '@/components'
+import { ContentHeader, homeBreadcrumbIcon, PageSurface } from '@/components'
 import styles from './page.module.css'
 
 export default function Home() {
@@ -9,9 +9,11 @@ export default function Home() {
         showBusinessUnitFilter={false}
         showDateFilter={false}
       />
-      <section className={styles.home}>
-        <h1 className={styles.title}>Главная</h1>
-      </section>
+      <PageSurface>
+        <section className={styles.home}>
+          <h1 className={styles.title}>Главная</h1>
+        </section>
+      </PageSurface>
     </>
   )
 }

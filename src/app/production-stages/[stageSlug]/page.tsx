@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 
-import { ContentHeader, homeBreadcrumbIcon, MiningStageOverview } from '@/components'
+import { ContentHeader, homeBreadcrumbIcon, MiningStageOverview, PageSurface } from '@/components'
 import { getMiningStageMetrics } from '@/shared/mocks'
 
 type ProductionStagePageProps = {
@@ -42,7 +42,9 @@ export default function ProductionStagePage({ params, searchParams }: Production
           { label: 'Добыча' }
         ]}
       />
-      <MiningStageOverview metrics={getMiningStageMetrics()} />
+      <PageSurface>
+        <MiningStageOverview metrics={getMiningStageMetrics()} />
+      </PageSurface>
     </>
   )
 }

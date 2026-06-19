@@ -17,7 +17,9 @@ export function Layout({ children }: LayoutProps) {
             <Sidebar />
           </Suspense>
           <div className={styles.contentColumn}>
-            <main className={styles.mainContent}>{children}</main>
+            <main className={styles.mainContent} data-main-content-scroll>
+              {children}
+            </main>
           </div>
         </section>
       </div>

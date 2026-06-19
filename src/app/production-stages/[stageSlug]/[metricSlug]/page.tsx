@@ -1,6 +1,11 @@
 import { notFound } from 'next/navigation'
 
-import { ContentHeader, homeBreadcrumbIcon, ProductionMetricDetail } from '@/components'
+import {
+  ContentHeader,
+  homeBreadcrumbIcon,
+  PageSurface,
+  ProductionMetricDetail
+} from '@/components'
 import { getProductionMetricDetail } from '@/shared/mocks'
 
 type ProductionMetricDetailPageProps = {
@@ -74,7 +79,9 @@ export default function ProductionMetricDetailPage({
           { label: detail.metricTitle }
         ]}
       />
-      <ProductionMetricDetail detail={detail} />
+      <PageSurface>
+        <ProductionMetricDetail detail={detail} />
+      </PageSurface>
     </>
   )
 }

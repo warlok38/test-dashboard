@@ -1,9 +1,6 @@
 .overview {
   min-width: 74rem;
-  flex: 0 0 auto;
-  min-height: 100%;
   padding: var(--space-5);
-  background: var(--palette-bg-elevated);
 }
 
 .overviewHeader {
