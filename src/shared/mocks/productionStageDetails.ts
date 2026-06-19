@@ -5,7 +5,7 @@ export type BusinessUnitSlug = 'olimpiada' | 'blagodatnoe' | 'natalka' | 'kurana
 export type BusinessUnitSummary = {
   slug: BusinessUnitSlug
   title: string
-  fact: number
+  fact: number | null
   plan: number
 }
 

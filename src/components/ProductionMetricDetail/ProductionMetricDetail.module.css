@@ -6,104 +6,102 @@
   background: var(--palette-bg-elevated);
 }
 
-.toolbar {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-5);
-  margin-bottom: var(--space-6);
-}
-
-.eyebrow {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
 .title {
-  margin-top: var(--space-1);
+  margin: 0;
   color: var(--color-text-strong);
-  font-size: 2rem;
+  font-size: var(--font-size-xl);
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.2;
   letter-spacing: 0;
 }
 
-.summaryGrid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(12rem, 1fr));
-  gap: var(--space-4);
+.title span:first-child {
+  display: inline-block;
 }
 
-.summaryCard {
-  min-width: 0;
+.titleNote {
+  display: inline-block;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.totalPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
   padding: var(--space-4);
   border: var(--border-width-hairline) solid var(--palette-border-soft);
+  border-left: 0.25rem solid var(--palette-border-soft);
   border-radius: var(--radius-5);
   background: var(--color-bg-default);
 }
 
-.unitTitle {
-  overflow: hidden;
-  color: var(--color-text-strong);
-  font-size: var(--font-size-lg);
-  font-weight: 700;
-  line-height: 1.2;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.summaryChart {
-  height: 9rem;
-  margin-top: var(--space-3);
-}
-
-.summaryValues {
+.totalHeader {
+  min-width: 0;
   display: flex;
-  justify-content: center;
-  gap: var(--space-5);
-  color: var(--color-text-default);
-  font-size: var(--font-size-xs);
-  font-weight: 700;
-}
-
-.summaryMeta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  margin-top: var(--space-2);
-  color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
-}
-
-.deltaSuccess {
-  color: #188a3b;
-  font-weight: 700;
-}
-
-.deltaDanger {
-  color: #e84b3c;
-  font-weight: 700;
-}
-
-.trendPanel {
-  margin-top: var(--space-6);
-  padding-top: var(--space-5);
-  border-top: var(--border-width-hairline) solid var(--palette-border-soft);
-}
-
-.trendHeader {
-  display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-4);
 }
 
-.sectionTitle {
+.totalPanelSuccess {
+  border-left-color: #188a3b;
+}
+
+.totalPanelDanger {
+  border-left-color: #e84b3c;
+}
+
+.panelLabel {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.totalStats dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.totalValue {
   color: var(--color-text-strong);
-  font-size: var(--font-size-xl);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.totalStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin: 0;
+}
+
+.totalStatsRow {
+  display: contents;
+}
+
+.totalStat {
+  flex: 1 1 8rem;
+  min-width: 7rem;
+}
+
+.totalFactStat {
+  flex-grow: 1.5;
+  min-width: 12rem;
+}
+
+.totalStats dd {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-strong);
+  font-size: var(--font-size-lg);
   font-weight: 700;
   line-height: 1.2;
 }
@@ -112,8 +110,10 @@
   display: flex;
   align-items: center;
   gap: var(--space-4);
+  flex: 0 0 auto;
+  padding-top: 0.125rem;
   color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   font-weight: 600;
 }
 
@@ -141,9 +141,98 @@
   --legend-color: #5d605d;
 }
 
-.trendChart {
-  height: 26rem;
-  margin-top: var(--space-4);
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(12rem, 1fr));
+  gap: var(--space-4);
+}
+
+.summaryCard {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4);
+  border: var(--border-width-hairline) solid var(--palette-border-soft);
+  border-radius: var(--radius-5);
+  background: var(--color-bg-default);
+}
+
+.cardHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.unitTitle {
+  overflow: hidden;
+  color: var(--color-text-strong);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statusBadge {
+  flex: 0 0 auto;
+  padding: 0.1875rem var(--space-2);
+  border-radius: var(--radius-5);
+  color: var(--color-text-muted);
+  background: var(--palette-bg-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.statusBadgeSuccess {
+  color: #188a3b;
+  background: color-mix(in srgb, #188a3b 12%, transparent);
+}
+
+.statusBadgeDanger {
+  color: #e84b3c;
+  background: color-mix(in srgb, #e84b3c 12%, transparent);
+}
+
+.chartArea {
+  margin-top: auto;
+}
+
+.summaryChart {
+  width: min(100%, 24rem);
+  height: 9rem;
+  margin: var(--space-5) auto 0;
+}
+
+.totalStats dd.deltaSuccess,
+.deltaSuccess {
+  color: #188a3b;
+  font-weight: 700;
+}
+
+.totalStats dd.deltaDanger,
+.deltaDanger {
+  color: #e84b3c;
+  font-weight: 700;
+}
+
+.totalStats dd.valuePlan,
+.valuePlan {
+  color: #5d605d;
+}
+
+.totalStat dd.valueFact,
+.valueFact {
+  color: #fab529;
+}
+
+.totalStats dd.valueNeutral,
+.totalStat dd.valueNeutral,
+.valueNeutral {
+  color: var(--color-text-muted);
 }
 
 @media (--screen-tablet), (--screen-medium) {
@@ -162,13 +251,35 @@
     padding: var(--space-4) var(--space-3) var(--space-5);
   }
 
-  .toolbar,
-  .trendHeader {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
   .summaryGrid {
     grid-template-columns: 1fr;
+  }
+
+  .totalHeader {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .legend {
+    align-self: flex-start;
+    padding-top: 0;
+  }
+
+  .totalStats {
+    flex-direction: column;
+  }
+
+  .totalStatsRow {
+    display: flex;
+    gap: var(--space-4);
+  }
+
+  .totalStat {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .cardHeader {
+    gap: var(--space-2);
   }
 }
