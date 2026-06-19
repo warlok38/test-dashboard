@@ -32,7 +32,7 @@
   border: var(--border-width-hairline) solid var(--palette-border-soft);
   border-left: 0.25rem solid var(--palette-border-soft);
   border-radius: var(--radius-5);
-  background: var(--color-bg-default);
+  background: var(--color-bg-card);
 }
 
 .totalHeader {
@@ -44,11 +44,11 @@
 }
 
 .totalPanelSuccess {
-  border-left-color: #188a3b;
+  border-left-color: var(--color-kpi-delta-positive);
 }
 
 .totalPanelDanger {
-  border-left-color: #e84b3c;
+  border-left-color: var(--color-kpi-delta-negative);
 }
 
 .panelLabel {
@@ -131,11 +131,11 @@
 }
 
 .factLegend {
-  --legend-color: #fab529;
+  --legend-color: var(--color-kpi-fact);
 }
 
 .planLegend {
-  --legend-color: #5d605d;
+  --legend-color: var(--color-kpi-plan);
 }
 
 .summaryGrid {
@@ -151,7 +151,7 @@
   padding: var(--space-4);
   border: var(--border-width-hairline) solid var(--palette-border-soft);
   border-radius: var(--radius-5);
-  background: var(--color-bg-default);
+  background: var(--color-bg-card);
 }
 
 .cardHeader {
@@ -185,13 +185,13 @@
 }
 
 .statusBadgeSuccess {
-  color: #188a3b;
-  background: color-mix(in srgb, #188a3b 12%, transparent);
+  color: var(--color-kpi-delta-positive);
+  background: color-mix(in srgb, var(--color-kpi-delta-positive) 12%, transparent);
 }
 
 .statusBadgeDanger {
-  color: #e84b3c;
-  background: color-mix(in srgb, #e84b3c 12%, transparent);
+  color: var(--color-kpi-delta-negative);
+  background: color-mix(in srgb, var(--color-kpi-delta-negative) 12%, transparent);
 }
 
 .chartArea {

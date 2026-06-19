@@ -94,7 +94,7 @@
 }
 
 .planDanger {
-  color: var(--palette-status-danger);
+  color: var(--color-kpi-delta-negative);
   background: var(--palette-status-danger-bg);
 }
 
@@ -104,18 +104,18 @@
 }
 
 .planSuccess {
-  color: var(--palette-status-success);
+  color: var(--color-kpi-delta-positive);
   background: var(--palette-status-success-bg);
 }
 
 .planNeutral {
-  color: var(--color-text-muted);
+  color: var(--color-kpi-neutral);
   background: var(--palette-status-neutral-bg);
 }
 
 .metricCell {
   position: relative;
-  --metric-fact-color: var(--palette-accent-primary);
+  --metric-fact-color: var(--color-kpi-fact);
   --metric-progress-color: var(--metric-fact-color);
   box-sizing: border-box;
   width: 100%;
@@ -180,6 +180,7 @@
 }
 
 .metricValue {
+  --kpi-value-color: var(--metric-fact-color);
   margin-top: var(--space-2);
   font-size: 1.75rem;
   font-weight: 500;
@@ -221,21 +222,6 @@
   display: block;
   height: 100%;
   background: var(--metric-progress-color);
-}
-
-.metricSuccess {
-  --metric-progress-color: var(--palette-status-success);
-  --metric-status-bg: var(--palette-status-success-bg);
-}
-
-.metricDanger {
-  --metric-status-bg: var(--palette-status-danger-bg);
-}
-
-.metricNeutral {
-  --metric-fact-color: var(--color-text-muted);
-  --metric-progress-color: var(--color-text-muted);
-  --metric-status-bg: var(--palette-status-neutral-bg);
 }
 
 .mobileDashboard {
@@ -359,7 +345,7 @@
 
 .mobileMetric {
   position: relative;
-  --metric-fact-color: var(--palette-accent-primary);
+  --metric-fact-color: var(--color-kpi-fact);
   --metric-progress-color: var(--metric-fact-color);
   box-sizing: border-box;
   min-height: 5.75rem;
@@ -393,6 +379,7 @@
 }
 
 .mobileMetricValue {
+  --kpi-value-color: var(--metric-fact-color);
   flex: 0 0 auto;
   font-size: 1.375rem;
   font-weight: 500;
@@ -423,6 +410,22 @@
   display: block;
   height: 100%;
   background: var(--metric-progress-color);
+}
+
+.metricSuccess {
+  --metric-fact-color: var(--color-kpi-delta-positive);
+  --metric-progress-color: var(--color-kpi-delta-positive);
+  --metric-status-bg: var(--palette-status-success-bg);
+}
+
+.metricDanger {
+  --metric-status-bg: var(--palette-status-danger-bg);
+}
+
+.metricNeutral {
+  --metric-fact-color: var(--color-kpi-neutral);
+  --metric-progress-color: var(--color-kpi-neutral);
+  --metric-status-bg: var(--palette-status-neutral-bg);
 }
 
 @media (--screen-medium) {

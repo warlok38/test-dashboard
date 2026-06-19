@@ -38,11 +38,11 @@
 }
 
 .factLegend {
-  --legend-color: #fab529;
+  --legend-color: var(--color-kpi-fact);
 }
 
 .planLegend {
-  --legend-color: #5d605d;
+  --legend-color: var(--color-kpi-plan);
 }
 
 .metricGrid {
@@ -53,28 +53,32 @@
 
 .metricCard {
   position: relative;
-  --metric-fact-color: var(--palette-accent-primary);
+  --metric-fact-color: var(--color-kpi-fact);
   --metric-progress-color: var(--metric-fact-color);
   min-width: 0;
   overflow: hidden;
   border: var(--border-width-hairline) solid var(--palette-border-soft);
   border-left: var(--border-width-strong) solid var(--metric-status-color);
   border-radius: var(--radius-5);
-  background: var(--color-bg-default);
+  background: var(--color-bg-card);
 }
 
 .metricHeader {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
   min-height: 4.25rem;
   padding: var(--space-4);
   border-bottom: var(--border-width-hairline) solid var(--palette-border-soft);
-  background: color-mix(in srgb, var(--metric-bg) 44%, transparent);
+  background: var(--color-bg-card);
 }
 
 .metricTitleGroup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
   min-width: 0;
 }
 
@@ -87,12 +91,13 @@
 }
 
 .metricUnit {
-  display: block;
-  margin-top: var(--space-1);
+  display: inline-flex;
+  flex: 0 0 auto;
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
   font-weight: 500;
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 .detailLink {
@@ -208,20 +213,20 @@
 }
 
 .metricSuccess {
-  --metric-progress-color: var(--palette-status-success);
-  --metric-status-color: var(--palette-status-success);
+  --metric-progress-color: var(--color-kpi-delta-positive);
+  --metric-status-color: var(--color-kpi-delta-positive);
   --metric-bg: var(--palette-status-success-bg);
 }
 
 .metricDanger {
-  --metric-status-color: var(--palette-status-danger);
+  --metric-status-color: var(--color-kpi-delta-negative);
   --metric-bg: var(--palette-status-danger-bg);
 }
 
 .metricNeutral {
-  --metric-fact-color: var(--color-text-muted);
-  --metric-progress-color: var(--color-text-muted);
-  --metric-status-color: var(--color-text-muted);
+  --metric-fact-color: var(--color-kpi-neutral);
+  --metric-progress-color: var(--color-kpi-neutral);
+  --metric-status-color: var(--color-kpi-neutral);
   --metric-bg: var(--palette-status-neutral-bg);
 }
 

@@ -5,6 +5,7 @@
   --color-text-inverse: var(--palette-neutral-000);
 
   --color-bg-default: var(--palette-bg-elevated);
+  --color-bg-card: #ffffff;
   --color-bg-page-start: var(--palette-surface-page-start);
   --color-bg-page-end: var(--palette-surface-page-end);
 
@@ -25,6 +26,12 @@
 
   --color-border-interactive: var(--palette-border-interactive);
 
+  --color-kpi-fact: var(--palette-accent-primary);
+  --color-kpi-plan: #5d605d;
+  --color-kpi-delta-positive: var(--palette-status-success);
+  --color-kpi-delta-negative: var(--palette-status-danger);
+  --color-kpi-neutral: var(--color-text-muted);
+
   /* Тёмная полоса Header1 — светлый текст */
   --color-text-on-header-primary: #f6f0e4f5;
 
@@ -34,6 +41,7 @@
 
 html[data-theme='dark'] {
   --color-bg-header-primary: #171716;
+  --color-bg-card: #242424;
 
   --color-bg-sidebar: var(--palette-brand-500);
   --color-bg-sidebar-accent: var(--palette-brand-600);
@@ -44,6 +52,8 @@ html[data-theme='dark'] {
   --color-text-sidebar: var(--color-text-inverse);
   --color-border-sidebar: rgb(255 255 255 / 20%);
   --color-scrollbar-sidebar-visible: rgb(233 227 216 / 35%);
+
+  --color-kpi-plan: #8f8f8f;
 
   --color-scrollbar-thumb: transparent;
   --color-scrollbar-thumb-visible: rgb(233 227 216 / 35%);

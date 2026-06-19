@@ -1,19 +1,19 @@
 .value.fact {
-  color: var(--palette-accent-primary);
+  color: var(--kpi-value-color, var(--color-kpi-fact));
 }
 
 .value.plan {
-  color: #5d605d;
+  color: var(--color-kpi-plan);
 }
 
 .value.success {
-  color: var(--palette-status-success);
+  color: var(--color-kpi-delta-positive);
 }
 
 .value.danger {
-  color: var(--palette-status-danger);
+  color: var(--color-kpi-delta-negative);
 }
 
 .value.neutral {
-  color: var(--color-text-muted);
+  color: var(--color-kpi-neutral);
 }

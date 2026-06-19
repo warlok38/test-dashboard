@@ -8,9 +8,9 @@ import { ChartFrame, formatKpiValue, getKpiValueTone, KpiValue } from '@/shared/
 
 import styles from './ProductionMetricDetail.module.css'
 
-const FACT_COLOR = '#fab529'
-const PLAN_COLOR = '#5d605d'
-const NEUTRAL_VALUE_COLOR = '#8a8f8a'
+const FACT_COLOR = 'var(--color-kpi-fact)'
+const PLAN_COLOR = 'var(--color-kpi-plan)'
+const NEUTRAL_VALUE_COLOR = 'var(--color-kpi-neutral)'
 const EMPTY_BAR_VALUE = 0.001
 
 type MetricValue = number | null | undefined

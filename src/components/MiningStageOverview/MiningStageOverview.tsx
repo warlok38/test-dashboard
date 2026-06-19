@@ -22,8 +22,8 @@ import { formatNumber } from '@/shared/utils/formatNumber'
 
 import styles from './MiningStageOverview.module.css'
 
-const FACT_COLOR = '#fab529'
-const PLAN_COLOR = '#5d605d'
+const FACT_COLOR = 'var(--color-kpi-fact)'
+const PLAN_COLOR = 'var(--color-kpi-plan)'
 const TREND_Y_AXIS_WIDTH = 40
 const TREND_MARGIN_RIGHT = 12
 const MIN_X_TICK_GAP = 26
