@@ -4,8 +4,7 @@ import { Bar, BarChart, LabelList, YAxis } from 'recharts'
 import classNames from 'classnames'
 
 import { type ProductionMetricDetail as ProductionMetricDetailData } from '@/shared/mocks'
-import { ChartFrame } from '@/shared/ui'
-import { formatNumber, formatPercent } from '@/shared/utils/formatNumber'
+import { ChartFrame, formatKpiValue, getKpiValueTone, KpiValue } from '@/shared/ui'
 
 import styles from './ProductionMetricDetail.module.css'
 
@@ -36,28 +35,12 @@ function getDelta(fact: MetricValue, plan: number) {
   return ((fact - plan) / plan) * 100
 }
 
-function formatDetailNumber(value: number) {
-  return formatNumber(value, { fractionDigits: value % 1 === 0 ? 0 : 2 })
-}
-
 function getMetricTone(fact: MetricValue, delta: number | null) {
   if (!hasMetricValue(fact)) {
     return 'danger'
   }
 
   if (delta === null) {
-    return 'neutral'
-  }
-
-  return delta < 0 ? 'danger' : 'success'
-}
-
-function getValueTone(value: MetricValue) {
-  return hasMetricValue(value) && value > 0 ? 'active' : 'neutral'
-}
-
-function getDeltaValueTone(delta: number | null) {
-  if (delta === null || delta === 0) {
     return 'neutral'
   }
 
@@ -76,12 +59,10 @@ function getStatusText(fact: MetricValue, delta: number | null) {
   return delta < 0 ? 'Ниже плана' : 'В плане'
 }
 
-function formatDelta(delta: number | null) {
-  return delta === null ? '-' : formatPercent(delta, 2)
-}
-
 function formatStatusBadge(fact: MetricValue, statusText: string, delta: number | null) {
-  return hasMetricValue(fact) ? `${statusText} ${formatDelta(delta)}` : statusText
+  return hasMetricValue(fact)
+    ? `${statusText} ${formatKpiValue(delta, { kind: 'delta', fractionDigits: 2 })}`
+    : statusText
 }
 
 function getChartValue(value: MetricValue) {
@@ -108,7 +89,19 @@ function getNumberProp(record: Record<string, unknown>, key: string) {
   return null
 }
 
-function createBarValueLabel(activeColor: string) {
+function getSvgKpiValueColor(tone: ReturnType<typeof getKpiValueTone>) {
+  if (tone === 'fact') {
+    return FACT_COLOR
+  }
+
+  if (tone === 'plan') {
+    return PLAN_COLOR
+  }
+
+  return NEUTRAL_VALUE_COLOR
+}
+
+function createBarValueLabel(kind: 'fact' | 'plan') {
   return function BarValueLabel(props: unknown) {
     if (typeof props !== 'object' || props === null) {
       return null
@@ -125,32 +118,34 @@ function createBarValueLabel(activeColor: string) {
       return null
     }
 
+    const tone = getKpiValueTone(value, { kind })
+
     return (
       <text
         x={x + width / 2}
         y={y + height + 20}
-        fill={value !== null && value > 0 ? activeColor : NEUTRAL_VALUE_COLOR}
+        fill={getSvgKpiValueColor(tone)}
         fontSize={14}
         fontWeight={700}
         textAnchor="middle"
       >
-        {value === null ? '-' : formatDetailNumber(value)}
+        {formatKpiValue(value, {
+          kind,
+          fractionDigits: value !== null && value % 1 === 0 ? 0 : 2
+        })}
       </text>
     )
   }
 }
 
-const renderPlanValueLabel = createBarValueLabel(PLAN_COLOR)
-const renderFactValueLabel = createBarValueLabel(FACT_COLOR)
+const renderPlanValueLabel = createBarValueLabel('plan')
+const renderFactValueLabel = createBarValueLabel('fact')
 
 export function ProductionMetricDetail({ detail }: ProductionMetricDetailProps) {
   const totalFact = detail.summaries.reduce((sum, unit) => sum + (unit.fact ?? 0), 0)
   const totalPlan = detail.summaries.reduce((sum, unit) => sum + unit.plan, 0)
   const totalDelta = getDelta(totalFact, totalPlan)
   const totalTone = getMetricTone(totalFact, totalDelta)
-  const totalFactTone = getValueTone(totalFact)
-  const totalPlanTone = getValueTone(totalPlan)
-  const totalDeltaTone = getDeltaValueTone(totalDelta)
   const problemUnitsCount = detail.summaries.filter((unit) => {
     const delta = getDelta(unit.fact, unit.plan)
 
@@ -184,37 +179,26 @@ export function ProductionMetricDetail({ detail }: ProductionMetricDetailProps) 
           <div className={styles.totalStatsRow}>
             <div className={styles.totalStat}>
               <dt>План</dt>
-              <dd
-                className={classNames({
-                  [styles.valuePlan]: totalPlanTone === 'active',
-                  [styles.valueNeutral]: totalPlanTone === 'neutral'
-                })}
-              >
-                {formatDetailNumber(totalPlan)}
-              </dd>
+              <KpiValue
+                as="dd"
+                kind="plan"
+                value={totalPlan}
+                fractionDigits={totalPlan % 1 === 0 ? 0 : 2}
+              />
             </div>
             <div className={classNames(styles.totalStat, styles.totalFactStat)}>
               <dt>Факт</dt>
-              <dd
-                className={classNames(styles.totalValue, {
-                  [styles.valueFact]: totalFactTone === 'active',
-                  [styles.valueNeutral]: totalFactTone === 'neutral'
-                })}
-              >
-                {formatDetailNumber(totalFact)}
-              </dd>
+              <KpiValue
+                as="dd"
+                className={styles.totalValue}
+                kind="fact"
+                value={totalFact}
+                fractionDigits={totalFact % 1 === 0 ? 0 : 2}
+              />
             </div>
             <div className={styles.totalStat}>
               <dt>Отклонение</dt>
-              <dd
-                className={classNames({
-                  [styles.deltaDanger]: totalDeltaTone === 'danger',
-                  [styles.deltaSuccess]: totalDeltaTone === 'success',
-                  [styles.valueNeutral]: totalDeltaTone === 'neutral'
-                })}
-              >
-                {formatDelta(totalDelta)}
-              </dd>
+              <KpiValue as="dd" kind="delta" value={totalDelta} fractionDigits={2} />
             </div>
           </div>
           <div className={styles.totalStatsRow}>

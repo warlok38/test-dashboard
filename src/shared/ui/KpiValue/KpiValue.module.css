@@ -1,0 +1,19 @@
+.value.fact {
+  color: var(--palette-accent-primary);
+}
+
+.value.plan {
+  color: #5d605d;
+}
+
+.value.success {
+  color: var(--palette-status-success);
+}
+
+.value.danger {
+  color: var(--palette-status-danger);
+}
+
+.value.neutral {
+  color: var(--color-text-muted);
+}

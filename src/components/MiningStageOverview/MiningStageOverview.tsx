@@ -17,8 +17,8 @@ import {
 } from 'recharts'
 
 import { type MiningStageMetric } from '@/shared/mocks'
-import { ChartFrame } from '@/shared/ui'
-import { formatNumber, formatPercent } from '@/shared/utils/formatNumber'
+import { ChartFrame, KpiValue } from '@/shared/ui'
+import { formatNumber } from '@/shared/utils/formatNumber'
 
 import styles from './MiningStageOverview.module.css'
 
@@ -201,17 +201,27 @@ export function MiningStageOverview({ metrics }: MiningStageOverviewProps) {
                 <div className={styles.summaryPanel}>
                   <div className={styles.primaryStat}>
                     <span>Факт</span>
-                    <strong>{formatMetricNumber(metric.summary.fact)}</strong>
+                    <KpiValue
+                      as="strong"
+                      kind="fact"
+                      value={metric.summary.fact}
+                      fractionDigits={metric.summary.fact % 1 === 0 ? 0 : 1}
+                    />
                   </div>
 
                   <div className={styles.statRow}>
                     <span>План</span>
-                    <strong>{formatMetricNumber(metric.summary.plan)}</strong>
+                    <KpiValue
+                      as="strong"
+                      kind="plan"
+                      value={metric.summary.plan}
+                      fractionDigits={metric.summary.plan % 1 === 0 ? 0 : 1}
+                    />
                   </div>
 
                   <div className={styles.statRow}>
                     <span>Отклонение</span>
-                    <strong>{delta === null ? '-' : formatPercent(delta, 1)}</strong>
+                    <KpiValue as="strong" kind="delta" value={delta} fractionDigits={1} />
                   </div>
 
                   <div className={styles.progressTrack} aria-hidden="true">

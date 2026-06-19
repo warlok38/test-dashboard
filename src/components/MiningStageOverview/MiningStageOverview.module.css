@@ -53,10 +53,12 @@
 
 .metricCard {
   position: relative;
+  --metric-fact-color: var(--palette-accent-primary);
+  --metric-progress-color: var(--metric-fact-color);
   min-width: 0;
   overflow: hidden;
   border: var(--border-width-hairline) solid var(--palette-border-soft);
-  border-left: var(--border-width-strong) solid var(--metric-color);
+  border-left: var(--border-width-strong) solid var(--metric-status-color);
   border-radius: var(--radius-5);
   background: var(--color-bg-default);
 }
@@ -147,7 +149,6 @@
 .primaryStat strong {
   display: block;
   margin-top: var(--space-1);
-  color: var(--metric-color);
   font-size: 2rem;
   font-weight: 500;
   line-height: 1.05;
@@ -163,7 +164,6 @@
 }
 
 .statRow strong {
-  color: var(--color-text-strong);
   font-size: var(--font-size-sm);
   font-weight: 700;
   line-height: 1.1;
@@ -181,7 +181,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--metric-color);
+  background: var(--metric-progress-color);
 }
 
 .summaryChart {
@@ -208,17 +208,20 @@
 }
 
 .metricSuccess {
-  --metric-color: var(--palette-status-success);
+  --metric-progress-color: var(--palette-status-success);
+  --metric-status-color: var(--palette-status-success);
   --metric-bg: var(--palette-status-success-bg);
 }
 
 .metricDanger {
-  --metric-color: var(--palette-status-danger);
+  --metric-status-color: var(--palette-status-danger);
   --metric-bg: var(--palette-status-danger-bg);
 }
 
 .metricNeutral {
-  --metric-color: var(--color-text-muted);
+  --metric-fact-color: var(--color-text-muted);
+  --metric-progress-color: var(--color-text-muted);
+  --metric-status-color: var(--color-text-muted);
   --metric-bg: var(--palette-status-neutral-bg);
 }
 

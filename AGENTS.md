@@ -10,6 +10,7 @@
 - Follow existing project structure and naming conventions before introducing new abstractions.
 - Prefer TypeScript-safe solutions over `any`, casts, or suppressed errors.
 - Do not introduce new dependencies unless they clearly reduce complexity.
+- Where it improves readability, prefer typed maps/lookup tables over large repetitive `if`/`else` or `switch` chains; keep direct conditionals for logic that depends on calculations or branching context.
 
 ## Decision discipline
 

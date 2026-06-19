@@ -204,34 +204,6 @@
   margin: var(--space-5) auto 0;
 }
 
-.totalStats dd.deltaSuccess,
-.deltaSuccess {
-  color: #188a3b;
-  font-weight: 700;
-}
-
-.totalStats dd.deltaDanger,
-.deltaDanger {
-  color: #e84b3c;
-  font-weight: 700;
-}
-
-.totalStats dd.valuePlan,
-.valuePlan {
-  color: #5d605d;
-}
-
-.totalStat dd.valueFact,
-.valueFact {
-  color: #fab529;
-}
-
-.totalStats dd.valueNeutral,
-.totalStat dd.valueNeutral,
-.valueNeutral {
-  color: var(--color-text-muted);
-}
-
 @media (--screen-tablet), (--screen-medium) {
   .detail {
     min-width: 0;

@@ -14,7 +14,7 @@ import {
   type DashboardStage
 } from '@/shared/mocks'
 import { useScreen } from '@/shared/hooks/useScreen'
-import { formatNumber, formatPercent } from '@/shared/utils/formatNumber'
+import { getKpiValueTone, KpiValue } from '@/shared/ui'
 import styles from './IndustrialDashboardTable.module.css'
 
 type DashboardRow = {
@@ -84,12 +84,10 @@ function getMetricClassName(status: DashboardMetric['status']) {
   return styles.metricNeutral
 }
 
-function formatNullableNumber(value: number | null, fractionDigits?: number) {
-  if (value === null) {
-    return '-'
-  }
-
-  return formatNumber(value, { fractionDigits })
+function getDeltaBadgeClassName(delta: number) {
+  return classNames(styles.deltaBadge, {
+    [styles.deltaBadgeNeutral]: getKpiValueTone(delta, { kind: 'delta' }) === 'neutral'
+  })
 }
 
 function getMetricProgressPercent(metric: DashboardMetric, status: DashboardMetric['status']) {
@@ -150,15 +148,26 @@ function renderMetric(metric: DashboardMetric | undefined, queryString: string) 
         </span>
       )}
       <div className={styles.metricTitle}>{metric.title}</div>
-      <div className={styles.metricValue}>
-        {formatNullableNumber(metric.value, metric.valueFractionDigits)}
-      </div>
+      <KpiValue
+        as="div"
+        className={styles.metricValue}
+        kind="fact"
+        value={metric.value}
+        fractionDigits={metric.valueFractionDigits}
+      />
       <div className={styles.metricMeta}>
-        <span>План: {formatNullableNumber(metric.plan, metric.planFractionDigits)}</span>
-        {metric.delta !== null && metric.delta !== 0 && (
-          <span className={styles.deltaBadge}>
-            {formatPercent(metric.delta, metric.deltaFractionDigits)}
-          </span>
+        <span>
+          План:{' '}
+          <KpiValue kind="plan" value={metric.plan} fractionDigits={metric.planFractionDigits} />
+        </span>
+        {metric.delta !== null && (
+          <KpiValue
+            as="span"
+            className={getDeltaBadgeClassName(metric.delta)}
+            kind="delta"
+            value={metric.delta}
+            fractionDigits={metric.deltaFractionDigits}
+          />
         )}
       </div>
       {progressPercent !== null && (
@@ -253,16 +262,27 @@ function renderMobileMetric(metric: DashboardMetric, queryString: string) {
     <div className={classNames(styles.mobileMetric, getMetricClassName(status))}>
       <div className={styles.mobileMetricMain}>
         <div className={styles.mobileMetricTitle}>{metric.title}</div>
-        <div className={styles.mobileMetricValue}>
-          {formatNullableNumber(metric.value, metric.valueFractionDigits)}
-        </div>
+        <KpiValue
+          as="div"
+          className={styles.mobileMetricValue}
+          kind="fact"
+          value={metric.value}
+          fractionDigits={metric.valueFractionDigits}
+        />
       </div>
       <div className={styles.mobileMetricMeta}>
-        <span>План: {formatNullableNumber(metric.plan, metric.planFractionDigits)}</span>
-        {metric.delta !== null && metric.delta !== 0 && (
-          <span className={styles.deltaBadge}>
-            {formatPercent(metric.delta, metric.deltaFractionDigits)}
-          </span>
+        <span>
+          План:{' '}
+          <KpiValue kind="plan" value={metric.plan} fractionDigits={metric.planFractionDigits} />
+        </span>
+        {metric.delta !== null && (
+          <KpiValue
+            as="span"
+            className={getDeltaBadgeClassName(metric.delta)}
+            kind="delta"
+            value={metric.delta}
+            fractionDigits={metric.deltaFractionDigits}
+          />
         )}
       </div>
       {progressPercent !== null && (
