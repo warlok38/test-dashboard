@@ -5,7 +5,7 @@ import {
   getProductionStagesHref,
   type ProductionStageSearchParams
 } from '@/entities/production-stage'
-import { PageSurface } from '@/shared/ui'
+import { PageShell, PageSurface } from '@/shared/ui'
 import { ContentHeader, homeBreadcrumbIcon, MiningStageOverview } from '@/widgets'
 
 type ProductionStagePageProps = {
@@ -21,7 +21,7 @@ export default function ProductionStagePage({ params, searchParams }: Production
   }
 
   return (
-    <>
+    <PageShell>
       <ContentHeader
         breadcrumbs={[
           { label: 'Главная', href: '/', icon: homeBreadcrumbIcon },
@@ -32,6 +32,6 @@ export default function ProductionStagePage({ params, searchParams }: Production
       <PageSurface>
         <MiningStageOverview metrics={getMiningStageMetrics()} />
       </PageSurface>
-    </>
+    </PageShell>
   )
 }

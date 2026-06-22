@@ -7,7 +7,7 @@ import {
   getProductionStagesHref,
   type ProductionStageSearchParams
 } from '@/entities/production-stage'
-import { PageSurface } from '@/shared/ui'
+import { PageShell, PageSurface } from '@/shared/ui'
 
 type ProductionMetricDetailPageProps = {
   params: {
@@ -28,7 +28,7 @@ export default function ProductionMetricDetailPage({
   }
 
   return (
-    <>
+    <PageShell>
       <ContentHeader
         breadcrumbs={[
           { label: 'Главная', href: '/', icon: homeBreadcrumbIcon },
@@ -43,6 +43,6 @@ export default function ProductionMetricDetailPage({
       <PageSurface>
         <ProductionMetricDetail detail={detail} />
       </PageSurface>
-    </>
+    </PageShell>
   )
 }
