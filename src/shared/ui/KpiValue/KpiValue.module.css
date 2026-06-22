@@ -1,5 +1,5 @@
 .value.fact {
-  color: var(--kpi-value-color, var(--color-kpi-fact));
+  color: var(--color-kpi-fact);
 }
 
 .value.plan {
