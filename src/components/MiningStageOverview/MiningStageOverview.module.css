@@ -74,20 +74,40 @@
   background: var(--color-bg-card);
 }
 
+.metricHeaderLink {
+  color: inherit;
+  text-decoration: none;
+  outline: none;
+  transition:
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.metricHeaderLink:hover,
+.metricHeaderLink:focus-visible {
+  background: var(--palette-accent-wash);
+  box-shadow: inset 0 0 0 0.125rem var(--palette-accent-wash);
+}
+
 .metricTitleGroup {
   display: flex;
-  flex-wrap: wrap;
+  flex: 1 1 auto;
+  flex-wrap: nowrap;
   align-items: baseline;
   gap: var(--space-2);
   min-width: 0;
 }
 
 .metricTitle {
+  min-width: 0;
+  overflow: hidden;
   color: var(--color-text-strong);
   font-size: var(--font-size-lg);
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .metricUnit {
@@ -100,34 +120,24 @@
   white-space: nowrap;
 }
 
-.detailLink {
+.detailIndicator {
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  min-height: 2rem;
-  padding: 0.25rem 0.625rem;
-  border: var(--border-width-hairline) solid var(--color-border-interactive);
-  border-radius: var(--radius-5);
+  justify-content: center;
   color: var(--palette-accent-primary-hover);
   font-size: var(--font-size-xs);
   font-weight: 700;
   line-height: 1;
-  background: var(--palette-bg-elevated);
-  outline: none;
   transition:
-    border-color 160ms ease,
-    background 160ms ease,
-    box-shadow 160ms ease,
-    color 160ms ease;
+    color 160ms ease,
+    transform 160ms ease;
 }
 
-.detailLink:hover,
-.detailLink:focus-visible {
-  border-color: var(--palette-accent-primary-hover);
+.metricHeaderLink:hover .detailIndicator,
+.metricHeaderLink:focus-visible .detailIndicator {
   color: var(--palette-accent-primary-hover);
-  background: var(--palette-accent-wash);
-  box-shadow: 0 0 0 0.125rem var(--palette-accent-wash);
+  transform: translateX(0.125rem);
 }
 
 .metricBody {
@@ -281,8 +291,7 @@
     padding: var(--space-3) var(--space-3) var(--space-5);
   }
 
-  .overviewHeader,
-  .metricHeader {
+  .overviewHeader {
     flex-direction: column;
     align-items: stretch;
   }
@@ -303,11 +312,6 @@
   .metricHeader {
     min-height: 0;
     padding: var(--space-3);
-  }
-
-  .detailLink {
-    justify-content: center;
-    width: 100%;
   }
 
   .metricBody {

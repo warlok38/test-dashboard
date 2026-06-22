@@ -173,29 +173,37 @@ export function MiningStageOverview({ metrics }: MiningStageOverviewProps) {
         {metrics.map((metric) => {
           const delta = getSummaryDelta(metric)
           const progressPercent = getProgressPercent(metric)
+          const metricHeaderContent = (
+            <>
+              <div className={styles.metricTitleGroup}>
+                <h2 className={styles.metricTitle}>{metric.title}</h2>
+                <span className={styles.metricUnit}>{metric.unit}</span>
+              </div>
+
+              {metric.detailRoute && (
+                <span className={styles.detailIndicator} aria-hidden="true">
+                  <ArrowRightOutlined />
+                </span>
+              )}
+            </>
+          )
 
           return (
             <article
               className={classNames(styles.metricCard, getMetricTone(delta))}
               key={metric.id}
             >
-              <div className={styles.metricHeader}>
-                <div className={styles.metricTitleGroup}>
-                  <h2 className={styles.metricTitle}>{metric.title}</h2>
-                  <span className={styles.metricUnit}>{metric.unit}</span>
-                </div>
-
-                {metric.detailRoute && (
-                  <Link
-                    className={styles.detailLink}
-                    href={getHrefWithQuery(metric.detailRoute, queryString)}
-                    aria-label={`Открыть детализацию: ${metric.title}`}
-                  >
-                    Детализация
-                    <ArrowRightOutlined />
-                  </Link>
-                )}
-              </div>
+              {metric.detailRoute ? (
+                <Link
+                  className={classNames(styles.metricHeader, styles.metricHeaderLink)}
+                  href={getHrefWithQuery(metric.detailRoute, queryString)}
+                  aria-label={`Открыть детализацию: ${metric.title}`}
+                >
+                  {metricHeaderContent}
+                </Link>
+              ) : (
+                <div className={styles.metricHeader}>{metricHeaderContent}</div>
+              )}
 
               <div className={styles.metricBody}>
                 <div className={styles.summaryPanel}>
