@@ -1,6 +1,8 @@
 import { SettingOutlined } from '@ant-design/icons'
 
-import { ContentHeader, homeBreadcrumbIcon, PageSurface, ThemeSwitch } from '@/components'
+import { ThemeSwitch } from '@/features'
+import { PageSurface } from '@/shared/ui'
+import { ContentHeader, homeBreadcrumbIcon } from '@/widgets'
 
 import styles from './page.module.css'
 

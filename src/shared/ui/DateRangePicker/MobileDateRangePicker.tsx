@@ -11,101 +11,27 @@ import {
 import { Button, Calendar, Drawer, Space, Typography } from 'antd'
 import { type CalendarMode } from 'antd/es/calendar/generateCalendar'
 import cn from 'classnames'
-import dayjs, { type Dayjs } from 'dayjs'
+import { type Dayjs } from 'dayjs'
 import 'dayjs/locale/ru'
 import { useEffect, useState } from 'react'
 
-import { DATE_DISPLAY_FORMAT } from '@/shared/constants'
-
-import { type DateRangePickerProps, type DateRangePickerValue } from './DateRangePicker'
+import { type DateRangePickerProps } from './DateRangePicker'
+import {
+  formatRange,
+  getPresetValue,
+  getVisiblePanelDate,
+  isDisabled,
+  normalizeRange,
+  resolveFormat,
+  sortRange,
+  type DraftRange
+} from './lib'
 import styles from './MobileDateRangePicker.module.css'
-
-type RangeValue = NonNullable<DateRangePickerValue>
-
-type DraftRange = [Dayjs | null, Dayjs | null]
+import { DateCell } from './ui'
 
 type Preset = NonNullable<DateRangePickerProps['presets']>[number]
 
-const DEFAULT_FORMAT = DATE_DISPLAY_FORMAT
 const RANGE_SEPARATOR = '—'
-
-function resolveFormat(format: unknown): string {
-  if (typeof format === 'string') {
-    return format
-  }
-
-  if (Array.isArray(format)) {
-    const firstFormat = format[0]
-
-    if (typeof firstFormat === 'string') {
-      return firstFormat
-    }
-
-    if (
-      typeof firstFormat === 'object' &&
-      firstFormat &&
-      'format' in firstFormat &&
-      typeof firstFormat.format === 'string'
-    ) {
-      return firstFormat.format
-    }
-  }
-
-  if (
-    typeof format === 'object' &&
-    format &&
-    'format' in format &&
-    typeof format.format === 'string'
-  ) {
-    return format.format
-  }
-
-  return DEFAULT_FORMAT
-}
-
-function normalizeRange(value: DateRangePickerValue | null | undefined): DraftRange {
-  return [value?.[0] ?? null, value?.[1] ?? null]
-}
-
-function formatDate(value: Dayjs | null, format: string): string {
-  return value ? value.format(format) : ''
-}
-
-function formatRange(value: DraftRange, format: string): [string, string] {
-  return [formatDate(value[0], format), formatDate(value[1], format)]
-}
-
-function getPresetValue(preset: Preset): RangeValue {
-  return typeof preset.value === 'function' ? preset.value() : preset.value
-}
-
-function isDisabled(disabled: DateRangePickerProps['disabled']): boolean {
-  return Array.isArray(disabled) ? disabled.some(Boolean) : Boolean(disabled)
-}
-
-function isSameDate(left: Dayjs | null, right: Dayjs | null): boolean {
-  return Boolean(left && right && left.isSame(right, 'day'))
-}
-
-function isInSelectedRange(date: Dayjs, range: DraftRange): boolean {
-  const [start, end] = range
-
-  return Boolean(start && end && date.isAfter(start, 'day') && date.isBefore(end, 'day'))
-}
-
-function sortRange(range: DraftRange): DraftRange {
-  const [start, end] = range
-
-  if (start && end && end.isBefore(start, 'day')) {
-    return [end.startOf('day'), start.endOf('day')]
-  }
-
-  return range
-}
-
-function getVisiblePanelDate(range: DraftRange): Dayjs {
-  return range[1] ?? range[0] ?? dayjs()
-}
 
 export function MobileDateRangePicker({
   allowClear,
@@ -204,28 +130,6 @@ export function MobileDateRangePicker({
     setCalendarMode('month')
   }
 
-  const renderDateCell = (date: Dayjs) => {
-    const isStart = isSameDate(date, draftRange[0])
-    const isEnd = isSameDate(date, draftRange[1])
-    const inRange = isInSelectedRange(date, draftRange)
-    const isCurrentMonth = date.isSame(panelDate, 'month')
-    const isToday = date.isSame(dayjs(), 'day')
-
-    return (
-      <div
-        className={cn(styles.dateCell, {
-          [styles.dateCellStart]: isStart,
-          [styles.dateCellEnd]: isEnd,
-          [styles.dateCellInRange]: inRange,
-          [styles.dateCellMuted]: !isCurrentMonth,
-          [styles.dateCellToday]: isToday
-        })}
-      >
-        <span className={styles.dateCellInner}>{date.date()}</span>
-      </div>
-    )
-  }
-
   const drawerTitle = (
     <div className={styles.drawerTitle}>
       <span className={styles.drawerTitleText}>Период</span>
@@ -300,7 +204,11 @@ export function MobileDateRangePicker({
               Boolean(disabledDate?.(date, { type: 'date', from: draftRange[0] ?? undefined }))
             }
             fullCellRender={(date, info) =>
-              info.type === 'date' ? renderDateCell(date) : info.originNode
+              info.type === 'date' ? (
+                <DateCell date={date} panelDate={panelDate} range={draftRange} />
+              ) : (
+                info.originNode
+              )
             }
             headerRender={({
               value: headerValue,

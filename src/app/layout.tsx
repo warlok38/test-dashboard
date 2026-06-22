@@ -2,7 +2,7 @@ import './globals.css'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
 import { Montserrat } from 'next/font/google'
 import { Providers } from './providers'
-import { Layout } from '@/components'
+import { Layout } from '@/widgets'
 
 const montserrat = Montserrat({
   subsets: ['latin', 'cyrillic'],

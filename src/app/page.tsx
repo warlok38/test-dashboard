@@ -1,4 +1,5 @@
-import { ContentHeader, homeBreadcrumbIcon, PageSurface } from '@/components'
+import { PageSurface } from '@/shared/ui'
+import { ContentHeader, homeBreadcrumbIcon } from '@/widgets'
 import styles from './page.module.css'
 
 export default function Home() {

@@ -1,11 +1,7 @@
 import { Suspense } from 'react'
 
-import {
-  ContentHeader,
-  homeBreadcrumbIcon,
-  IndustrialDashboardTable,
-  PageSurface
-} from '@/components'
+import { ContentHeader, homeBreadcrumbIcon, IndustrialDashboardTable } from '@/widgets'
+import { PageSurface } from '@/shared/ui'
 
 export default function ProductionStagesPage() {
   return (
