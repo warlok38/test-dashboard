@@ -12,6 +12,20 @@
 - Do not introduce new dependencies unless they clearly reduce complexity.
 - Where it improves readability, prefer typed maps/lookup tables over large repetitive `if`/`else` or `switch` chains; keep direct conditionals for logic that depends on calculations or branching context.
 
+## Project Architecture
+
+- Use a soft Feature-Sliced Design structure:
+  - `src/app` — thin Next.js App Router routes, params/searchParams, server composition.
+  - `src/widgets` — large page blocks, layout, composed UI sections.
+  - `src/features` — user actions and interactive units: filters, switches, URL controls.
+  - `src/entities` — domain types, mock data, domain getters, business calculations.
+  - `src/shared` — reusable UI, hooks, utils, constants, theme, styles, errors.
+- Keep `page.tsx` files thin and server-first. Do not add `'use client'` to route files unless clearly necessary; move hook-based/client logic into `features` or `widgets`.
+- Use `kebab-case` for module folders, `PascalCase` for React components, and `camelCase` for hooks/helpers.
+- For large modules, split by responsibility: `ui/` for internal visual subcomponents, `lib/` for pure helpers/calculations/mappers/URL helpers, and `index.ts` for the public module API.
+- Do not use the old `src/components` structure. Import through `@/widgets`, `@/features`, `@/entities`, or `@/shared`.
+- Preserve existing routes, search params, and visible behavior during refactors. After structural changes, run `npm.cmd run lint` and `npm.cmd run build`.
+
 ## Decision discipline
 
 - If project instructions recommend a specific library, framework component, or pattern, use it by default.

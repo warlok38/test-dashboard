@@ -1,15 +1,11 @@
 import { Suspense } from 'react'
 
-import {
-  ContentHeader,
-  homeBreadcrumbIcon,
-  IndustrialDashboardTable,
-  PageSurface
-} from '@/components'
+import { ContentHeader, homeBreadcrumbIcon, IndustrialDashboardTable } from '@/widgets'
+import { PageShell, PageSurface } from '@/shared/ui'
 
 export default function ProductionStagesPage() {
   return (
-    <>
+    <PageShell>
       <ContentHeader
         breadcrumbs={[
           { label: 'Главная', href: '/', icon: homeBreadcrumbIcon },
@@ -21,6 +17,6 @@ export default function ProductionStagesPage() {
           <IndustrialDashboardTable />
         </Suspense>
       </PageSurface>
-    </>
+    </PageShell>
   )
 }

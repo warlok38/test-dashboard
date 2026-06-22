@@ -1,31 +1,18 @@
 import { notFound } from 'next/navigation'
 
-import { ContentHeader, homeBreadcrumbIcon, MiningStageOverview, PageSurface } from '@/components'
-import { getMiningStageMetrics } from '@/shared/mocks'
+import {
+  getMiningStageMetrics,
+  getProductionStagesHref,
+  type ProductionStageSearchParams
+} from '@/entities/production-stage'
+import { PageShell, PageSurface } from '@/shared/ui'
+import { ContentHeader, homeBreadcrumbIcon, MiningStageOverview } from '@/widgets'
 
 type ProductionStagePageProps = {
   params: {
     stageSlug: string
   }
-  searchParams?: Record<string, string | string[] | undefined>
-}
-
-function getProductionStagesHref(searchParams?: ProductionStagePageProps['searchParams']) {
-  const params = new URLSearchParams()
-  const dateFrom = searchParams?.dateFrom
-  const dateTo = searchParams?.dateTo
-
-  if (typeof dateFrom === 'string') {
-    params.set('dateFrom', dateFrom)
-  }
-
-  if (typeof dateTo === 'string') {
-    params.set('dateTo', dateTo)
-  }
-
-  const query = params.toString()
-
-  return query ? `/production-stages?${query}` : '/production-stages'
+  searchParams?: ProductionStageSearchParams
 }
 
 export default function ProductionStagePage({ params, searchParams }: ProductionStagePageProps) {
@@ -34,7 +21,7 @@ export default function ProductionStagePage({ params, searchParams }: Production
   }
 
   return (
-    <>
+    <PageShell>
       <ContentHeader
         breadcrumbs={[
           { label: 'Главная', href: '/', icon: homeBreadcrumbIcon },
@@ -45,6 +32,6 @@ export default function ProductionStagePage({ params, searchParams }: Production
       <PageSurface>
         <MiningStageOverview metrics={getMiningStageMetrics()} />
       </PageSurface>
-    </>
+    </PageShell>
   )
 }

@@ -1,12 +1,14 @@
 import { SettingOutlined } from '@ant-design/icons'
 
-import { ContentHeader, homeBreadcrumbIcon, PageSurface, ThemeSwitch } from '@/components'
+import { ThemeSwitch } from '@/features'
+import { PageShell, PageSurface } from '@/shared/ui'
+import { ContentHeader, homeBreadcrumbIcon } from '@/widgets'
 
 import styles from './page.module.css'
 
 export default function SettingsPage() {
   return (
-    <>
+    <PageShell>
       <ContentHeader
         breadcrumbs={[
           { label: 'Главная', href: '/', icon: homeBreadcrumbIcon },
@@ -31,6 +33,6 @@ export default function SettingsPage() {
           </div>
         </section>
       </PageSurface>
-    </>
+    </PageShell>
   )
 }

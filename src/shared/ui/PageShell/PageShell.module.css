@@ -1,0 +1,6 @@
+.shell {
+  flex: 1 0 auto;
+  min-width: 100%;
+  display: flex;
+  flex-direction: column;
+}
