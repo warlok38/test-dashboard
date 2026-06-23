@@ -2,12 +2,18 @@
 
 import { Select } from 'antd'
 
-import { businessUnits, type BusinessUnitValue } from '@/entities/business-unit'
+import {
+  businessUnits,
+  type BusinessUnitValue,
+  useGetBusinessUnitsQuery
+} from '@/entities/business-unit'
 
 import { useBusinessUnitSearchParams } from './useBusinessUnitSearchParams'
 
 export function BusinessUnitFilter() {
   const { value, setBusinessUnits } = useBusinessUnitSearchParams()
+  const { data: apiBusinessUnits } = useGetBusinessUnitsQuery()
+  const options = apiBusinessUnits ?? businessUnits
 
   return (
     <Select<BusinessUnitValue[]>
@@ -15,7 +21,7 @@ export function BusinessUnitFilter() {
       mode="multiple"
       maxTagCount="responsive"
       showSearch={{ optionFilterProp: 'label' }}
-      options={businessUnits}
+      options={options}
       placeholder="Все БЕ"
       value={value}
       onChange={setBusinessUnits}

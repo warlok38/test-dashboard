@@ -1,18 +1,48 @@
 'use client'
 
-import { type ProductionMetricDetail as ProductionMetricDetailData } from '@/entities/production-stage'
+import { Alert, Skeleton } from 'antd'
+
+import { useGetProductionMetricDetailQuery } from '@/entities/production-stage'
+import { ProductionMetricCommentForm } from '@/features/production-metric-comment'
 
 import styles from './ProductionMetricDetail.module.css'
 import { SummaryCard, TotalPanel } from './ui'
 
 type ProductionMetricDetailProps = {
-  detail: ProductionMetricDetailData
+  stageSlug: string
+  metricSlug: string
 }
 
-export function ProductionMetricDetail({ detail }: ProductionMetricDetailProps) {
+export function ProductionMetricDetail({ stageSlug, metricSlug }: ProductionMetricDetailProps) {
+  const {
+    data: detail,
+    error,
+    isLoading
+  } = useGetProductionMetricDetailQuery({
+    stageSlug,
+    metricSlug
+  })
+
+  if (isLoading) {
+    return (
+      <section className={styles.detail} aria-labelledby="metric-detail-title">
+        <Skeleton active paragraph={{ rows: 8 }} title={false} />
+      </section>
+    )
+  }
+
+  if (error || !detail) {
+    return (
+      <section className={styles.detail} aria-labelledby="metric-detail-title">
+        <Alert showIcon type="error" message="Не удалось загрузить детализацию показателя" />
+      </section>
+    )
+  }
+
   return (
     <section className={styles.detail} aria-labelledby="metric-detail-title">
       <TotalPanel detail={detail} />
+      <ProductionMetricCommentForm stageSlug={stageSlug} metricSlug={metricSlug} />
 
       <div className={styles.summaryGrid}>
         {detail.summaries.map((unit) => (

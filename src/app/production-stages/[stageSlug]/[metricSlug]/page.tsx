@@ -41,7 +41,7 @@ export default function ProductionMetricDetailPage({
         ]}
       />
       <PageSurface>
-        <ProductionMetricDetail detail={detail} />
+        <ProductionMetricDetail stageSlug={params.stageSlug} metricSlug={params.metricSlug} />
       </PageSurface>
     </PageShell>
   )

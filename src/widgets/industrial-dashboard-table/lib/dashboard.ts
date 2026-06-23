@@ -59,6 +59,10 @@ export function getMetricProgressPercent(
 }
 
 export function getRows(stages: DashboardStage[]): DashboardRow[] {
+  if (stages.length === 0) {
+    return []
+  }
+
   const rowCount = Math.max(...stages.map((stage) => stage.metrics.length))
 
   return Array.from({ length: rowCount }, (_, rowIndex) => ({

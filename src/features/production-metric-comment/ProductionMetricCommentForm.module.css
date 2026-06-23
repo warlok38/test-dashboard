@@ -1,0 +1,46 @@
+.commentPanel {
+  margin-bottom: var(--space-4);
+  padding: var(--space-4);
+  border: var(--border-width-hairline) solid var(--palette-border-soft);
+  border-radius: var(--radius-5);
+  background: var(--color-bg-card);
+}
+
+.commentHeader {
+  margin-bottom: var(--space-4);
+}
+
+.commentTitle {
+  margin: 0;
+  color: var(--color-text-strong);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.commentFields {
+  display: grid;
+  grid-template-columns: minmax(14rem, 0.28fr) minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.commentActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (--screen-small) {
+  .commentFields {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .commentActions {
+    justify-content: stretch;
+  }
+
+  .commentActions :global(.ant-btn) {
+    width: 100%;
+  }
+}

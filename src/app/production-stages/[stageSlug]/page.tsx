@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation'
 
 import {
-  getMiningStageMetrics,
   getProductionStagesHref,
   type ProductionStageSearchParams
 } from '@/entities/production-stage'
@@ -30,7 +29,7 @@ export default function ProductionStagePage({ params, searchParams }: Production
         ]}
       />
       <PageSurface>
-        <MiningStageOverview metrics={getMiningStageMetrics()} />
+        <MiningStageOverview stageSlug={params.stageSlug} />
       </PageSurface>
     </PageShell>
   )
