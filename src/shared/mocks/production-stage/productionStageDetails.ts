@@ -1,38 +1,4 @@
-export type DetailPeriod = 'day' | 'month-to-date' | 'year-to-date'
-
-export type BusinessUnitSlug = 'olimpiada' | 'blagodatnoe' | 'natalka' | 'kuranah' | 'suhoy-log'
-
-export type BusinessUnitSummary = {
-  slug: BusinessUnitSlug
-  title: string
-  fact: number | null
-  plan: number
-}
-
-export type MetricTrendPoint = {
-  day: string
-  month: string
-  fact: number
-  plan: number
-}
-
-export type ProductionMetricDetail = {
-  stageSlug: string
-  stageTitle: string
-  metricSlug: string
-  metricTitle: string
-  unit: string
-  summaries: BusinessUnitSummary[]
-  trend: MetricTrendPoint[]
-}
-
-export const DETAIL_PERIODS: Array<{ value: DetailPeriod; label: string }> = [
-  { value: 'day', label: 'Сутки' },
-  { value: 'month-to-date', label: 'С начала месяца' },
-  { value: 'year-to-date', label: 'С начала года' }
-]
-
-export const DEFAULT_DETAIL_PERIOD: DetailPeriod = 'day'
+import { type ProductionMetricDetail } from '@/entities/production-stage/model/types'
 
 export const productionMetricDetails: ProductionMetricDetail[] = [
   {

@@ -1,28 +1,4 @@
-export type DashboardMetricStatus = 'success' | 'danger' | 'neutral'
-
-export type DashboardMetric = {
-  id: string
-  title: string
-  value: number | null
-  plan: number | null
-  delta: number | null
-  detailRoute?: string
-  valueFractionDigits?: number
-  planFractionDigits?: number
-  deltaFractionDigits?: number
-  status: DashboardMetricStatus
-}
-
-export type DashboardStage = {
-  id: string
-  title: string
-  detailRoute?: string
-  plan: {
-    completed: number
-    total: number
-  }
-  metrics: DashboardMetric[]
-}
+import { type DashboardStage } from '@/entities/production-stage/model/types'
 
 export const industrialDashboardStages: DashboardStage[] = [
   {

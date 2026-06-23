@@ -2,18 +2,13 @@
 
 import { Select } from 'antd'
 
-import {
-  businessUnits,
-  type BusinessUnitValue,
-  useGetBusinessUnitsQuery
-} from '@/entities/business-unit'
+import { type BusinessUnitValue, useGetBusinessUnitsQuery } from '@/entities/business-unit'
 
 import { useBusinessUnitSearchParams } from './useBusinessUnitSearchParams'
 
 export function BusinessUnitFilter() {
   const { value, setBusinessUnits } = useBusinessUnitSearchParams()
-  const { data: apiBusinessUnits } = useGetBusinessUnitsQuery()
-  const options = apiBusinessUnits ?? businessUnits
+  const { data: options = [] } = useGetBusinessUnitsQuery()
 
   return (
     <Select<BusinessUnitValue[]>

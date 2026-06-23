@@ -1,24 +1,7 @@
-export type MiningStageMetricKind = 'bar-line' | 'line'
-
-export type MiningStagePoint = {
-  day: string
-  month: string
-  fact: number
-  plan: number
-}
-
-export type MiningStageMetric = {
-  id: string
-  title: string
-  unit: string
-  kind: MiningStageMetricKind
-  detailRoute?: string
-  summary: {
-    fact: number
-    plan: number
-  }
-  data: MiningStagePoint[]
-}
+import {
+  type MiningStageMetric,
+  type MiningStagePoint
+} from '@/entities/production-stage/model/types'
 
 const rockMassData: MiningStagePoint[] = [
   { day: '10', month: 'Май', fact: 296, plan: 323 },

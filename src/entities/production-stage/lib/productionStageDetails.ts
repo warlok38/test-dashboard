@@ -1,8 +1,6 @@
-import {
-  DETAIL_PERIODS,
-  productionMetricDetails,
-  type DetailPeriod
-} from '../mock/productionStageDetails'
+import { productionMetricDetails } from '@/shared/mocks/production-stage/productionStageDetails'
+
+import { DETAIL_PERIODS, type DetailPeriod } from '../model/types'
 
 export function getProductionMetricDetail(stageSlug: string, metricSlug: string) {
   return productionMetricDetails.find(
