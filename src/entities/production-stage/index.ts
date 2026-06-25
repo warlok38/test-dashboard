@@ -16,6 +16,9 @@ export {
 } from './api/productionStagesApi'
 export type {
   CreateProductionMetricCommentRequest,
+  ProductionMetricDetailQuery,
+  ProductionStageFilters,
+  ProductionStageMetricsQuery,
   ProductionMetricComment,
   ProductionStagesQuery
 } from './model/types'

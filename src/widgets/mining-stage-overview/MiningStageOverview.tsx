@@ -3,7 +3,10 @@
 import { Alert, Empty, Skeleton } from 'antd'
 import { useSearchParams } from 'next/navigation'
 
-import { useGetProductionStageMetricsQuery } from '@/entities/production-stage'
+import {
+  getProductionStageFiltersFromSearchParams,
+  useGetProductionStageMetricsQuery
+} from '@/entities/production-stage'
 
 import styles from './MiningStageOverview.module.css'
 import { MiningMetricCard } from './ui'
@@ -15,7 +18,14 @@ type MiningStageOverviewProps = {
 export function MiningStageOverview({ stageSlug }: MiningStageOverviewProps) {
   const searchParams = useSearchParams()
   const queryString = searchParams.toString()
-  const { data: metrics = [], error, isLoading } = useGetProductionStageMetricsQuery(stageSlug)
+  const {
+    data: metrics = [],
+    error,
+    isLoading
+  } = useGetProductionStageMetricsQuery({
+    stageSlug,
+    ...getProductionStageFiltersFromSearchParams(searchParams)
+  })
 
   if (isLoading) {
     return (

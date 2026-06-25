@@ -82,10 +82,21 @@ export const DETAIL_PERIODS: Array<{ value: DetailPeriod; label: string }> = [
 
 export const DEFAULT_DETAIL_PERIOD: DetailPeriod = 'day'
 
-export type ProductionStagesQuery = {
+export type ProductionStageFilters = {
   dateFrom?: string
   dateTo?: string
   businessUnit?: string[]
+}
+
+export type ProductionStagesQuery = ProductionStageFilters
+
+export type ProductionStageMetricsQuery = ProductionStageFilters & {
+  stageSlug: string
+}
+
+export type ProductionMetricDetailQuery = ProductionStageFilters & {
+  stageSlug: string
+  metricSlug: string
 }
 
 export type CreateProductionMetricCommentRequest = {

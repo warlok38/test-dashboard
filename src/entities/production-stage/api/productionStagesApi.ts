@@ -6,6 +6,8 @@ import {
   type MiningStageMetric,
   type ProductionMetricComment,
   type ProductionMetricDetail,
+  type ProductionMetricDetailQuery,
+  type ProductionStageMetricsQuery,
   type ProductionStagesQuery
 } from '../model/types'
 
@@ -18,18 +20,20 @@ export const productionStagesApi = mainApi.injectEndpoints({
       }),
       providesTags: [API_TAGS.productionStages]
     }),
-    getProductionStageMetrics: build.query<MiningStageMetric[], string>({
-      query: (stageSlug) => API_ROUTES.productionStageMetrics(stageSlug),
-      providesTags: (_result, _error, stageSlug) => [
+    getProductionStageMetrics: build.query<MiningStageMetric[], ProductionStageMetricsQuery>({
+      query: ({ stageSlug, ...params }) => ({
+        url: API_ROUTES.productionStageMetrics(stageSlug),
+        params
+      }),
+      providesTags: (_result, _error, { stageSlug }) => [
         { type: API_TAGS.productionStageMetrics, id: stageSlug }
       ]
     }),
-    getProductionMetricDetail: build.query<
-      ProductionMetricDetail,
-      { stageSlug: string; metricSlug: string }
-    >({
-      query: ({ stageSlug, metricSlug }) =>
-        API_ROUTES.productionMetricDetail(stageSlug, metricSlug),
+    getProductionMetricDetail: build.query<ProductionMetricDetail, ProductionMetricDetailQuery>({
+      query: ({ stageSlug, metricSlug, ...params }) => ({
+        url: API_ROUTES.productionMetricDetail(stageSlug, metricSlug),
+        params
+      }),
       providesTags: (_result, _error, { stageSlug, metricSlug }) => [
         { type: API_TAGS.productionMetricDetail, id: `${stageSlug}/${metricSlug}` }
       ]

@@ -1,8 +1,12 @@
 'use client'
 
 import { Alert, Skeleton } from 'antd'
+import { useSearchParams } from 'next/navigation'
 
-import { useGetProductionMetricDetailQuery } from '@/entities/production-stage'
+import {
+  getProductionStageFiltersFromSearchParams,
+  useGetProductionMetricDetailQuery
+} from '@/entities/production-stage'
 import { ProductionMetricCommentForm } from '@/features/production-metric-comment'
 
 import styles from './ProductionMetricDetail.module.css'
@@ -14,13 +18,15 @@ type ProductionMetricDetailProps = {
 }
 
 export function ProductionMetricDetail({ stageSlug, metricSlug }: ProductionMetricDetailProps) {
+  const searchParams = useSearchParams()
   const {
     data: detail,
     error,
     isLoading
   } = useGetProductionMetricDetailQuery({
     stageSlug,
-    metricSlug
+    metricSlug,
+    ...getProductionStageFiltersFromSearchParams(searchParams)
   })
 
   if (isLoading) {

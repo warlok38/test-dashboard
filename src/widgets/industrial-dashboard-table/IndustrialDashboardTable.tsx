@@ -4,7 +4,10 @@ import { useMemo } from 'react'
 import { Alert, Empty, Skeleton } from 'antd'
 import { useSearchParams } from 'next/navigation'
 
-import { useGetProductionStagesQuery } from '@/entities/production-stage'
+import {
+  getProductionStageFiltersFromSearchParams,
+  useGetProductionStagesQuery
+} from '@/entities/production-stage'
 import { useScreen } from '@/shared/hooks/useScreen'
 
 import { getColumnWidth, getRows } from './lib'
@@ -20,11 +23,7 @@ export function IndustrialDashboardTable() {
     data: stages = [],
     error,
     isLoading
-  } = useGetProductionStagesQuery({
-    dateFrom: searchParams.get('dateFrom') ?? undefined,
-    dateTo: searchParams.get('dateTo') ?? undefined,
-    businessUnit: searchParams.getAll('businessUnit')
-  })
+  } = useGetProductionStagesQuery(getProductionStageFiltersFromSearchParams(searchParams))
   const rows = useMemo(() => getRows(stages), [stages])
   const defaultMobileActiveKeys = useMemo(() => stages.map((stage) => stage.id), [stages])
 
