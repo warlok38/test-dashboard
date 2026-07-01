@@ -3,6 +3,7 @@
 import { Alert, Skeleton } from 'antd'
 
 import {
+  getFirstStageIndicator,
   getMiningStage,
   groupCardsByDeposit,
   type SummaryQuery,
@@ -10,17 +11,32 @@ import {
 } from '@/entities/production-summary'
 
 import styles from './ProductionSummaryDashboard.module.css'
-import { CollapsibleStagePanel, DepositGrid, StaticStagePanel } from './ui'
+import { CollapsibleStagePanel, DepositGrid, GraphPanel, StaticStagePanel } from './ui'
 
 type ProductionSummaryDashboardProps = {
   query: SummaryQuery
   title?: string
+  showGraph?: boolean
 }
 
-export function ProductionSummaryDashboard({ query, title }: ProductionSummaryDashboardProps) {
+export function ProductionSummaryDashboard({
+  query,
+  title,
+  showGraph = false
+}: ProductionSummaryDashboardProps) {
   const { data: summary, error, isLoading } = useGetSummaryQuery(query)
   const miningStage = getMiningStage(summary)
   const deposits = groupCardsByDeposit(miningStage?.cards ?? [])
+  const firstIndicator = getFirstStageIndicator(miningStage)
+  const graphQuery =
+    showGraph && query.gtk && firstIndicator
+      ? {
+          indicator: firstIndicator,
+          date_from: query.date_from,
+          date_to: query.date_to,
+          gtk: query.gtk
+        }
+      : undefined
 
   if (isLoading) {
     return (
@@ -45,6 +61,7 @@ export function ProductionSummaryDashboard({ query, title }: ProductionSummaryDa
         <p>{title ?? 'ПРОИЗВОДСТВО · 26 июня 2026'}</p>
       </div>
       <CollapsibleStagePanel stage={miningStage} />
+      {showGraph && <GraphPanel query={graphQuery} />}
       <DepositGrid deposits={deposits} />
       <StaticStagePanel title="Минеральные ресурсы" />
       <StaticStagePanel title="Обогащение" />

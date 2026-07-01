@@ -241,6 +241,42 @@
   font-size: 1rem;
 }
 
+.graphPanel {
+  padding: 1rem 1.25rem;
+  border: 1px solid #dcdcdc;
+  border-radius: 5px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 14%);
+}
+
+.graphHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.graphHeader h2 {
+  margin: 0;
+  color: #202020;
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.graphHeader span {
+  color: #777;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.chartBox {
+  width: 100%;
+  height: 20rem;
+}
+
 @media (max-width: 1200px) {
   .kpiGrid,
   .depositGrid {

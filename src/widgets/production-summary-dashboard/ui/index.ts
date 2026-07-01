@@ -1,4 +1,5 @@
 export { CollapsibleStagePanel } from './CollapsibleStagePanel'
 export { DepositGrid } from './DepositGrid'
+export { GraphPanel } from './GraphPanel'
 export { KpiCard } from './KpiCard'
 export { StaticStagePanel } from './StaticStagePanel'
