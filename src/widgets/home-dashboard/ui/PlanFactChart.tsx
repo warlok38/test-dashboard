@@ -20,6 +20,11 @@ type PlanFactChartProps = {
   trend: HomeDashboardTrend
 }
 
+const TREND_TOOLTIP_LABELS = {
+  fact: 'Факт',
+  plan: 'План'
+} satisfies Record<'fact' | 'plan', string>
+
 export function PlanFactChart({ trend }: PlanFactChartProps) {
   const [isChartReady, setIsChartReady] = useState(false)
 
@@ -48,23 +53,23 @@ export function PlanFactChart({ trend }: PlanFactChartProps) {
               <Tooltip
                 formatter={(value, name) => [
                   `${value ?? '--'} ${trend.unit}`,
-                  String(name) === 'fact' ? 'Факт' : 'План'
+                  getTrendTooltipLabel(name)
                 ]}
                 labelFormatter={(label) => `Время: ${label}`}
               />
               <Line
                 type="monotone"
                 dataKey="plan"
-                name="План"
-                stroke="#8792a2"
+                name="plan"
+                stroke="var(--color-kpi-plan)"
                 strokeWidth={2}
                 dot
               />
               <Line
                 type="monotone"
                 dataKey="fact"
-                name="Факт"
-                stroke="#1677ff"
+                name="fact"
+                stroke="var(--color-kpi-fact)"
                 strokeWidth={3}
                 dot
               />
@@ -81,4 +86,8 @@ export function PlanFactChart({ trend }: PlanFactChartProps) {
 
 function getActiveMetricLabel(trend: HomeDashboardTrend): string {
   return trend.tabs.find((tab) => tab.id === trend.activeMetric)?.label ?? 'Показатель'
+}
+
+function getTrendTooltipLabel(name: unknown): string {
+  return name === 'fact' || name === 'plan' ? TREND_TOOLTIP_LABELS[name] : String(name)
 }

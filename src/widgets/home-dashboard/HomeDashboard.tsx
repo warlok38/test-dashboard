@@ -1,5 +1,4 @@
-import { getHomeDashboardSummary } from '@/entities/production-stage'
-import { homeDashboardSummaryMock } from '@/shared/mocks/production-stage/homeDashboard'
+import { getHomeDashboardMockSummary, getHomeDashboardSummary } from '@/entities/production-stage'
 
 import styles from './HomeDashboard.module.css'
 import {
@@ -13,7 +12,7 @@ import {
 } from './ui'
 
 export function HomeDashboard() {
-  const summary = getHomeDashboardSummary(homeDashboardSummaryMock)
+  const summary = getHomeDashboardSummary(getHomeDashboardMockSummary())
 
   return (
     <section className={styles.dashboard} aria-label="Главная сводка производства">

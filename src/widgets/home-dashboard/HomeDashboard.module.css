@@ -95,12 +95,6 @@
   margin-top: var(--space-2);
 }
 
-.insightGrid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(22rem, 0.8fr);
-  gap: var(--space-5);
-}
-
 .primaryGrid,
 .secondaryGrid {
   display: grid;
@@ -139,19 +133,6 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-3);
-}
-
-.cardLink {
-  display: block;
-  color: inherit;
-  outline: none;
-}
-
-.cardLink:hover .attentionCard,
-.cardLink:focus-visible .attentionCard,
-.cardLink:hover .chainItem,
-.cardLink:focus-visible .chainItem {
-  background: var(--palette-accent-wash);
 }
 
 .attentionCard {
@@ -290,8 +271,7 @@
   letter-spacing: 0;
 }
 
-.chainItem p,
-.businessCard p {
+.chainItem p {
   margin-top: var(--space-3);
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
@@ -299,8 +279,7 @@
   line-height: 1.35;
 }
 
-.chainItem span,
-.businessCard p span {
+.chainItem span {
   display: inline-block;
   margin-top: var(--space-2);
   color: var(--status-color);
@@ -360,12 +339,6 @@
   line-height: 1.15;
 }
 
-.businessCard dd span {
-  display: block;
-  margin-top: var(--space-1);
-  font-size: var(--font-size-xs);
-}
-
 .status-success {
   --status-color: var(--color-kpi-delta-positive);
   --status-bg: var(--palette-status-success-bg);
@@ -388,7 +361,6 @@
 
 @media (--screen-medium) {
   .summary,
-  .insightGrid,
   .primaryGrid,
   .secondaryGrid {
     grid-template-columns: 1fr;
@@ -422,7 +394,6 @@
   }
 
   .summary,
-  .insightGrid,
   .primaryGrid,
   .secondaryGrid,
   .attentionList,

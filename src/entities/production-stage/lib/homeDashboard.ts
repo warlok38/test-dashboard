@@ -1,7 +1,12 @@
 import { type HomeDashboardSummary } from '../model/types'
+import { homeDashboardSummaryMock } from '@/shared/mocks/production-stage/homeDashboard'
 
 export function getHomeDashboardSummary(summary: HomeDashboardSummary): HomeDashboardSummary {
   return summary
+}
+
+export function getHomeDashboardMockSummary(): HomeDashboardSummary {
+  return homeDashboardSummaryMock
 }
 
 export function getHomeDashboardHasCritical(summary: HomeDashboardSummary): boolean {
