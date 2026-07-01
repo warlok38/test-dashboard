@@ -14,45 +14,49 @@ export function AssetPerformanceTable({ assets }: AssetPerformanceTableProps) {
       <div className={styles.panelHeader}>
         <div>
           <span className={styles.panelEyebrow}>Активы</span>
-          <h2>Вклад по активам</h2>
+          <h2>Активы / месторождения</h2>
         </div>
       </div>
-      <div className={styles.businessGrid}>
+      <div className={styles.assetTable} role="table" aria-label="Показатели по активам">
+        <div className={styles.assetTableHead} role="row">
+          <span role="columnheader">Актив</span>
+          <span role="columnheader">Статус</span>
+          <span role="columnheader">Золото</span>
+          <span role="columnheader">Руда добыта</span>
+          <span role="columnheader">Руда переработана</span>
+          <span role="columnheader">Извлечение</span>
+          <span role="columnheader">Причина</span>
+          <span role="columnheader">Вклад</span>
+        </div>
         {assets.map((asset) => (
-          <article
-            key={asset.id}
-            className={classNames(styles.businessCard, styles[`status-${asset.status}`])}
-          >
-            <div className={styles.businessHeader}>
-              <h3>{asset.title}</h3>
-              <strong>{asset.contributionLabel}</strong>
-            </div>
-            <b>{asset.primaryReasonTitle}</b>
-            <dl>
-              <div>
-                <dt>Золото</dt>
-                <dd>{asset.goldLabel}</dd>
-              </div>
-              <div>
-                <dt>Добыча</dt>
-                <dd>{asset.oreMinedLabel}</dd>
-              </div>
-              <div>
-                <dt>Переработка</dt>
-                <dd>{asset.oreProcessedLabel}</dd>
-              </div>
-              <div>
-                <dt>Извлечение</dt>
-                <dd>{asset.recoveryLabel}</dd>
-              </div>
-              <div>
-                <dt>Вклад</dt>
-                <dd>{asset.contributionPercent}%</dd>
-              </div>
-            </dl>
-          </article>
+          <div key={asset.id} className={styles.assetTableRow} role="row">
+            <strong role="cell">{asset.title}</strong>
+            <span
+              role="cell"
+              className={classNames(styles.statusPill, styles[`status-${asset.status}`])}
+            >
+              {getStatusLabel(asset.status)}
+            </span>
+            <span role="cell">{asset.goldLabel}</span>
+            <span role="cell">{asset.oreMinedLabel}</span>
+            <span role="cell">{asset.oreProcessedLabel}</span>
+            <span role="cell">{asset.recoveryLabel}</span>
+            <span role="cell">{asset.primaryReasonTitle}</span>
+            <span role="cell">{asset.contributionLabel}</span>
+          </div>
         ))}
       </div>
     </section>
   )
+}
+
+function getStatusLabel(status: HomeDashboardAsset['status']) {
+  const statusLabels: Record<HomeDashboardAsset['status'], string> = {
+    danger: 'Критично',
+    neutral: 'Нет данных',
+    success: 'В норме',
+    warning: 'Отклонение'
+  }
+
+  return statusLabels[status]
 }

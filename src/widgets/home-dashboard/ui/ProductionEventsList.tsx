@@ -14,29 +14,21 @@ export function ProductionEventsList({ events }: ProductionEventsListProps) {
       <div className={styles.panelHeader}>
         <div>
           <span className={styles.panelEyebrow}>События</span>
-          <h2>Последние события</h2>
+          <h2>События периода</h2>
         </div>
       </div>
-      <div className={styles.attentionList}>
+      <div className={styles.eventList}>
         {events.map((event) => (
           <article
             key={event.id}
-            className={classNames(styles.attentionCard, styles[`status-${event.status}`])}
+            className={classNames(styles.eventRow, styles[`status-${event.status}`])}
           >
-            <div className={styles.attentionHeader}>
-              <div>
-                <span>
-                  {event.timeLabel} · {event.assetTitle}
-                </span>
-                <h3>{event.title}</h3>
-              </div>
-              <strong>{event.durationLabel}</strong>
+            <time>{event.timeLabel}</time>
+            <div>
+              <h3>{event.assetTitle}</h3>
+              <p>{event.title}</p>
             </div>
-            <div className={styles.attentionFooter}>
-              <p>
-                {event.linkedDeviationId ? 'Связано с отклонением' : 'Без связанного отклонения'}
-              </p>
-            </div>
+            <strong>{event.durationLabel}</strong>
           </article>
         ))}
       </div>

@@ -21,16 +21,13 @@ export function ProductionFlow({ stages }: ProductionFlowProps) {
         {stages.map((stage) => (
           <article
             key={stage.id}
-            className={classNames(styles.chainItem, styles[`status-${stage.status}`])}
+            className={classNames(styles.flowItem, styles[`status-${stage.status}`])}
           >
-            <div className={styles.chainTop}>
-              <h3>{stage.title}</h3>
-              <strong>{stage.deltaLabel}</strong>
-            </div>
+            <h3>{stage.title}</h3>
             <p>
-              Факт / план
-              <span>{stage.factPlanLabel}</span>
+              Факт / план <span>{stage.factPlanLabel}</span>
             </p>
+            <strong>{stage.deltaLabel}</strong>
             {stage.reasonTitle ? <p>Причина: {stage.reasonTitle}</p> : null}
           </article>
         ))}

@@ -13,32 +13,28 @@ export function DeviationReasonsList({ deviations }: DeviationReasonsListProps) 
     <section className={styles.panel} aria-label="Причины отклонений">
       <div className={styles.panelHeader}>
         <div>
-          <span className={styles.panelEyebrow}>Отклонения</span>
-          <h2>Ключевые причины</h2>
+          <span className={styles.panelEyebrow}>Проблемы</span>
+          <h2>Отклонения и причины</h2>
         </div>
       </div>
-      <div className={styles.attentionList}>
+      <div className={styles.deviationList}>
         {deviations.map((deviation) => (
           <article
             key={deviation.id}
-            className={classNames(styles.attentionCard, styles[`status-${deviation.status}`])}
+            className={classNames(styles.deviationRow, styles[`status-${deviation.status}`])}
           >
-            <div className={styles.attentionHeader}>
-              <div>
-                <span>
-                  {deviation.assetTitle} · {deviation.stageTitle}
-                </span>
-                <h3>{deviation.reasonTitle}</h3>
-              </div>
-              <strong>{deviation.deltaLabel}</strong>
-            </div>
-            <div className={styles.attentionMetric}>
-              <span>{deviation.metricTitle}</span>
+            <div>
+              <span>
+                {deviation.assetTitle} · {deviation.stageTitle}
+              </span>
+              <h3>{deviation.reasonTitle}</h3>
+              <p>{deviation.metricTitle}</p>
               <b>{deviation.factPlanLabel}</b>
             </div>
-            <div className={styles.attentionFooter}>
-              <strong>{deviation.impactLabel}</strong>
-              <p>Влияние на выпуск золота</p>
+            <div className={styles.deviationMeta}>
+              <strong>{deviation.deltaLabel}</strong>
+              <em>{deviation.impactLabel}</em>
+              <small>влияние</small>
             </div>
           </article>
         ))}

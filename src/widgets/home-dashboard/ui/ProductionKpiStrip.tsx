@@ -10,20 +10,21 @@ type ProductionKpiStripProps = {
 
 export function ProductionKpiStrip({ kpis }: ProductionKpiStripProps) {
   return (
-    <section className={styles.summaryCards} aria-label="Ключевые показатели производства">
+    <section className={styles.kpiStrip} aria-label="Ключевые показатели производства">
       {kpis.map((kpi) => (
         <article
           key={kpi.id}
-          className={classNames(styles.summaryCard, styles[`status-${kpi.status}`])}
+          className={classNames(styles.kpiCard, styles[`status-${kpi.status}`])}
         >
-          <span>{kpi.title}</span>
-          <strong>
+          <div className={styles.kpiHeader}>
+            <span>{kpi.title}</span>
+            <strong>{kpi.deltaLabel}</strong>
+          </div>
+          <b>
             {kpi.value}
-            {kpi.unit ? ` ${kpi.unit}` : ''}
-          </strong>
-          <p>
-            {kpi.caption} · {kpi.deltaLabel}
-          </p>
+            {kpi.unit ? <small>{kpi.unit}</small> : null}
+          </b>
+          <p>{kpi.caption}</p>
         </article>
       ))}
     </section>

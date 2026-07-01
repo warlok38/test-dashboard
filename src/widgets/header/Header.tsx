@@ -20,7 +20,7 @@ export function Header() {
       </button>
 
       <div className={styles.titleGroup}>
-        <span className={styles.title}>COOL DASHBOARD</span>
+        <span className={styles.title}>ЦИФРОВОЙ ГОК</span>
       </div>
 
       <div className={styles.actions} aria-label="Действия панели" />

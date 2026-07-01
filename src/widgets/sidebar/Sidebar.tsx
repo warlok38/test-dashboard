@@ -54,7 +54,7 @@ function SidebarContent({ collapsed = false, variant = 'desktop' }: SidebarConte
         </div>
 
         <div className={styles.brand}>
-          <span className={styles.title}>COOL DASHBOARD</span>
+          <span className={styles.title}>ЦИФРОВОЙ ГОК</span>
           <span className={styles.subtitle}>Production Monitor</span>
         </div>
 
