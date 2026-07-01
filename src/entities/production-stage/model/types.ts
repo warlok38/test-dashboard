@@ -26,69 +26,124 @@ export type DashboardStage = {
 
 export type HomeDashboardStatus = 'success' | 'warning' | 'danger' | 'neutral'
 
+export type HomeDashboardReasonType =
+  | 'downtime'
+  | 'kio'
+  | 'ktg'
+  | 'maintenance'
+  | 'mill-constraint'
+  | 'logistics'
+  | 'grade'
+  | 'data'
+  | 'unclassified'
+
 export type HomeDashboardMetricDirection = 'higher-is-better' | 'lower-is-better'
 
-export type HomeDashboardSummaryCard = {
+export type HomeDashboardKpi = {
   id: string
   title: string
   value: string
+  unit?: string
   caption: string
-  status: HomeDashboardStatus
-}
-
-export type HomeDashboardAttentionItem = {
-  id: string
-  title: string
-  metricTitle: string
-  factLabel: string
-  planLabel: string
   deltaLabel: string
-  impact: string
-  status: Exclude<HomeDashboardStatus, 'success'>
+  status: HomeDashboardStatus
   href?: string
 }
 
-export type HomeDashboardChainItem = {
-  id: string
-  title: string
-  planText: string
-  status: HomeDashboardStatus
-  worstMetricTitle: string
-  worstMetricDeltaLabel: string
-  href?: string
-}
+export type HomeDashboardTrendMetric =
+  | 'gold'
+  | 'ore-mined'
+  | 'ore-processed'
+  | 'recovery'
+  | 'au-grade'
 
 export type HomeDashboardTrendPoint = {
   label: string
   fact: number
   plan: number
+  event?: HomeDashboardReasonType
 }
 
-export type HomeDashboardBusinessUnit = {
+export type HomeDashboardTrend = {
+  activeMetric: HomeDashboardTrendMetric
+  tabs: Array<{
+    id: HomeDashboardTrendMetric
+    label: string
+  }>
+  unit: string
+  factTotal: string
+  planTotal: string
+  deltaTotal: string
+  status: HomeDashboardStatus
+  points: HomeDashboardTrendPoint[]
+}
+
+export type HomeDashboardDeviation = {
+  id: string
+  assetTitle: string
+  stageTitle: string
+  metricTitle: string
+  factPlanLabel: string
+  deltaLabel: string
+  reasonType: HomeDashboardReasonType
+  reasonTitle: string
+  impactLabel: string
+  status: Exclude<HomeDashboardStatus, 'success'>
+  href?: string
+}
+
+export type HomeDashboardAsset = {
   id: BusinessUnitSlug
   title: string
   status: HomeDashboardStatus
-  worstMetricTitle: string
-  worstMetricDeltaLabel: string
+  goldLabel: string
+  oreMinedLabel: string
+  oreProcessedLabel: string
+  recoveryLabel: string
+  primaryReasonTitle: string
   contributionLabel: string
-  metrics: Array<{
-    id: string
-    title: string
-    value: string
-    deltaLabel: string
-    status: HomeDashboardStatus
-  }>
+  contributionPercent: number
+  href?: string
+}
+
+export type HomeDashboardFlowStage = {
+  id: string
+  title: string
+  factPlanLabel: string
+  deltaLabel: string
+  status: HomeDashboardStatus
+  reasonTitle?: string
+  href?: string
+}
+
+export type HomeDashboardEvent = {
+  id: string
+  timeLabel: string
+  assetTitle: string
+  title: string
+  durationLabel: string
+  status: HomeDashboardStatus
+  linkedDeviationId?: string
+  href?: string
+}
+
+export type HomeDashboardPeriodControls = {
+  periodLabel: string
+  shiftLabel: string
+  assetLabel: string
+  updatedAtLabel: string
 }
 
 export type HomeDashboardSummary = {
-  status: HomeDashboardStatus
-  statusTitle: string
-  statusDescription: string
-  cards: HomeDashboardSummaryCard[]
-  attentionItems: HomeDashboardAttentionItem[]
-  chain: HomeDashboardChainItem[]
-  trend: HomeDashboardTrendPoint[]
-  businessUnits: HomeDashboardBusinessUnit[]
+  title: string
+  subtitle: string
+  controls: HomeDashboardPeriodControls
+  kpis: HomeDashboardKpi[]
+  trend: HomeDashboardTrend
+  deviations: HomeDashboardDeviation[]
+  assets: HomeDashboardAsset[]
+  flow: HomeDashboardFlowStage[]
+  events: HomeDashboardEvent[]
 }
 
 export type MiningStageMetricKind = 'bar-line' | 'line'

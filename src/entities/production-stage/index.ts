@@ -2,13 +2,18 @@ export type {
   DashboardMetric,
   DashboardMetricStatus,
   DashboardStage,
-  HomeDashboardAttentionItem,
-  HomeDashboardBusinessUnit,
-  HomeDashboardChainItem,
+  HomeDashboardAsset,
+  HomeDashboardDeviation,
+  HomeDashboardEvent,
+  HomeDashboardFlowStage,
+  HomeDashboardKpi,
   HomeDashboardMetricDirection,
+  HomeDashboardPeriodControls,
+  HomeDashboardReasonType,
   HomeDashboardStatus,
   HomeDashboardSummary,
-  HomeDashboardSummaryCard,
+  HomeDashboardTrend,
+  HomeDashboardTrendMetric,
   HomeDashboardTrendPoint
 } from './model/types'
 export { DEFAULT_DETAIL_PERIOD, DETAIL_PERIODS } from './model/types'
