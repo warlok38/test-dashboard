@@ -27,6 +27,6 @@
   flex: 1;
   min-height: 0;
   color: var(--color-text-default);
-  background: var(--color-bg-default);
+  background: #f0f0f0;
   overflow: auto;
 }

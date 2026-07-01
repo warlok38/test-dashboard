@@ -38,7 +38,7 @@ export function MiningStageOverview({ stageSlug }: MiningStageOverviewProps) {
   if (error) {
     return (
       <section className={styles.overview} aria-label="Обзор показателей добычи">
-        <Alert showIcon type="error" message="Не удалось загрузить показатели стадии" />
+        <Alert showIcon type="error" title="Не удалось загрузить показатели стадии" />
       </section>
     )
   }

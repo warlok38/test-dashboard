@@ -6,8 +6,14 @@ import classNames from 'classnames'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
+import { getGtkHrefByName, getGtkSlugByName, useGetGtkQuery } from '@/entities/production-summary'
 import { useSidebar } from './SidebarProvider'
-import { getOpenSidebarKeys, getSelectedSidebarKey, SIDEBAR_ITEMS } from './sidebarConfig'
+import {
+  BASE_SIDEBAR_ITEMS,
+  getOpenSidebarKeys,
+  getSelectedSidebarKey,
+  GTK_MENU_KEY
+} from './sidebarConfig'
 import styles from './Sidebar.module.css'
 import { CollapsedSidebarNav, SidebarMenu } from './ui'
 
@@ -22,10 +28,35 @@ function SidebarContent({ collapsed = false, variant = 'desktop' }: SidebarConte
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const { closeMobileSidebar, toggleCollapsed } = useSidebar()
+  const { data: gtkNames = [] } = useGetGtkQuery()
   const isDrawer = variant === 'drawer'
   const isCollapsed = !isDrawer && collapsed
-  const routeOpenKeys = useMemo(() => getOpenSidebarKeys(pathname), [pathname])
+  const routeOpenKeys = useMemo(() => getOpenSidebarKeys(), [])
   const [openKeys, setOpenKeys] = useState(routeOpenKeys)
+  const sidebarItems = useMemo(
+    () =>
+      BASE_SIDEBAR_ITEMS.map((item) => {
+        if (item.key !== GTK_MENU_KEY) {
+          return item
+        }
+
+        return {
+          ...item,
+          children: gtkNames
+            .filter((name) => getGtkSlugByName(name))
+            .map((name) => {
+              const href = getGtkHrefByName(name)
+
+              return {
+                key: href ?? name,
+                href,
+                label: name
+              }
+            })
+        }
+      }),
+    [gtkNames]
+  )
 
   useEffect(() => {
     setOpenKeys(routeOpenKeys)
@@ -54,8 +85,8 @@ function SidebarContent({ collapsed = false, variant = 'desktop' }: SidebarConte
         </div>
 
         <div className={styles.brand}>
-          <span className={styles.title}>COOL DASHBOARD</span>
-          <span className={styles.subtitle}>Production Monitor</span>
+          <span className={styles.title}>ЦИФРОВОЙ ГОК</span>
+          <span className={styles.subtitle}>Планерка</span>
         </div>
 
         {isDrawer && (
@@ -70,11 +101,18 @@ function SidebarContent({ collapsed = false, variant = 'desktop' }: SidebarConte
         )}
       </div>
 
+      {!isCollapsed && (
+        <div className={styles.dateBlock}>
+          <strong>Пятница, 26 июня</strong>
+          <span>2026 · 09:14 МСК</span>
+        </div>
+      )}
+
       {isCollapsed ? (
-        <CollapsedSidebarNav items={SIDEBAR_ITEMS} pathname={pathname} queryString={queryString} />
+        <CollapsedSidebarNav items={sidebarItems} pathname={pathname} queryString={queryString} />
       ) : (
         <SidebarMenu
-          items={SIDEBAR_ITEMS}
+          items={sidebarItems}
           onOpenChange={setOpenKeys}
           onRouteClick={onRouteClick}
           openKeys={openKeys}
