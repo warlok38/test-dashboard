@@ -1,4 +1,5 @@
 import { Suspense, type ReactNode } from 'react'
+import { AppFooter } from '@/widgets/app-footer'
 import { Header } from '@/widgets/header'
 import { Sidebar, SidebarProvider } from '@/widgets/sidebar'
 import styles from './Layout.module.css'
@@ -20,6 +21,7 @@ export function Layout({ children }: LayoutProps) {
             <main className={styles.mainContent} data-main-content-scroll>
               {children}
             </main>
+            <AppFooter />
           </div>
         </section>
       </div>

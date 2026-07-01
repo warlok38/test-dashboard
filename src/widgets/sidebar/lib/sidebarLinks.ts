@@ -1,4 +1,4 @@
-import { PRODUCTION_MENU_KEY, type SidebarMenuItem } from '../sidebarConfig'
+import { type SidebarMenuItem } from '../sidebarConfig'
 
 export function getHrefWithQuery(href: string, queryString: string) {
   if (!queryString || !href.startsWith('/production-stages')) {
@@ -17,8 +17,8 @@ export function isCollapsedItemActive(item: SidebarMenuItem, pathname: string) {
     return pathname === '/'
   }
 
-  if (item.key === PRODUCTION_MENU_KEY) {
-    return pathname.startsWith('/production-stages')
+  if (item.children?.some((child) => child.href === pathname)) {
+    return true
   }
 
   return (

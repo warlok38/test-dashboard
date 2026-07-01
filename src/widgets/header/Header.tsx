@@ -20,10 +20,14 @@ export function Header() {
       </button>
 
       <div className={styles.titleGroup}>
-        <span className={styles.title}>COOL DASHBOARD</span>
+        <span className={styles.title}>ЦИФРОВОЙ</span>
+        <strong className={styles.accent}>ГОК</strong>
       </div>
 
-      <div className={styles.actions} aria-label="Действия панели" />
+      <div className={styles.user}>
+        <span>Доброе утро, Ярослав Сергеевич</span>
+        <span className={styles.avatar} aria-hidden="true" />
+      </div>
     </header>
   )
 }
