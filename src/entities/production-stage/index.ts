@@ -1,4 +1,16 @@
-export type { DashboardMetric, DashboardMetricStatus, DashboardStage } from './model/types'
+export type {
+  DashboardMetric,
+  DashboardMetricStatus,
+  DashboardStage,
+  HomeDashboardAttentionItem,
+  HomeDashboardBusinessUnit,
+  HomeDashboardChainItem,
+  HomeDashboardMetricDirection,
+  HomeDashboardStatus,
+  HomeDashboardSummary,
+  HomeDashboardSummaryCard,
+  HomeDashboardTrendPoint
+} from './model/types'
 export { DEFAULT_DETAIL_PERIOD, DETAIL_PERIODS } from './model/types'
 export type {
   BusinessUnitSlug,

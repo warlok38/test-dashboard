@@ -24,6 +24,73 @@ export type DashboardStage = {
   metrics: DashboardMetric[]
 }
 
+export type HomeDashboardStatus = 'success' | 'warning' | 'danger' | 'neutral'
+
+export type HomeDashboardMetricDirection = 'higher-is-better' | 'lower-is-better'
+
+export type HomeDashboardSummaryCard = {
+  id: string
+  title: string
+  value: string
+  caption: string
+  status: HomeDashboardStatus
+}
+
+export type HomeDashboardAttentionItem = {
+  id: string
+  title: string
+  metricTitle: string
+  factLabel: string
+  planLabel: string
+  deltaLabel: string
+  impact: string
+  status: Exclude<HomeDashboardStatus, 'success'>
+  href?: string
+}
+
+export type HomeDashboardChainItem = {
+  id: string
+  title: string
+  planText: string
+  status: HomeDashboardStatus
+  worstMetricTitle: string
+  worstMetricDeltaLabel: string
+  href?: string
+}
+
+export type HomeDashboardTrendPoint = {
+  label: string
+  fact: number
+  plan: number
+}
+
+export type HomeDashboardBusinessUnit = {
+  id: BusinessUnitSlug
+  title: string
+  status: HomeDashboardStatus
+  worstMetricTitle: string
+  worstMetricDeltaLabel: string
+  contributionLabel: string
+  metrics: Array<{
+    id: string
+    title: string
+    value: string
+    deltaLabel: string
+    status: HomeDashboardStatus
+  }>
+}
+
+export type HomeDashboardSummary = {
+  status: HomeDashboardStatus
+  statusTitle: string
+  statusDescription: string
+  cards: HomeDashboardSummaryCard[]
+  attentionItems: HomeDashboardAttentionItem[]
+  chain: HomeDashboardChainItem[]
+  trend: HomeDashboardTrendPoint[]
+  businessUnits: HomeDashboardBusinessUnit[]
+}
+
 export type MiningStageMetricKind = 'bar-line' | 'line'
 
 export type MiningStagePoint = {
