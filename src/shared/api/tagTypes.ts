@@ -1,5 +1,8 @@
 export const API_TAGS = {
   businessUnits: 'BusinessUnits',
+  gtk: 'Gtk',
+  summary: 'Summary',
+  graph: 'Graph',
   productionStages: 'ProductionStages',
   productionStageMetrics: 'ProductionStageMetrics',
   productionMetricDetail: 'ProductionMetricDetail',
