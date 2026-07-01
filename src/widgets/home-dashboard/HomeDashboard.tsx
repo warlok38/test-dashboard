@@ -1,70 +1,44 @@
-'use client'
-
-import { Alert, Empty, Skeleton } from 'antd'
-import { useSearchParams } from 'next/navigation'
-
-import {
-  getHomeDashboardSummary,
-  getProductionStageFiltersFromSearchParams,
-  useGetProductionStagesQuery
-} from '@/entities/production-stage'
-import {
-  homeDashboardBusinessUnits,
-  homeDashboardTrend
-} from '@/shared/mocks/production-stage/homeDashboard'
+import { getHomeDashboardSummary } from '@/entities/production-stage'
+import { homeDashboardSummaryMock } from '@/shared/mocks/production-stage/homeDashboard'
 
 import styles from './HomeDashboard.module.css'
 import {
-  AttentionList,
-  BusinessUnitHealthGrid,
-  ExecutiveSummary,
-  PlanFactTrend,
-  ProductionChain
+  AssetPerformanceTable,
+  DeviationReasonsList,
+  PeriodControls,
+  PlanFactChart,
+  ProductionEventsList,
+  ProductionFlow,
+  ProductionKpiStrip
 } from './ui'
 
 export function HomeDashboard() {
-  const searchParams = useSearchParams()
-  const {
-    data: stages = [],
-    error,
-    isLoading
-  } = useGetProductionStagesQuery(getProductionStageFiltersFromSearchParams(searchParams))
-
-  if (isLoading) {
-    return (
-      <section className={styles.dashboard} aria-label="Главная сводка производства">
-        <Skeleton active paragraph={{ rows: 10 }} title={false} />
-      </section>
-    )
-  }
-
-  if (error) {
-    return (
-      <section className={styles.dashboard} aria-label="Главная сводка производства">
-        <Alert showIcon type="error" message="Не удалось загрузить главную сводку" />
-      </section>
-    )
-  }
-
-  if (stages.length === 0) {
-    return (
-      <section className={styles.dashboard} aria-label="Главная сводка производства">
-        <Empty description="Нет данных для главной сводки" />
-      </section>
-    )
-  }
-
-  const summary = getHomeDashboardSummary(stages, homeDashboardTrend, homeDashboardBusinessUnits)
+  const summary = getHomeDashboardSummary(homeDashboardSummaryMock)
 
   return (
     <section className={styles.dashboard} aria-label="Главная сводка производства">
-      <ExecutiveSummary summary={summary} />
-      <div className={styles.insightGrid}>
-        <AttentionList items={summary.attentionItems} />
-        <PlanFactTrend data={summary.trend} />
+      <header className={styles.summary}>
+        <div className={styles.summaryLead}>
+          <span className={styles.summaryEyebrow}>{summary.controls.updatedAtLabel}</span>
+          <h1>{summary.title}</h1>
+          <p>{summary.subtitle}</p>
+        </div>
+        <PeriodControls
+          periodLabel={summary.controls.periodLabel}
+          shiftLabel={summary.controls.shiftLabel}
+          assetLabel={summary.controls.assetLabel}
+        />
+      </header>
+      <ProductionKpiStrip kpis={summary.kpis} />
+      <div className={styles.primaryGrid}>
+        <PlanFactChart trend={summary.trend} />
+        <DeviationReasonsList deviations={summary.deviations} />
       </div>
-      <ProductionChain items={summary.chain} />
-      <BusinessUnitHealthGrid units={summary.businessUnits} />
+      <ProductionFlow stages={summary.flow} />
+      <div className={styles.secondaryGrid}>
+        <AssetPerformanceTable assets={summary.assets} />
+        <ProductionEventsList events={summary.events} />
+      </div>
     </section>
   )
 }

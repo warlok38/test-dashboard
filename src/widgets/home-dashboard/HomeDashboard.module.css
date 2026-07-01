@@ -101,6 +101,13 @@
   gap: var(--space-5);
 }
 
+.primaryGrid,
+.secondaryGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(22rem, 0.8fr);
+  gap: var(--space-5);
+}
+
 .panel {
   min-width: 0;
   max-width: 100%;
@@ -381,7 +388,9 @@
 
 @media (--screen-medium) {
   .summary,
-  .insightGrid {
+  .insightGrid,
+  .primaryGrid,
+  .secondaryGrid {
     grid-template-columns: 1fr;
   }
 
@@ -414,6 +423,8 @@
 
   .summary,
   .insightGrid,
+  .primaryGrid,
+  .secondaryGrid,
   .attentionList,
   .chain,
   .businessGrid,
