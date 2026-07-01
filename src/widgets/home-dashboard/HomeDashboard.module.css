@@ -3,6 +3,8 @@
   flex-direction: column;
   gap: var(--space-5);
   min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
   padding: var(--space-5);
 }
 
@@ -13,6 +15,8 @@
   display: grid;
   grid-template-columns: minmax(18rem, 0.9fr) minmax(0, 1.4fr);
   gap: var(--space-5);
+  min-width: 0;
+  max-width: 100%;
   padding: var(--space-5);
   border: var(--border-width-hairline) solid var(--palette-border-soft);
   border-left: var(--border-width-strong) solid var(--status-color);
@@ -22,6 +26,7 @@
 
 .summaryLead {
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .summaryEyebrow,
@@ -60,6 +65,8 @@
   --status-bg: var(--palette-status-neutral-bg);
 
   min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   padding: var(--space-4);
   border: var(--border-width-hairline) solid var(--palette-border-soft);
   border-radius: var(--radius-5);
@@ -96,6 +103,8 @@
 
 .panel {
   min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
   padding: var(--space-5);
   border: var(--border-width-hairline) solid var(--palette-border-soft);
   border-radius: var(--radius-5);
@@ -143,6 +152,9 @@
   --status-bg: var(--palette-status-neutral-bg);
 
   min-height: 12rem;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   padding: var(--space-4);
   border: var(--border-width-hairline) solid var(--palette-border-soft);
   border-left: var(--border-width-strong) solid var(--status-color);
@@ -242,6 +254,9 @@
   --status-bg: var(--palette-status-neutral-bg);
 
   min-height: 9rem;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   padding: var(--space-4);
   border: var(--border-width-hairline) solid var(--palette-border-soft);
   border-top: var(--border-width-strong) solid var(--status-color);
@@ -298,6 +313,8 @@
   --status-bg: var(--palette-status-neutral-bg);
 
   min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   padding: var(--space-4);
   border: var(--border-width-hairline) solid var(--palette-border-soft);
   border-left: var(--border-width-strong) solid var(--status-color);
@@ -390,7 +407,19 @@
 
 @media (--screen-small) {
   .dashboard {
+    width: 100vw;
+    max-width: 100vw;
     padding: var(--space-3);
+  }
+
+  .summary,
+  .insightGrid,
+  .attentionList,
+  .chain,
+  .businessGrid,
+  .summaryCards,
+  .businessCard dl {
+    grid-template-columns: 1fr;
   }
 
   .summary,
@@ -398,10 +427,11 @@
     padding: var(--space-4);
   }
 
-  .summaryCards,
-  .chain,
-  .businessGrid,
-  .businessCard dl {
-    grid-template-columns: 1fr;
+  .summaryLead h1 {
+    font-size: var(--font-size-lg);
+  }
+
+  .trendChart {
+    height: 16rem;
   }
 }
