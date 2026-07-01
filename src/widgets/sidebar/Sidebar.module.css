@@ -2,14 +2,14 @@
   box-sizing: content-box;
   position: relative;
   z-index: 2;
-  flex: 0 0 var(--layout-sidebar-width-expanded);
-  width: var(--layout-sidebar-width-expanded);
+  flex: 0 0 17.5rem;
+  width: 17.5rem;
   min-height: 0;
   display: flex;
   flex-direction: column;
   color: var(--color-text-sidebar);
-  background: var(--color-bg-sidebar);
-  border-right: var(--border-width-hairline) solid var(--color-border-sidebar);
+  background: #4a4a4a;
+  border-right: 0;
   overflow: hidden;
   transition:
     flex-basis 220ms ease,
@@ -42,14 +42,41 @@
 }
 
 .header {
-  flex: 0 0 var(--layout-header-height);
-  min-height: var(--layout-header-height);
+  display: none;
+}
+
+.sidebarDrawer .header {
+  flex: 0 0 4.25rem;
+  min-height: 4.25rem;
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-0) var(--space-4);
-  background: var(--color-bg-sidebar);
-  border-bottom: var(--border-width-hairline) solid var(--color-border-sidebar);
+  padding: 0 var(--space-4);
+  background: #4a4a4a;
+}
+
+.dateBlock {
+  flex: 0 0 4.25rem;
+  min-height: 4.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.3125rem;
+  padding: 0 1.25rem;
+  color: #fff;
+  background: #4a4a4a;
+}
+
+.dateBlock strong {
+  font-size: 0.9375rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.dateBlock span {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.1;
 }
 
 .logoMark {
@@ -129,7 +156,7 @@
 
 .menu {
   flex: 0 0 auto;
-  padding: var(--space-4) var(--space-0);
+  padding: 0.25rem;
   background: transparent;
   border-inline-end: 0 !important;
 }
@@ -143,10 +170,14 @@
 
 .menu :global(.ant-menu-item),
 .menu :global(.ant-menu-submenu-title) {
-  min-height: 2.5rem;
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  line-height: 2.5rem;
+  min-height: 2.5625rem;
+  height: 2.5625rem;
+  margin: 0 0 0.25rem !important;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 2.5625rem;
 }
 
 .menu :global(.ant-menu-item a) {
@@ -158,11 +189,23 @@
 }
 
 .menu :global(.ant-menu-item-selected) {
+  color: #111;
   font-weight: 700;
+  background: #f8b529 !important;
 }
 
 .menu :global(.ant-menu-submenu-selected > .ant-menu-submenu-title) {
+  color: #fff;
   font-weight: 700;
+}
+
+.menu :global(.ant-menu-sub .ant-menu-item) {
+  padding-left: 2.25rem !important;
+  font-weight: 700;
+}
+
+.menu :global(.ant-menu-sub) {
+  background: transparent !important;
 }
 
 .menu :global(.ant-menu-submenu-arrow),
@@ -228,8 +271,8 @@
   display: flex;
   align-items: center;
   padding: var(--space-1);
-  background: var(--color-bg-sidebar);
-  border-top: var(--border-width-hairline) solid var(--color-border-sidebar);
+  background: #4a4a4a;
+  border-top: 0;
 }
 
 .collapseButton {
