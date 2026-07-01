@@ -1,6 +1,7 @@
 export * from './app-layout'
 export * from './content-header'
 export * from './header'
+export * from './home-dashboard'
 export * from './industrial-dashboard-table'
 export * from './mining-stage-overview'
 export * from './production-metric-detail'

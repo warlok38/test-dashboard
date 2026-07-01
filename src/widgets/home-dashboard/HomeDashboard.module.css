@@ -1,0 +1,407 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+  padding: var(--space-5);
+}
+
+.summary {
+  --status-color: var(--color-kpi-neutral);
+  --status-bg: var(--palette-status-neutral-bg);
+
+  display: grid;
+  grid-template-columns: minmax(18rem, 0.9fr) minmax(0, 1.4fr);
+  gap: var(--space-5);
+  padding: var(--space-5);
+  border: var(--border-width-hairline) solid var(--palette-border-soft);
+  border-left: var(--border-width-strong) solid var(--status-color);
+  border-radius: var(--radius-5);
+  background: var(--color-bg-card);
+}
+
+.summaryLead {
+  min-width: 0;
+}
+
+.summaryEyebrow,
+.panelEyebrow {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.summaryLead h1 {
+  margin-top: var(--space-2);
+  color: var(--color-text-strong);
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.summaryLead p {
+  margin-top: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+
+.summaryCards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.summaryCard {
+  --status-color: var(--color-kpi-neutral);
+  --status-bg: var(--palette-status-neutral-bg);
+
+  min-width: 0;
+  padding: var(--space-4);
+  border: var(--border-width-hairline) solid var(--palette-border-soft);
+  border-radius: var(--radius-5);
+  background: var(--status-bg);
+}
+
+.summaryCard span,
+.summaryCard p {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.summaryCard strong {
+  display: block;
+  margin-top: var(--space-2);
+  color: var(--status-color);
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.summaryCard p {
+  margin-top: var(--space-2);
+}
+
+.insightGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(22rem, 0.8fr);
+  gap: var(--space-5);
+}
+
+.panel {
+  min-width: 0;
+  padding: var(--space-5);
+  border: var(--border-width-hairline) solid var(--palette-border-soft);
+  border-radius: var(--radius-5);
+  background: var(--color-bg-card);
+}
+
+.panelHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.panelHeader h2 {
+  margin-top: var(--space-1);
+  color: var(--color-text-strong);
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.attentionList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.cardLink {
+  display: block;
+  color: inherit;
+  outline: none;
+}
+
+.cardLink:hover .attentionCard,
+.cardLink:focus-visible .attentionCard,
+.cardLink:hover .chainItem,
+.cardLink:focus-visible .chainItem {
+  background: var(--palette-accent-wash);
+}
+
+.attentionCard {
+  --status-color: var(--color-kpi-neutral);
+  --status-bg: var(--palette-status-neutral-bg);
+
+  min-height: 12rem;
+  padding: var(--space-4);
+  border: var(--border-width-hairline) solid var(--palette-border-soft);
+  border-left: var(--border-width-strong) solid var(--status-color);
+  border-radius: var(--radius-5);
+  background: var(--color-bg-card);
+  transition: background 160ms ease;
+}
+
+.attentionHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.attentionHeader span,
+.attentionMetric span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.attentionHeader h3 {
+  margin-top: var(--space-1);
+  color: var(--color-text-strong);
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+.attentionHeader strong,
+.trendBadge,
+.chainTop strong,
+.businessHeader strong {
+  flex: 0 0 auto;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-5);
+  color: var(--status-color);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  line-height: 1;
+  background: var(--status-bg);
+}
+
+.attentionMetric {
+  margin-top: var(--space-4);
+}
+
+.attentionMetric b {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--color-text-strong);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.attentionFooter {
+  margin-top: var(--space-4);
+}
+
+.attentionFooter strong {
+  color: var(--status-color);
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.attentionFooter p {
+  margin-top: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.trendBadge {
+  --status-color: var(--palette-status-warning);
+  --status-bg: var(--palette-status-warning-bg);
+}
+
+.trendChart {
+  width: 100%;
+  height: 19rem;
+}
+
+.chain {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.chainItem {
+  --status-color: var(--color-kpi-neutral);
+  --status-bg: var(--palette-status-neutral-bg);
+
+  min-height: 9rem;
+  padding: var(--space-4);
+  border: var(--border-width-hairline) solid var(--palette-border-soft);
+  border-top: var(--border-width-strong) solid var(--status-color);
+  border-radius: var(--radius-5);
+  background: var(--color-bg-card);
+  transition: background 160ms ease;
+}
+
+.chainTop,
+.businessHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.chainTop h3,
+.businessHeader h3 {
+  min-width: 0;
+  color: var(--color-text-strong);
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+.chainItem p,
+.businessCard p {
+  margin-top: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.chainItem span,
+.businessCard p span {
+  display: inline-block;
+  margin-top: var(--space-2);
+  color: var(--status-color);
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.businessGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.businessCard {
+  --status-color: var(--color-kpi-neutral);
+  --status-bg: var(--palette-status-neutral-bg);
+
+  min-width: 0;
+  padding: var(--space-4);
+  border: var(--border-width-hairline) solid var(--palette-border-soft);
+  border-left: var(--border-width-strong) solid var(--status-color);
+  border-radius: var(--radius-5);
+  background: var(--color-bg-card);
+}
+
+.businessCard > b {
+  display: block;
+  margin-top: var(--space-3);
+  color: var(--status-color);
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.businessCard dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.businessCard dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.businessCard dd {
+  margin-top: var(--space-1);
+  color: var(--status-color);
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.businessCard dd span {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: var(--font-size-xs);
+}
+
+.status-success {
+  --status-color: var(--color-kpi-delta-positive);
+  --status-bg: var(--palette-status-success-bg);
+}
+
+.status-warning {
+  --status-color: var(--palette-status-warning);
+  --status-bg: var(--palette-status-warning-bg);
+}
+
+.status-danger {
+  --status-color: var(--color-kpi-delta-negative);
+  --status-bg: var(--palette-status-danger-bg);
+}
+
+.status-neutral {
+  --status-color: var(--color-kpi-neutral);
+  --status-bg: var(--palette-status-neutral-bg);
+}
+
+@media (--screen-medium) {
+  .summary,
+  .insightGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryCards,
+  .businessGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .chain {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (--screen-tablet) {
+  .attentionList {
+    grid-template-columns: 1fr;
+  }
+
+  .chain {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (--screen-small) {
+  .dashboard {
+    padding: var(--space-3);
+  }
+
+  .summary,
+  .panel {
+    padding: var(--space-4);
+  }
+
+  .summaryCards,
+  .chain,
+  .businessGrid,
+  .businessCard dl {
+    grid-template-columns: 1fr;
+  }
+}
