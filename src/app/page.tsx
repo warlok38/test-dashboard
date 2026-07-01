@@ -1,6 +1,7 @@
+import { Suspense } from 'react'
+
 import { PageShell, PageSurface } from '@/shared/ui'
-import { ContentHeader, homeBreadcrumbIcon } from '@/widgets'
-import styles from './page.module.css'
+import { ContentHeader, HomeDashboard, homeBreadcrumbIcon } from '@/widgets'
 
 export default function Home() {
   return (
@@ -10,10 +11,10 @@ export default function Home() {
         showBusinessUnitFilter={false}
         showDateFilter={false}
       />
-      <PageSurface>
-        <section className={styles.home}>
-          <h1 className={styles.title}>Главная</h1>
-        </section>
+      <PageSurface variant="constrained">
+        <Suspense fallback={null}>
+          <HomeDashboard />
+        </Suspense>
       </PageSurface>
     </PageShell>
   )
