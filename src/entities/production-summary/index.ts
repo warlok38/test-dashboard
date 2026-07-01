@@ -12,6 +12,7 @@ export {
   GTK_SLUG_BY_NAME,
   isKnownGtkSlug
 } from './model/gtk'
+export * from './lib'
 export type {
   AlarmSummaryResponse,
   DepositMetricView,
