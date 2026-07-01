@@ -49,7 +49,7 @@ export function ProductionSummaryDashboard({
   if (error) {
     return (
       <section className={styles.dashboard} aria-label="Сводка производства">
-        <Alert showIcon type="error" message="Не удалось загрузить сводку производства" />
+        <Alert showIcon type="error" title="Не удалось загрузить сводку производства" />
       </section>
     )
   }
@@ -62,7 +62,7 @@ export function ProductionSummaryDashboard({
       </div>
       <CollapsibleStagePanel stage={miningStage} />
       {showGraph && <GraphPanel query={graphQuery} />}
-      <DepositGrid deposits={deposits} />
+      {!showGraph && <DepositGrid deposits={deposits} />}
       <StaticStagePanel title="Минеральные ресурсы" />
       <StaticStagePanel title="Обогащение" />
     </section>

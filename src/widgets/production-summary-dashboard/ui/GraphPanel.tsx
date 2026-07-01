@@ -36,7 +36,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
       </header>
       {!query && <div className={styles.emptyState}>Нет показателя для графика</div>}
       {query && isFetching && <Skeleton active paragraph={{ rows: 6 }} title={false} />}
-      {query && error && <Alert showIcon type="error" message="Не удалось загрузить график" />}
+      {query && error && <Alert showIcon type="error" title="Не удалось загрузить график" />}
       {query && !isFetching && !error && data.length === 0 && (
         <div className={styles.emptyState}>Нет данных для графика</div>
       )}

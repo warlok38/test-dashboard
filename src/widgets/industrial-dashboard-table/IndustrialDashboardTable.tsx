@@ -38,11 +38,7 @@ export function IndustrialDashboardTable() {
   if (error) {
     return (
       <div className={styles.dashboard}>
-        <Alert
-          showIcon
-          type="error"
-          message="Не удалось загрузить сводку по стадиям производства"
-        />
+        <Alert showIcon type="error" title="Не удалось загрузить сводку по стадиям производства" />
       </div>
     )
   }

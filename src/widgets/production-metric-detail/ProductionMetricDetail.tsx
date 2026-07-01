@@ -40,7 +40,7 @@ export function ProductionMetricDetail({ stageSlug, metricSlug }: ProductionMetr
   if (error || !detail) {
     return (
       <section className={styles.detail} aria-labelledby="metric-detail-title">
-        <Alert showIcon type="error" message="Не удалось загрузить детализацию показателя" />
+        <Alert showIcon type="error" title="Не удалось загрузить детализацию показателя" />
       </section>
     )
   }
