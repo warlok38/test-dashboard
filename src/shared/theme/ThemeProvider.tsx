@@ -14,11 +14,8 @@ import ruRU from 'antd/locale/ru_RU'
 import { App as AntApp, ConfigProvider, theme as antdTheme } from 'antd'
 import type { ThemeConfig } from 'antd'
 
+import { THEME_COOKIE_MAX_AGE, THEME_STORAGE_KEY, isThemeMode, type ThemeMode } from './constants'
 import { darkThemeConfig, themeConfig } from './themeConfig'
-
-export type ThemeMode = 'light' | 'dark'
-
-const STORAGE_KEY = 'theme'
 
 interface ThemeContextType {
   mode: ThemeMode
@@ -28,41 +25,42 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | null>(null)
 
-function isThemeMode(value: unknown): value is ThemeMode {
-  return value === 'light' || value === 'dark'
-}
-
-function readStoredMode(): ThemeMode {
+function readStoredMode(fallback: ThemeMode): ThemeMode {
   if (typeof window === 'undefined') {
-    return 'light'
+    return fallback
   }
 
-  const current = window.localStorage.getItem(STORAGE_KEY)
-  if (isThemeMode(current)) {
-    return current
+  try {
+    const current = window.localStorage.getItem(THEME_STORAGE_KEY)
+    if (isThemeMode(current)) {
+      return current
+    }
+  } catch {
+    // Ignore storage access errors and fall back to the document attribute.
   }
 
   const fromAttr = document.documentElement.dataset.theme
-  return isThemeMode(fromAttr) ? fromAttr : 'light'
+  return isThemeMode(fromAttr) ? fromAttr : fallback
 }
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [mode, setModeInternal] = useState<ThemeMode>('light')
-  const [mounted, setMounted] = useState(false)
+export function ThemeProvider({
+  children,
+  initialMode = 'light'
+}: {
+  children: ReactNode
+  initialMode?: ThemeMode
+}) {
+  const [mode, setModeInternal] = useState<ThemeMode>(() => readStoredMode(initialMode))
 
   useEffect(() => {
-    setModeInternal(readStoredMode())
-    setMounted(true)
-  }, [])
-
-  useEffect(() => {
-    if (!mounted) {
-      return
-    }
-
     document.documentElement.dataset.theme = mode
-    window.localStorage.setItem(STORAGE_KEY, mode)
-  }, [mode, mounted])
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, mode)
+    } catch {
+      // Ignore storage access errors; the in-memory theme still applies.
+    }
+    document.cookie = `${THEME_STORAGE_KEY}=${mode}; path=/; max-age=${THEME_COOKIE_MAX_AGE}; SameSite=Lax`
+  }, [mode])
 
   const setMode = useCallback((next: ThemeMode) => {
     setModeInternal(next)

@@ -218,7 +218,6 @@
 .menu :global(.ant-menu-submenu-title) {
   min-height: 2.5625rem;
   height: 2.5625rem;
-  margin: 0 0 0.25rem !important;
   border-radius: 5px;
   color: var(--color-text-sidebar);
   font-size: 0.9375rem;

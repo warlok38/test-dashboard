@@ -23,8 +23,8 @@
 ## Контракт темы
 
 - Тема управляется вручную через `html[data-theme='light' | 'dark']`.
-- Источник темы хранится в `localStorage` по ключу `theme`.
-- Начальное значение темы на сервере - `light`, затем после гидрации тема синхронизируется с `localStorage` через `ThemeProvider` / `useTheme`.
+- Источник темы хранится в `localStorage` и cookie по ключу `theme`.
+- Начальное значение темы на сервере берется из cookie, а ранний inline-скрипт в `RootLayout` синхронизирует `html[data-theme]` с `localStorage` до первого paint.
 - Переключение темы реализовано через `useTheme` (`src/shared/theme/ThemeProvider.tsx`, реэкспорт в `src/hooks/index.ts`) и UI в `Header1`.
 
 ## Правила использования
