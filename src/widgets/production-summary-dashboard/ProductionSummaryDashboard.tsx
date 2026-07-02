@@ -21,32 +21,39 @@ import {
 
 type ProductionSummaryDashboardProps = {
   query: SummaryQuery
+  showDeposits?: boolean
   showGraph?: boolean
 }
 
 export function ProductionSummaryDashboard({
   query,
+  showDeposits,
   showGraph = false
 }: ProductionSummaryDashboardProps) {
-  const { data: summary, error, isFetching, isLoading } = useGetSummaryQuery(query)
+  const { indicator, ...summaryQuery } = query
+  const { data: summary, error, isFetching, isLoading } = useGetSummaryQuery(summaryQuery)
   const miningStage = getMiningStage(summary)
   const deposits = groupCardsByDeposit(miningStage?.cards ?? [])
   const firstIndicator = getFirstStageIndicator(miningStage)
+  const activeIndicator = miningStage?.cards.some((card) => card.indicator_name === indicator)
+    ? indicator
+    : firstIndicator
   const isInitialLoading = isLoading && !summary
+  const shouldShowDeposits = showDeposits ?? !showGraph
   const graphQuery =
-    showGraph && query.gtk && firstIndicator
+    showGraph && activeIndicator
       ? {
-          indicator: firstIndicator,
-          gtk: query.gtk
+          indicator: activeIndicator,
+          ...(query.gtk ? { gtk: query.gtk } : {})
         }
       : undefined
 
   if (isInitialLoading) {
     return (
       <section className={styles.dashboard} aria-label="Сводка производства">
-        <ProductionSummaryDashboardSkeleton showDeposits={!showGraph} />
-        <StaticStagePanel title="Минеральные ресурсы" />
-        <StaticStagePanel title="Обогащение" />
+        <ProductionSummaryDashboardSkeleton showDeposits={shouldShowDeposits} />
+        {/* <StaticStagePanel title="Минеральные ресурсы" /> */}
+        {/* <StaticStagePanel title="Обогащение" /> */}
       </section>
     )
   }
@@ -73,10 +80,14 @@ export function ProductionSummaryDashboard({
           title="Не удалось обновить сводку, показаны последние загруженные данные"
         />
       )}
-      <CollapsibleStagePanel stage={miningStage} />
+      <CollapsibleStagePanel
+        activeIndicator={activeIndicator}
+        selectableIndicators={showGraph}
+        stage={miningStage}
+      />
       {showGraph && <GraphPanel query={graphQuery} />}
-      {!showGraph && <DepositGrid deposits={deposits} />}
-      <StaticStagePanel title="Минеральные ресурсы" />
+      {shouldShowDeposits && <DepositGrid deposits={deposits} />}
+      {/* <StaticStagePanel title="Минеральные ресурсы" /> */}
       <StaticStagePanel title="Обогащение" />
     </section>
   )

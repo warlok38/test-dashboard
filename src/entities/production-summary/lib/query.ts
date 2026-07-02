@@ -14,6 +14,7 @@ type SearchParamValue = string | string[] | undefined
 export type SummarySearchParams = {
   dateFrom?: SearchParamValue
   dateTo?: SearchParamValue
+  indicator?: SearchParamValue
 }
 
 function getSearchParamValue(value: SearchParamValue) {
@@ -39,6 +40,7 @@ export function getSummaryQueryFromSearchParams(
   return {
     date_from: formatSummaryDate(searchParams?.dateFrom),
     date_to: formatSummaryDate(searchParams?.dateTo),
+    indicator: getSearchParamValue(searchParams?.indicator),
     ...(gtk ? { gtk } : {})
   }
 }

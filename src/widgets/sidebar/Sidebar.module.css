@@ -8,7 +8,7 @@
   display: flex;
   flex-direction: column;
   color: var(--color-text-sidebar);
-  background: #4a4a4a;
+  background: var(--color-bg-sidebar);
   border-right: 0;
   overflow: hidden;
   transition:
@@ -51,8 +51,16 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: 0 var(--space-4);
-  background: #4a4a4a;
+  padding: 0 var(--space-3) 0 var(--space-4);
+  background: var(--color-bg-sidebar);
+}
+
+.sidebarDrawer .dateBlock {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: auto;
+  padding: 0;
+  background: transparent;
 }
 
 .dateBlock {
@@ -63,8 +71,20 @@
   justify-content: center;
   gap: 0.3125rem;
   padding: 0 1.25rem;
-  color: #fff;
-  background: #4a4a4a;
+  color: var(--color-text-sidebar);
+  background: var(--color-bg-sidebar);
+}
+
+.dateBlockCollapsed {
+  flex: 0 0 4.25rem;
+  min-height: 4.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1875rem;
+  color: var(--color-text-sidebar);
+  background: var(--color-bg-sidebar);
 }
 
 .dateLabel {
@@ -73,10 +93,32 @@
   line-height: 1.1;
 }
 
-.dateBlock span {
+.dateMeta {
   font-size: 0.8125rem;
   font-weight: 500;
   line-height: 1.1;
+  color: color-mix(in srgb, var(--color-text-sidebar) 74%, transparent);
+}
+
+.dateCollapsedWeekday {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.dateCollapsedDate {
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  line-height: 1;
+  color: color-mix(in srgb, var(--color-text-sidebar) 74%, transparent);
+}
+
+.dateCollapsedTime {
+  margin-top: 0.125rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  line-height: 1;
+  color: color-mix(in srgb, var(--color-text-sidebar) 64%, transparent);
 }
 
 .logoMark {
@@ -149,6 +191,10 @@
   cursor: pointer;
 }
 
+.sidebarDrawer .closeButton {
+  margin-left: auto;
+}
+
 .closeButton:hover {
   color: var(--color-text-sidebar);
   background: var(--color-bg-sidebar-hover);
@@ -156,7 +202,7 @@
 
 .menu {
   flex: 0 0 auto;
-  padding: 0.25rem;
+  padding: 0.25rem 0.5rem;
   background: transparent;
   border-inline-end: 0 !important;
 }
@@ -174,7 +220,7 @@
   height: 2.5625rem;
   margin: 0 0 0.25rem !important;
   border-radius: 5px;
-  color: #fff;
+  color: var(--color-text-sidebar);
   font-size: 0.9375rem;
   font-weight: 500;
   line-height: 2.5625rem;
@@ -189,13 +235,13 @@
 }
 
 .menu :global(.ant-menu-item-selected) {
-  color: #111;
+  color: var(--palette-accent-on-solid);
   font-weight: 700;
-  background: #f8b529 !important;
+  background: var(--palette-accent-primary) !important;
 }
 
 .menu :global(.ant-menu-submenu-selected > .ant-menu-submenu-title) {
-  color: #fff;
+  color: var(--color-text-sidebar);
   font-weight: 600;
 }
 
@@ -233,12 +279,20 @@
   color: currentColor;
 }
 
+.menu :global(.ant-menu-item-selected a),
+.menu :global(.ant-menu-item-selected .ant-menu-item-icon),
+.menu :global(.ant-menu-item-selected .ant-menu-title-content),
+.menu :global(.ant-menu-item-selected .anticon),
+.menu :global(.ant-menu-item-selected .anticon svg) {
+  color: var(--palette-accent-on-solid);
+  fill: currentColor;
+}
+
 .rail {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-1);
-  padding: var(--space-4) var(--space-0);
 }
 
 .railItem {
@@ -290,7 +344,7 @@
   display: flex;
   align-items: center;
   padding: var(--space-1);
-  background: #4a4a4a;
+  background: var(--color-bg-sidebar);
   border-top: 0;
 }
 
@@ -337,6 +391,10 @@
 .sidebarCollapsed .brand,
 .sidebarCollapsed .collapseLabel {
   display: none;
+}
+
+.sidebarCollapsed .rail {
+  padding: 0.25rem var(--space-0);
 }
 
 .sidebarCollapsed .footer {

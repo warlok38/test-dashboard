@@ -2,7 +2,7 @@
   flex: 1 0 auto;
   width: fit-content;
   min-width: 100%;
-  background: var(--palette-bg-elevated);
+  background: var(--color-bg-default);
 }
 
 .surfaceConstrained {

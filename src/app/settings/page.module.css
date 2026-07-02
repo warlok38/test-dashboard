@@ -27,7 +27,7 @@
   padding: var(--space-5) var(--space-6);
   border: var(--border-width-hairline) solid var(--color-border-interactive);
   border-radius: var(--radius-8);
-  background: var(--color-bg-default);
+  background: var(--color-bg-card);
 }
 
 .settingText {

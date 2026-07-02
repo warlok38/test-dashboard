@@ -6,10 +6,16 @@ import styles from '../ProductionSummaryDashboard.module.css'
 import { KpiCard } from './KpiCard'
 
 type CollapsibleStagePanelProps = {
+  activeIndicator?: string
+  selectableIndicators?: boolean
   stage: StageSummary | undefined
 }
 
-export function CollapsibleStagePanel({ stage }: CollapsibleStagePanelProps) {
+export function CollapsibleStagePanel({
+  activeIndicator,
+  selectableIndicators = false,
+  stage
+}: CollapsibleStagePanelProps) {
   return (
     <section className={styles.stagePanel} aria-labelledby="mining-title">
       <header className={styles.stageHeader}>
@@ -24,7 +30,12 @@ export function CollapsibleStagePanel({ stage }: CollapsibleStagePanelProps) {
       {stage && stage.cards.length > 0 ? (
         <div className={styles.kpiGrid}>
           {stage.cards.map((card) => (
-            <KpiCard key={card.indicator_name} card={card} />
+            <KpiCard
+              key={card.indicator_name}
+              active={card.indicator_name === activeIndicator}
+              card={card}
+              selectable={selectableIndicators}
+            />
           ))}
         </div>
       ) : (

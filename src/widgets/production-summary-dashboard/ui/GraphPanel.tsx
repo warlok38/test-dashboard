@@ -27,6 +27,14 @@ const DEFAULT_VISIBLE_DAYS = 30
 const MIN_VISIBLE_DAYS = 7
 const MAX_VISIBLE_DAYS = 365
 const MAX_X_AXIS_TICKS = 8
+const FACT_COLOR = 'var(--color-kpi-fact)'
+const PLAN_COLOR = 'var(--color-kpi-plan)'
+const GRID_COLOR = 'var(--palette-dashboard-grid-border)'
+const DOT_FILL_COLOR = 'var(--color-bg-card)'
+const BRUSH_TRACK_FILL_COLOR = 'var(--color-chart-brush-track-bg)'
+const BRUSH_TRACK_STROKE_COLOR = 'var(--color-chart-brush-track-border)'
+const BRUSH_HANDLE_FILL_COLOR = 'var(--color-chart-brush-handle-bg)'
+const BRUSH_HANDLE_GRIP_COLOR = 'var(--color-chart-brush-handle-grip)'
 const RANGE_PRESETS = [
   { label: 'Неделя', value: 7 },
   { label: 'Месяц', value: 30 },
@@ -64,6 +72,38 @@ type GraphRange = {
 type BrushRange = {
   startIndex?: number
   endIndex?: number
+}
+
+type BrushTravellerProps = {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+function renderBrushTraveller({ x, y, width, height }: BrushTravellerProps) {
+  const lineY = Math.floor(y + height / 2) - 1
+
+  return (
+    <g>
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        fill={BRUSH_HANDLE_FILL_COLOR}
+        stroke="none"
+      />
+      <line x1={x + 1} y1={lineY} x2={x + width - 1} y2={lineY} stroke={BRUSH_HANDLE_GRIP_COLOR} />
+      <line
+        x1={x + 1}
+        y1={lineY + 2}
+        x2={x + width - 1}
+        y2={lineY + 2}
+        stroke={BRUSH_HANDLE_GRIP_COLOR}
+      />
+    </g>
+  )
 }
 
 function parseGraphDate(value: string | undefined) {
@@ -291,7 +331,9 @@ export function GraphPanel({ query }: GraphPanelProps) {
       return null
     }
 
-    return <circle cx={cx} cy={cy} fill="#fff" r={3} stroke="#ffae16" strokeWidth={3} />
+    return (
+      <circle cx={cx} cy={cy} fill={DOT_FILL_COLOR} r={3} stroke={FACT_COLOR} strokeWidth={3} />
+    )
   }
 
   const renderGraphContent = () => {
@@ -319,7 +361,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
       <div className={styles.chartBox}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: -16 }}>
-            <CartesianGrid stroke="#e5e5e5" vertical={false} />
+            <CartesianGrid stroke={GRID_COLOR} vertical={false} />
             <XAxis
               dataKey="date"
               tickLine={false}
@@ -334,7 +376,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
               type="monotone"
               dataKey="plan"
               name="План"
-              stroke="#8a8a8a"
+              stroke={PLAN_COLOR}
               strokeWidth={2}
               dot={false}
               connectNulls={false}
@@ -343,18 +385,21 @@ export function GraphPanel({ query }: GraphPanelProps) {
               type="monotone"
               dataKey="fact"
               name="Факт"
-              stroke="#ffae16"
+              stroke={FACT_COLOR}
               strokeWidth={3}
               dot={renderFactDot}
               connectNulls={false}
             />
             <Brush
+              className={styles.chartBrush}
               dataKey="date"
               endIndex={visibleIndexes.endIndex}
+              fill={BRUSH_TRACK_FILL_COLOR}
               height={24}
               onChange={updateVisibleRange}
               startIndex={visibleIndexes.startIndex}
-              stroke="#ffae16"
+              stroke={BRUSH_TRACK_STROKE_COLOR}
+              traveller={renderBrushTraveller}
               travellerWidth={8}
             />
           </LineChart>
@@ -367,11 +412,10 @@ export function GraphPanel({ query }: GraphPanelProps) {
     <section className={styles.graphPanel} aria-labelledby="graph-title">
       <header className={styles.graphHeader}>
         <div>
-          <h2 id="graph-title">График</h2>
+          <h2 id="graph-title">{query?.indicator ?? 'График'}</h2>
           <div className={styles.graphRange}>{rangeLabel}</div>
         </div>
         <div className={styles.graphMeta}>
-          {query?.indicator && <span>{query.indicator}</span>}
           <div className={styles.graphControls}>
             <Segmented
               options={RANGE_PRESETS}

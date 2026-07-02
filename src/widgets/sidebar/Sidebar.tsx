@@ -15,7 +15,7 @@ import {
   GTK_MENU_KEY
 } from './sidebarConfig'
 import styles from './Sidebar.module.css'
-import { CollapsedSidebarNav, SidebarMenu } from './ui'
+import { CollapsedSidebarNav, SidebarDateTime, SidebarMenu } from './ui'
 
 type SidebarVariant = 'desktop' | 'drawer'
 
@@ -25,6 +25,8 @@ const GTK_MENU_SKELETON_ITEMS = Array.from({ length: 4 }, (_, index) => ({
   disabled: true,
   isSkeleton: true
 }))
+
+const SETTINGS_MENU_KEY = '/settings'
 
 type SidebarContentProps = {
   collapsed?: boolean
@@ -87,6 +89,14 @@ function SidebarContent({ collapsed = false, variant = 'desktop' }: SidebarConte
       }),
     [gtkNames, isGtkInitialError, isGtkInitialLoading]
   )
+  const primarySidebarItems = useMemo(
+    () => sidebarItems.filter((item) => item.key !== SETTINGS_MENU_KEY),
+    [sidebarItems]
+  )
+  const footerSidebarItems = useMemo(
+    () => sidebarItems.filter((item) => item.key === SETTINGS_MENU_KEY),
+    [sidebarItems]
+  )
 
   useEffect(() => {
     setOpenKeys(routeOpenKeys)
@@ -107,19 +117,9 @@ function SidebarContent({ collapsed = false, variant = 'desktop' }: SidebarConte
       })}
       aria-label="Навигация приложения"
     >
-      <div className={styles.header}>
-        <div className={styles.logoMark} aria-hidden="true">
-          <span />
-          <span />
-          <span />
-        </div>
-
-        <div className={styles.brand}>
-          <span className={styles.title}>ЦИФРОВОЙ ГОК</span>
-          <span className={styles.subtitle}>Планерка</span>
-        </div>
-
-        {isDrawer && (
+      {isDrawer && (
+        <div className={styles.header}>
+          <SidebarDateTime collapsed={isCollapsed} />
           <button
             type="button"
             className={styles.closeButton}
@@ -128,21 +128,20 @@ function SidebarContent({ collapsed = false, variant = 'desktop' }: SidebarConte
           >
             <CloseOutlined />
           </button>
-        )}
-      </div>
-
-      {!isCollapsed && (
-        <div className={styles.dateBlock}>
-          <span className={styles.dateLabel}>Пятница, 26 июня</span>
-          <span>2026 · 09:14 МСК</span>
         </div>
       )}
 
+      {!isDrawer && <SidebarDateTime collapsed={isCollapsed} />}
+
       {isCollapsed ? (
-        <CollapsedSidebarNav items={sidebarItems} pathname={pathname} queryString={queryString} />
+        <CollapsedSidebarNav
+          items={primarySidebarItems}
+          pathname={pathname}
+          queryString={queryString}
+        />
       ) : (
         <SidebarMenu
-          items={sidebarItems}
+          items={primarySidebarItems}
           onOpenChange={setOpenKeys}
           onRouteClick={onRouteClick}
           openKeys={openKeys}
@@ -152,6 +151,23 @@ function SidebarContent({ collapsed = false, variant = 'desktop' }: SidebarConte
       )}
 
       <div className={styles.spacer} />
+
+      {isCollapsed ? (
+        <CollapsedSidebarNav
+          items={footerSidebarItems}
+          pathname={pathname}
+          queryString={queryString}
+        />
+      ) : (
+        <SidebarMenu
+          items={footerSidebarItems}
+          onOpenChange={setOpenKeys}
+          onRouteClick={onRouteClick}
+          openKeys={openKeys}
+          queryString={queryString}
+          selectedKey={selectedKey}
+        />
+      )}
 
       {!isDrawer && (
         <div className={styles.footer}>

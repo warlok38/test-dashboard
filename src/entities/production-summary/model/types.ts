@@ -7,6 +7,7 @@ export type GtkSlug = 'olimpiada' | 'blagodatnoe' | 'natalka' | 'kuranah' | 'suh
 export type SummaryQuery = {
   date_from?: string
   date_to?: string
+  indicator?: string
   gtk?: string
 }
 
@@ -51,7 +52,7 @@ export type GraphQuery = {
   date?: string
   date_from?: string
   date_to?: string
-  gtk: string
+  gtk?: string
 }
 
 export type GraphPoint = {

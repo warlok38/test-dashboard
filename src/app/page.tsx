@@ -14,7 +14,11 @@ export default function Home({ searchParams }: HomePageProps) {
     <PageShell>
       <ContentHeader breadcrumbs={[{ label: 'Производство' }]} showBusinessUnitFilter={false} />
       <PageSurface variant="constrained">
-        <ProductionSummaryDashboard query={getSummaryQueryFromSearchParams(searchParams)} />
+        <ProductionSummaryDashboard
+          query={getSummaryQueryFromSearchParams(searchParams)}
+          showDeposits
+          showGraph
+        />
       </PageSurface>
     </PageShell>
   )
