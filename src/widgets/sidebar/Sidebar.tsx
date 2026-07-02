@@ -103,7 +103,7 @@ function SidebarContent({ collapsed = false, variant = 'desktop' }: SidebarConte
 
       {!isCollapsed && (
         <div className={styles.dateBlock}>
-          <strong>Пятница, 26 июня</strong>
+          <span className={styles.dateLabel}>Пятница, 26 июня</span>
           <span>2026 · 09:14 МСК</span>
         </div>
       )}

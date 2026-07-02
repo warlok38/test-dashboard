@@ -34,7 +34,7 @@ export function ContentHeader({
     hasDefaultActions ? (
       <>
         {showBusinessUnitFilter && <BusinessUnitFilter />}
-        {showDateFilter && <DateRangeFilter />}
+        {showDateFilter && <DateRangeFilter variant="borderless" />}
       </>
     ) : null
   const resolvedActions = actions ?? renderDefaultActions()

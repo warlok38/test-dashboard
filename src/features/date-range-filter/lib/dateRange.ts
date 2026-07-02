@@ -9,6 +9,12 @@ dayjs.extend(customParseFormat)
 export const DATE_FROM_PARAM = 'dateFrom'
 export const DATE_TO_PARAM = 'dateTo'
 
+export function getYesterdayRange(): NonNullable<DateRangePickerValue> {
+  const yesterday = dayjs().subtract(1, 'day')
+
+  return [yesterday.startOf('day'), yesterday.endOf('day')]
+}
+
 export function getTodayRange(): NonNullable<DateRangePickerValue> {
   const today = dayjs()
 

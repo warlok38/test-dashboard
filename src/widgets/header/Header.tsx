@@ -21,7 +21,7 @@ export function Header() {
 
       <div className={styles.titleGroup}>
         <span className={styles.title}>ЦИФРОВОЙ</span>
-        <strong className={styles.accent}>ГОК</strong>
+        <span className={styles.accent}>ГОК</span>
       </div>
 
       <div className={styles.user}>

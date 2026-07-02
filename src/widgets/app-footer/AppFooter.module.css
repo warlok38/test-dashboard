@@ -42,9 +42,13 @@
   white-space: nowrap;
 }
 
-.statGroup strong,
+.statTitle,
 .statGroup b {
   font-weight: 700;
+}
+
+.statTitle {
+  font-weight: 600;
 }
 
 .divider {

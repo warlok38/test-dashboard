@@ -1,9 +1,9 @@
 import classNames from 'classnames'
 
 import {
+  getDeviationClassName,
   formatDeviation,
   formatSummaryNumber,
-  getSeverityClassName,
   type SummaryIndicatorCard
 } from '@/entities/production-summary'
 
@@ -19,11 +19,13 @@ export function KpiCard({ card }: KpiCardProps) {
   return (
     <article className={styles.kpiCard}>
       <div className={styles.metricTitle}>
-        <strong>{card.indicator_name}</strong>
-        <span>{card.measure_unit}</span>
+        <span className={styles.metricName}>{card.indicator_name}</span>
+        <span className={styles.metricUnit}>{card.measure_unit}</span>
       </div>
       <b className={styles.metricValue}>{formatSummaryNumber(card.fact_value, fractionDigits)}</b>
-      <span className={classNames(styles.deviation, styles[getSeverityClassName(card.severity)])}>
+      <span
+        className={classNames(styles.deviation, styles[getDeviationClassName(card.deviation_pct)])}
+      >
         {formatDeviation(card.deviation_pct)}
       </span>
     </article>

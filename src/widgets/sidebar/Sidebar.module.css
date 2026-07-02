@@ -67,9 +67,9 @@
   background: #4a4a4a;
 }
 
-.dateBlock strong {
+.dateLabel {
   font-size: 0.9375rem;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1.1;
 }
 
@@ -122,7 +122,7 @@
 .title {
   color: var(--color-text-sidebar);
   font-size: var(--font-size-sm);
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1.1;
   white-space: nowrap;
 }
@@ -176,7 +176,7 @@
   border-radius: 5px;
   color: #fff;
   font-size: 0.9375rem;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 2.5625rem;
 }
 
@@ -185,7 +185,7 @@
 }
 
 .menu :global(.ant-menu-submenu-open > .ant-menu-submenu-title) {
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .menu :global(.ant-menu-item-selected) {
@@ -196,12 +196,11 @@
 
 .menu :global(.ant-menu-submenu-selected > .ant-menu-submenu-title) {
   color: #fff;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .menu :global(.ant-menu-sub .ant-menu-item) {
   padding-left: 2.25rem !important;
-  font-weight: 700;
 }
 
 .menu :global(.ant-menu-sub) {

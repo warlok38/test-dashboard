@@ -179,7 +179,7 @@
   color: var(--color-text-muted);
   background: var(--palette-bg-muted);
   font-size: var(--font-size-xs);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.2;
   text-align: center;
 }

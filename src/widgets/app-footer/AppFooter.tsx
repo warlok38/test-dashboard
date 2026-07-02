@@ -21,7 +21,7 @@ type FooterStats = typeof requestStats
 function StatGroup({ title, stats }: { title: string; stats: FooterStats }) {
   return (
     <div className={styles.statGroup}>
-      <strong>{title}</strong>
+      <span className={styles.statTitle}>{title}</span>
       <span>
         Сегодня: <b>{formatFooterCount(stats.today)}</b>
       </span>

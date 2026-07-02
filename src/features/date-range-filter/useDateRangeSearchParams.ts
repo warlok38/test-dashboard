@@ -1,10 +1,17 @@
 'use client'
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useMemo } from 'react'
 
 import { type DateRangePickerValue } from '@/shared/ui'
 
-import { DATE_FROM_PARAM, DATE_TO_PARAM, formatUrlDate, getTodayRange, parseUrlDate } from './lib'
+import {
+  DATE_FROM_PARAM,
+  DATE_TO_PARAM,
+  formatUrlDate,
+  getYesterdayRange,
+  parseUrlDate
+} from './lib'
 
 export function useDateRangeSearchParams() {
   const router = useRouter()
@@ -13,8 +20,11 @@ export function useDateRangeSearchParams() {
 
   const dateFrom = parseUrlDate(searchParams.get(DATE_FROM_PARAM))
   const dateTo = parseUrlDate(searchParams.get(DATE_TO_PARAM))
-  const value: NonNullable<DateRangePickerValue> =
-    dateFrom && dateTo ? [dateFrom, dateTo] : getTodayRange()
+  const defaultValue = useMemo(() => getYesterdayRange(), [])
+  const value: NonNullable<DateRangePickerValue> = useMemo(
+    () => (dateFrom && dateTo ? [dateFrom, dateTo] : defaultValue),
+    [dateFrom, dateTo, defaultValue]
+  )
 
   const setDateRange = (nextValue: DateRangePickerValue | null) => {
     const params = new URLSearchParams(searchParams.toString())

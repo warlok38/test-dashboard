@@ -1,6 +1,6 @@
 'use client'
 
-import { Alert, Skeleton } from 'antd'
+import { Alert } from 'antd'
 
 import {
   getFirstStageIndicator,
@@ -11,23 +11,28 @@ import {
 } from '@/entities/production-summary'
 
 import styles from './ProductionSummaryDashboard.module.css'
-import { CollapsibleStagePanel, DepositGrid, GraphPanel, StaticStagePanel } from './ui'
+import {
+  CollapsibleStagePanel,
+  DepositGrid,
+  GraphPanel,
+  ProductionSummaryDashboardSkeleton,
+  StaticStagePanel
+} from './ui'
 
 type ProductionSummaryDashboardProps = {
   query: SummaryQuery
-  title?: string
   showGraph?: boolean
 }
 
 export function ProductionSummaryDashboard({
   query,
-  title,
   showGraph = false
 }: ProductionSummaryDashboardProps) {
-  const { data: summary, error, isLoading } = useGetSummaryQuery(query)
+  const { data: summary, error, isFetching, isLoading } = useGetSummaryQuery(query)
   const miningStage = getMiningStage(summary)
   const deposits = groupCardsByDeposit(miningStage?.cards ?? [])
   const firstIndicator = getFirstStageIndicator(miningStage)
+  const isInitialLoading = isLoading && !summary
   const graphQuery =
     showGraph && query.gtk && firstIndicator
       ? {
@@ -38,15 +43,17 @@ export function ProductionSummaryDashboard({
         }
       : undefined
 
-  if (isLoading) {
+  if (isInitialLoading) {
     return (
       <section className={styles.dashboard} aria-label="Сводка производства">
-        <Skeleton active paragraph={{ rows: 14 }} title={false} />
+        <ProductionSummaryDashboardSkeleton showDeposits={!showGraph} />
+        <StaticStagePanel title="Минеральные ресурсы" />
+        <StaticStagePanel title="Обогащение" />
       </section>
     )
   }
 
-  if (error) {
+  if (error && !summary) {
     return (
       <section className={styles.dashboard} aria-label="Сводка производства">
         <Alert showIcon type="error" title="Не удалось загрузить сводку производства" />
@@ -56,10 +63,18 @@ export function ProductionSummaryDashboard({
 
   return (
     <section className={styles.dashboard} aria-label="Сводка производства">
-      <div className={styles.breadcrumbLine}>
-        <span aria-hidden="true" />
-        <p>{title ?? 'ПРОИЗВОДСТВО · 26 июня 2026'}</p>
-      </div>
+      {isFetching && (
+        <div className={styles.refreshStatus} role="status" aria-live="polite">
+          Обновляем показатели
+        </div>
+      )}
+      {error && (
+        <Alert
+          showIcon
+          type="warning"
+          title="Не удалось обновить сводку, показаны последние загруженные данные"
+        />
+      )}
       <CollapsibleStagePanel stage={miningStage} />
       {showGraph && <GraphPanel query={graphQuery} />}
       {!showGraph && <DepositGrid deposits={deposits} />}

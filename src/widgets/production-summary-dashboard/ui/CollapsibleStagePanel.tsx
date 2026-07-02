@@ -15,7 +15,7 @@ export function CollapsibleStagePanel({ stage }: CollapsibleStagePanelProps) {
       <header className={styles.stageHeader}>
         <div className={styles.stageTitle}>
           <h1 id="mining-title">{stage?.display_name ?? 'Добыча'}</h1>
-          <span>{getStageHealthText(stage)}</span>
+          <span className={styles.stageBadge}>{getStageHealthText(stage)}</span>
         </div>
         <button type="button" className={styles.iconButton} aria-label="Свернуть добычу">
           <DownOutlined />

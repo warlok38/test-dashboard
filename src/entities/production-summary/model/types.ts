@@ -5,24 +5,24 @@ export type GtkName = string
 export type GtkSlug = 'olimpiada' | 'blagodatnoe' | 'natalka' | 'kuranah' | 'suhoy-log'
 
 export type SummaryQuery = {
-  date_from: string
-  date_to: string
+  date_from?: string
+  date_to?: string
   gtk?: string
 }
 
 export type SummaryIndicatorDetail = {
   gtk_or_zif: string
-  plan_value: number
-  fact_value: number
-  deviation_pct: number
+  plan_value: number | null
+  fact_value: number | null
+  deviation_pct: number | null
   severity: SummarySeverity
 }
 
 export type SummaryIndicatorCard = {
   indicator_name: string
-  plan_value: number
-  fact_value: number
-  deviation_pct: number
+  plan_value: number | null
+  fact_value: number | null
+  deviation_pct: number | null
   severity: SummarySeverity
   measure_unit: string
   details: SummaryIndicatorDetail[]
@@ -64,9 +64,9 @@ export type DepositMetricView = {
   id: string
   title: string
   unit: string
-  factValue: number
-  planValue: number
-  deviationPct: number
+  factValue: number | null
+  planValue: number | null
+  deviationPct: number | null
   severity: SummarySeverity
 }
 

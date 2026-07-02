@@ -72,6 +72,14 @@ export function getSeverityClassName(severity: SummarySeverity) {
   return 'severityInfo'
 }
 
+export function getDeviationClassName(value: number | null | undefined) {
+  if (value === null || value === undefined || Number.isNaN(value)) {
+    return 'severityNeutral'
+  }
+
+  return value < 0 ? 'severityCritical' : 'severityInfo'
+}
+
 export function groupCardsByDeposit(cards: SummaryIndicatorCard[]): DepositSummaryView[] {
   const deposits = new Map<string, DepositSummaryView>()
 

@@ -2,6 +2,7 @@ import classNames from 'classnames'
 import Link from 'next/link'
 
 import {
+  getDeviationClassName,
   formatDeviation,
   formatSummaryNumber,
   getSeverityClassName,
@@ -41,8 +42,8 @@ export function DepositGrid({ deposits }: DepositGridProps) {
                 {deposit.metrics.map((metric) => (
                   <div key={metric.id} className={styles.depositMetric}>
                     <div className={styles.metricTitle}>
-                      <strong>{metric.title}</strong>
-                      <span>{metric.unit}</span>
+                      <span className={styles.metricName}>{metric.title}</span>
+                      <span className={styles.metricUnit}>{metric.unit}</span>
                     </div>
                     <b className={styles.metricValue}>
                       {formatSummaryNumber(metric.factValue, metric.title === 'Содержание' ? 2 : 1)}
@@ -50,7 +51,7 @@ export function DepositGrid({ deposits }: DepositGridProps) {
                     <span
                       className={classNames(
                         styles.deviation,
-                        styles[getSeverityClassName(metric.severity)]
+                        styles[getDeviationClassName(metric.deviationPct)]
                       )}
                     >
                       {formatDeviation(metric.deviationPct)}

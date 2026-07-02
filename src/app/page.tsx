@@ -1,14 +1,21 @@
-import { ProductionSummaryDashboard } from '@/widgets'
+import {
+  getSummaryQueryFromSearchParams,
+  type SummarySearchParams
+} from '@/entities/production-summary'
+import { PageShell, PageSurface } from '@/shared/ui'
+import { ContentHeader, ProductionSummaryDashboard } from '@/widgets'
 
-const DEFAULT_SUMMARY_DATE = '2026-06-26'
+type HomePageProps = {
+  searchParams?: SummarySearchParams
+}
 
-export default function Home() {
+export default function Home({ searchParams }: HomePageProps) {
   return (
-    <ProductionSummaryDashboard
-      query={{
-        date_from: DEFAULT_SUMMARY_DATE,
-        date_to: DEFAULT_SUMMARY_DATE
-      }}
-    />
+    <PageShell>
+      <ContentHeader breadcrumbs={[{ label: 'Производство' }]} showBusinessUnitFilter={false} />
+      <PageSurface variant="constrained">
+        <ProductionSummaryDashboard query={getSummaryQueryFromSearchParams(searchParams)} />
+      </PageSurface>
+    </PageShell>
   )
 }

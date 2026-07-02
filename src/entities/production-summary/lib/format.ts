@@ -1,17 +1,16 @@
+import { formatNumber } from '@/shared/utils/formatNumber'
+
 export function formatSummaryNumber(value: number | null | undefined, fractionDigits = 1) {
   if (value === null || value === undefined || Number.isNaN(value)) {
     return '-'
   }
 
-  return value.toLocaleString('ru-RU', {
-    maximumFractionDigits: fractionDigits,
-    minimumFractionDigits: fractionDigits
-  })
+  return formatNumber(value, { fractionDigits })
 }
 
 export function formatDeviation(value: number | null | undefined) {
   if (value === null || value === undefined || Number.isNaN(value)) {
-    return '- к плану'
+    return '-'
   }
 
   const sign = value > 0 ? '+' : ''
