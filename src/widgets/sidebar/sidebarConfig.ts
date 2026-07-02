@@ -1,4 +1,9 @@
-import { EnvironmentOutlined, HomeOutlined, SettingOutlined } from '@ant-design/icons'
+import {
+  EnvironmentOutlined,
+  ExportOutlined,
+  HomeOutlined,
+  SettingOutlined
+} from '@ant-design/icons'
 import type { ComponentType } from 'react'
 
 export const GTK_MENU_KEY = 'gtk-root'
@@ -8,6 +13,7 @@ export type SidebarMenuItem = {
   label: string
   href?: string
   icon?: ComponentType
+  isExternal?: boolean
   children?: SidebarMenuItem[]
   disabled?: boolean
   isSkeleton?: boolean
@@ -26,6 +32,13 @@ export const BASE_SIDEBAR_ITEMS: SidebarMenuItem[] = [
     label: 'Месторождения',
     icon: EnvironmentOutlined,
     children: []
+  },
+  {
+    key: 'factor-analysis',
+    href: 'https://google.com',
+    label: 'Факторный анализ',
+    icon: ExportOutlined,
+    isExternal: true
   },
   {
     key: '/settings',

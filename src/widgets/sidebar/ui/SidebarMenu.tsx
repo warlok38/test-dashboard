@@ -24,6 +24,14 @@ function getMenuLabel(item: SidebarMenuItem, queryString: string, onRouteClick?:
   }
 
   if (item.href) {
+    if (item.isExternal) {
+      return (
+        <a href={item.href} target="_blank" rel="noreferrer" onClick={onRouteClick}>
+          {item.label}
+        </a>
+      )
+    }
+
     return (
       <Link href={getHrefWithQuery(item.href, queryString)} onClick={onRouteClick}>
         {item.label}

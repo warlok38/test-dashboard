@@ -23,6 +23,22 @@ export function CollapsedSidebarNav({ items, pathname, queryString }: CollapsedS
           return null
         }
 
+        if (item.isExternal) {
+          return (
+            <a
+              key={item.key}
+              href={href}
+              className={styles.railItem}
+              title={item.label}
+              aria-label={item.label}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Icon />
+            </a>
+          )
+        }
+
         return (
           <Link
             key={item.key}
