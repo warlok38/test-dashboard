@@ -45,6 +45,7 @@ export type AlarmSummaryResponse = {
   total_warning: number
   total_incidents: number
   by_stage: Record<string, StageSummary>
+  by_enrichment: StageSummary
 }
 
 export type GraphQuery = {

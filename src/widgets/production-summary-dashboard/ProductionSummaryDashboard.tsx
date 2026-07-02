@@ -15,8 +15,7 @@ import {
   CollapsibleStagePanel,
   DepositGrid,
   GraphPanel,
-  ProductionSummaryDashboardSkeleton,
-  StaticStagePanel
+  ProductionSummaryDashboardSkeleton
 } from './ui'
 
 type ProductionSummaryDashboardProps = {
@@ -34,6 +33,7 @@ export function ProductionSummaryDashboard({
   const { data: summary, error, isFetching, isLoading } = useGetSummaryQuery(summaryQuery)
   const miningStage = getMiningStage(summary)
   const deposits = groupCardsByDeposit(miningStage?.cards ?? [])
+  const enrichmentDeposits = groupCardsByDeposit(summary?.by_enrichment?.cards ?? [])
   const firstIndicator = getFirstStageIndicator(miningStage)
   const activeIndicator = miningStage?.cards.some((card) => card.indicator_name === indicator)
     ? indicator
@@ -86,9 +86,11 @@ export function ProductionSummaryDashboard({
         stage={miningStage}
       />
       {showGraph && <GraphPanel query={graphQuery} />}
-      {shouldShowDeposits && <DepositGrid deposits={deposits} />}
+      {shouldShowDeposits && (
+        <DepositGrid items={deposits} title="Месторождения" titleId="deposits-title" />
+      )}
       {/* <StaticStagePanel title="Минеральные ресурсы" /> */}
-      <StaticStagePanel title="Обогащение" />
+      <DepositGrid items={enrichmentDeposits} title="Обогащение" titleId="enrichment-title" />
     </section>
   )
 }

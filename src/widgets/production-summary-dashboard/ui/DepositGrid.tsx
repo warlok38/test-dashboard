@@ -12,19 +12,21 @@ import {
 import styles from '../ProductionSummaryDashboard.module.css'
 
 type DepositGridProps = {
-  deposits: DepositSummaryView[]
+  items: DepositSummaryView[]
+  title: string
+  titleId: string
 }
 
-export function DepositGrid({ deposits }: DepositGridProps) {
-  if (deposits.length === 0) {
+export function DepositGrid({ items, title, titleId }: DepositGridProps) {
+  if (items.length === 0) {
     return null
   }
 
   return (
-    <section className={styles.depositSection} aria-labelledby="deposits-title">
-      <h2 id="deposits-title">Месторождения</h2>
+    <section className={styles.depositSection} aria-labelledby={titleId}>
+      <h2 id={titleId}>{title}</h2>
       <div className={styles.depositGrid}>
-        {deposits.map((deposit) => {
+        {items.map((deposit) => {
           const content = (
             <article className={styles.depositCard}>
               <header className={styles.depositHeader}>

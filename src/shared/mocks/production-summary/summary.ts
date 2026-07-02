@@ -38,6 +38,44 @@ const details = [
   }
 ]
 
+const enrichmentDetails = [
+  {
+    gtk_or_zif: 'Олимпиада',
+    plan_value: 42.4,
+    fact_value: 44.6,
+    deviation_pct: 5.2,
+    severity: 'info'
+  },
+  {
+    gtk_or_zif: 'Наталка',
+    plan_value: 27.8,
+    fact_value: 26.4,
+    deviation_pct: -5.2,
+    severity: 'warning'
+  },
+  {
+    gtk_or_zif: 'Благодатное',
+    plan_value: 18.7,
+    fact_value: 19.7,
+    deviation_pct: 5.2,
+    severity: 'info'
+  },
+  {
+    gtk_or_zif: 'Куранах',
+    plan_value: 9.6,
+    fact_value: 9.1,
+    deviation_pct: -5.2,
+    severity: 'critical'
+  },
+  {
+    gtk_or_zif: 'Сухой Лог',
+    plan_value: 6.3,
+    fact_value: 6.6,
+    deviation_pct: 5.2,
+    severity: 'info'
+  }
+]
+
 function getMockProblemSeverity(gtkOrZif: string) {
   if (gtkOrZif === 'Наталка') {
     return 'critical'
@@ -123,5 +161,52 @@ export const summaryMock: AlarmSummaryResponse = {
         }
       ]
     }
+  },
+  by_enrichment: {
+    display_name: 'Обогащение',
+    critical: 1,
+    warning: 1,
+    info: 1,
+    cards: [
+      {
+        indicator_name: 'Переработка руды',
+        plan_value: 104.8,
+        fact_value: 106.3,
+        deviation_pct: 1.4,
+        severity: 'info',
+        measure_unit: 'тыс. т',
+        details: enrichmentDetails
+      },
+      {
+        indicator_name: 'Извлечение Au',
+        plan_value: 83.5,
+        fact_value: 82.1,
+        deviation_pct: -1.7,
+        severity: 'warning',
+        measure_unit: '%',
+        details: enrichmentDetails.map((item) => ({
+          ...item,
+          plan_value: item.gtk_or_zif === 'Куранах' ? 78.2 : 84.1,
+          fact_value: item.gtk_or_zif === 'Куранах' ? 74.1 : 85.2,
+          deviation_pct: item.gtk_or_zif === 'Куранах' ? -5.2 : 1.3,
+          severity: item.gtk_or_zif === 'Куранах' ? 'critical' : 'info'
+        }))
+      },
+      {
+        indicator_name: 'Выпуск золота',
+        plan_value: 14.9,
+        fact_value: 15.4,
+        deviation_pct: 3.4,
+        severity: 'info',
+        measure_unit: 'т',
+        details: enrichmentDetails.map((item) => ({
+          ...item,
+          plan_value: 2.98,
+          fact_value: item.gtk_or_zif === 'Наталка' ? 2.83 : 3.08,
+          deviation_pct: item.gtk_or_zif === 'Наталка' ? -5.2 : 3.4,
+          severity: item.gtk_or_zif === 'Наталка' ? 'warning' : 'info'
+        }))
+      }
+    ]
   }
 }
