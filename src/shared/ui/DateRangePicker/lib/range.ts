@@ -20,6 +20,10 @@ export function isSameDate(left: Dayjs | null, right: Dayjs | null): boolean {
   return Boolean(left && right && left.isSame(right, 'day'))
 }
 
+export function isSameRange(left: DraftRange, right: DraftRange): boolean {
+  return isSameDate(left[0], right[0]) && isSameDate(left[1], right[1])
+}
+
 export function isInSelectedRange(date: Dayjs, range: DraftRange): boolean {
   const [start, end] = range
 

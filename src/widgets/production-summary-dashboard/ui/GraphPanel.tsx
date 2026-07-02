@@ -50,8 +50,10 @@ const MONTH_LABELS = [
 
 dayjs.extend(customParseFormat)
 
+type GraphPanelQuery = Pick<GraphQuery, 'indicator' | 'gtk'>
+
 type GraphPanelProps = {
-  query: GraphQuery | undefined
+  query: GraphPanelQuery | undefined
 }
 
 type GraphRange = {
@@ -189,7 +191,7 @@ function isGraphPoint(value: unknown): value is GraphPoint {
 }
 
 export function GraphPanel({ query }: GraphPanelProps) {
-  const [loadedRange, setLoadedRange] = useState(() => getInitialLoadedRange(query?.date_to))
+  const [loadedRange, setLoadedRange] = useState(() => getInitialLoadedRange(undefined))
   const [visibleRange, setVisibleRange] = useState<GraphRange | null>(null)
   const graphQuery = useMemo<GraphQuery | undefined>(() => {
     if (!query) {
@@ -227,9 +229,9 @@ export function GraphPanel({ query }: GraphPanelProps) {
   const selectedPreset = getPresetValue(visibleRange)
 
   useEffect(() => {
-    setLoadedRange(getInitialLoadedRange(query?.date_to))
+    setLoadedRange(getInitialLoadedRange(undefined))
     setVisibleRange(null)
-  }, [query?.date_to, query?.gtk, query?.indicator])
+  }, [query?.gtk, query?.indicator])
 
   useEffect(() => {
     if (data.length === 0 || visibleRange) {

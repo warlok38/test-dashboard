@@ -15,6 +15,24 @@ export function getYesterdayRange(): NonNullable<DateRangePickerValue> {
   return [yesterday.startOf('day'), yesterday.endOf('day')]
 }
 
+export function getLastWeekRange(): NonNullable<DateRangePickerValue> {
+  const yesterday = dayjs().subtract(1, 'day')
+
+  return [yesterday.subtract(6, 'day').startOf('day'), yesterday.endOf('day')]
+}
+
+export function getLastMonthRange(): NonNullable<DateRangePickerValue> {
+  const yesterday = dayjs().subtract(1, 'day')
+
+  return [yesterday.subtract(1, 'month').add(1, 'day').startOf('day'), yesterday.endOf('day')]
+}
+
+export function getLastYearRange(): NonNullable<DateRangePickerValue> {
+  const yesterday = dayjs().subtract(1, 'day')
+
+  return [yesterday.subtract(1, 'year').add(1, 'day').startOf('day'), yesterday.endOf('day')]
+}
+
 export function getTodayRange(): NonNullable<DateRangePickerValue> {
   const today = dayjs()
 

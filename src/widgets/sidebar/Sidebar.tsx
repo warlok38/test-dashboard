@@ -19,6 +19,13 @@ import { CollapsedSidebarNav, SidebarMenu } from './ui'
 
 type SidebarVariant = 'desktop' | 'drawer'
 
+const GTK_MENU_SKELETON_ITEMS = Array.from({ length: 4 }, (_, index) => ({
+  key: `${GTK_MENU_KEY}-loading-${index}`,
+  label: '',
+  disabled: true,
+  isSkeleton: true
+}))
+
 type SidebarContentProps = {
   collapsed?: boolean
   variant?: SidebarVariant
@@ -28,16 +35,39 @@ function SidebarContent({ collapsed = false, variant = 'desktop' }: SidebarConte
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const { closeMobileSidebar, toggleCollapsed } = useSidebar()
-  const { data: gtkNames = [] } = useGetGtkQuery()
+  const { data: gtkNames = [], error: gtkError, isLoading: isGtkLoading } = useGetGtkQuery()
   const isDrawer = variant === 'drawer'
   const isCollapsed = !isDrawer && collapsed
   const routeOpenKeys = useMemo(() => getOpenSidebarKeys(), [])
   const [openKeys, setOpenKeys] = useState(routeOpenKeys)
+  const isGtkInitialLoading = isGtkLoading && gtkNames.length === 0
+  const isGtkInitialError = Boolean(gtkError) && gtkNames.length === 0
   const sidebarItems = useMemo(
     () =>
       BASE_SIDEBAR_ITEMS.map((item) => {
         if (item.key !== GTK_MENU_KEY) {
           return item
+        }
+
+        if (isGtkInitialLoading) {
+          return {
+            ...item,
+            children: GTK_MENU_SKELETON_ITEMS
+          }
+        }
+
+        if (isGtkInitialError) {
+          return {
+            ...item,
+            children: [
+              {
+                key: `${GTK_MENU_KEY}-error`,
+                label: 'Список недоступен',
+                disabled: true,
+                isStatus: true
+              }
+            ]
+          }
         }
 
         return {
@@ -55,7 +85,7 @@ function SidebarContent({ collapsed = false, variant = 'desktop' }: SidebarConte
             })
         }
       }),
-    [gtkNames]
+    [gtkNames, isGtkInitialError, isGtkInitialLoading]
   )
 
   useEffect(() => {

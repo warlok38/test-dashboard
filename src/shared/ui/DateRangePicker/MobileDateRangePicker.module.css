@@ -117,6 +117,13 @@
   width: 100%;
 }
 
+.activePresetButton {
+  border-color: var(--ant-color-primary);
+  background: var(--ant-control-item-bg-active);
+  color: var(--ant-color-primary);
+  font-weight: 600;
+}
+
 .calendarHeader {
   display: grid;
   grid-template-columns: 2rem 2rem minmax(0, 1fr) 2rem 2rem;

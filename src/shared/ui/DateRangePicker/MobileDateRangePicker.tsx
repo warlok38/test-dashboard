@@ -21,6 +21,7 @@ import {
   getPresetValue,
   getVisiblePanelDate,
   isDisabled,
+  isSameRange,
   normalizeRange,
   resolveFormat,
   sortRange,
@@ -179,8 +180,12 @@ export function MobileDateRangePicker({
       <Drawer
         className={styles.drawer}
         placement="bottom"
-        size="60%"
-        styles={{ body: { padding: 'var(--space-4)' } }}
+        size="auto"
+        styles={{
+          wrapper: { height: 'auto', maxHeight: '80vh' },
+          section: { display: 'flex', flexDirection: 'column', maxHeight: '80vh' },
+          body: { flex: '1 1 auto', overflow: 'auto', padding: 'var(--space-4)' }
+        }}
         title={drawerTitle}
         open={isOpen}
         onClose={closePicker}
@@ -188,11 +193,22 @@ export function MobileDateRangePicker({
         <div className={styles.content}>
           {presets && presets.length > 0 && (
             <Space className={styles.presets} size={[8, 8]} wrap>
-              {presets.map((preset, index) => (
-                <Button key={index} size="small" onClick={() => selectPreset(preset)}>
-                  {preset.label}
-                </Button>
-              ))}
+              {presets.map((preset, index) => {
+                const presetRange = sortRange(normalizeRange(getPresetValue(preset)))
+                const isActivePreset = isSameRange(draftRange, presetRange)
+
+                return (
+                  <Button
+                    key={index}
+                    aria-pressed={isActivePreset}
+                    className={cn({ [styles.activePresetButton]: isActivePreset })}
+                    size="small"
+                    onClick={() => selectPreset(preset)}
+                  >
+                    {preset.label}
+                  </Button>
+                )
+              })}
             </Space>
           )}
 

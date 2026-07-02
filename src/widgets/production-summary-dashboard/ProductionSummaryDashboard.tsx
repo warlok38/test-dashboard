@@ -37,8 +37,6 @@ export function ProductionSummaryDashboard({
     showGraph && query.gtk && firstIndicator
       ? {
           indicator: firstIndicator,
-          date_from: query.date_from,
-          date_to: query.date_to,
           gtk: query.gtk
         }
       : undefined

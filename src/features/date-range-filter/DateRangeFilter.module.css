@@ -1,0 +1,25 @@
+.root {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.activePresetTag {
+  flex: 0 0 auto;
+  margin-inline-end: 0;
+  color: var(--ant-color-primary);
+  background: var(--ant-control-item-bg-active);
+  font-weight: 500;
+}
+
+.activePresetLabel {
+  color: var(--ant-color-primary);
+  font-weight: 600;
+}
+
+@media (--screen-small) {
+  .root {
+    width: 100%;
+  }
+}

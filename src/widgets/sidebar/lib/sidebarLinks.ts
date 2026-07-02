@@ -17,7 +17,13 @@ export function isCollapsedItemActive(item: SidebarMenuItem, pathname: string) {
     return pathname === '/'
   }
 
-  if (item.children?.some((child) => child.href === pathname)) {
+  if (
+    item.children?.some(
+      (child) =>
+        typeof child.href === 'string' &&
+        (pathname === child.href || pathname.startsWith(`${child.href}/`))
+    )
+  ) {
     return true
   }
 

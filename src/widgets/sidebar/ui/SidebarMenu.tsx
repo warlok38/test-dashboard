@@ -14,6 +14,26 @@ type SidebarMenuProps = {
   selectedKey?: string
 }
 
+function getMenuLabel(item: SidebarMenuItem, queryString: string, onRouteClick?: () => void) {
+  if (item.isSkeleton) {
+    return <span className={styles.menuSkeletonLine} aria-hidden="true" />
+  }
+
+  if (item.isStatus) {
+    return <span className={styles.menuStatusText}>{item.label}</span>
+  }
+
+  if (item.href) {
+    return (
+      <Link href={getHrefWithQuery(item.href, queryString)} onClick={onRouteClick}>
+        {item.label}
+      </Link>
+    )
+  }
+
+  return item.label
+}
+
 function getMenuItems(
   items: SidebarMenuItem[],
   queryString: string,
@@ -21,19 +41,13 @@ function getMenuItems(
 ): MenuProps['items'] {
   return items.map((item) => {
     const Icon = item.icon
-    const label = item.href ? (
-      <Link href={getHrefWithQuery(item.href, queryString)} onClick={onRouteClick}>
-        {item.label}
-      </Link>
-    ) : (
-      item.label
-    )
 
     return {
       key: item.key,
       icon: Icon ? <Icon /> : undefined,
-      label,
-      children: item.children ? getMenuItems(item.children, queryString, onRouteClick) : undefined
+      label: getMenuLabel(item, queryString, onRouteClick),
+      children: item.children ? getMenuItems(item.children, queryString, onRouteClick) : undefined,
+      disabled: item.disabled
     }
   })
 }
