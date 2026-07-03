@@ -85,7 +85,12 @@ export function ProductionSummaryDashboard({
         selectableIndicators={showGraph}
         stage={miningStage}
       />
-      {showGraph && <GraphPanel query={graphQuery} />}
+      {showGraph && (
+        <GraphPanel
+          key={`${graphQuery?.gtk ?? ''}:${graphQuery?.indicator ?? ''}`}
+          query={graphQuery}
+        />
+      )}
       {shouldShowDeposits && (
         <DepositGrid items={deposits} title="Месторождения" titleId="deposits-title" />
       )}
