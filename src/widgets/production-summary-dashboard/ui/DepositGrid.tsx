@@ -5,6 +5,7 @@ import {
   getDeviationClassName,
   formatDeviation,
   formatSummaryNumber,
+  getSummaryFractionDigits,
   getSeverityClassName,
   type DepositSummaryView
 } from '@/entities/production-summary'
@@ -48,7 +49,10 @@ export function DepositGrid({ items, title, titleId }: DepositGridProps) {
                       <span className={styles.metricUnit}>{metric.unit}</span>
                     </div>
                     <b className={styles.metricValue}>
-                      {formatSummaryNumber(metric.factValue, metric.title === 'Содержание' ? 2 : 1)}
+                      {formatSummaryNumber(
+                        metric.factValue,
+                        getSummaryFractionDigits(metric.title)
+                      )}
                     </b>
                     <span
                       className={classNames(

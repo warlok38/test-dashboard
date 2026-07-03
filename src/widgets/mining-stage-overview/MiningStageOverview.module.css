@@ -42,7 +42,7 @@
 }
 
 .planLegend {
-  --legend-color: var(--color-kpi-plan);
+  --legend-color: var(--color-chart-plan);
 }
 
 .metricGrid {

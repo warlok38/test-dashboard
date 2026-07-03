@@ -3,7 +3,7 @@ import { formatKpiValue, getKpiValueTone } from '@/shared/ui'
 import { getNumberProp } from '../lib'
 
 const FACT_COLOR = 'var(--color-kpi-fact)'
-const PLAN_COLOR = 'var(--color-kpi-plan)'
+const PLAN_COLOR = 'var(--color-chart-plan)'
 const NEUTRAL_VALUE_COLOR = 'var(--color-kpi-neutral)'
 
 function getSvgKpiValueColor(tone: ReturnType<typeof getKpiValueTone>) {

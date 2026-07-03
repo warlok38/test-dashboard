@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import {
   getDeviationClassName,
   formatDeviation,
+  getSummaryFractionDigits,
   formatSummaryNumber,
   type SummaryIndicatorCard
 } from '@/entities/production-summary'
@@ -24,7 +25,7 @@ export function KpiCard({ active = false, card, selectable = false }: KpiCardPro
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const fractionDigits = card.indicator_name === 'Содержание Au' ? 2 : 1
+  const fractionDigits = getSummaryFractionDigits(card.indicator_name)
 
   const selectIndicator = () => {
     if (!selectable || active) {

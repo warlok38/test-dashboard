@@ -11,7 +11,7 @@ import styles from '../MiningStageOverview.module.css'
 import { TrendChart } from './TrendChart'
 
 const FACT_COLOR = 'var(--color-kpi-fact)'
-const PLAN_COLOR = 'var(--color-kpi-plan)'
+const PLAN_COLOR = 'var(--color-chart-plan)'
 
 type MiningMetricCardProps = {
   metric: MiningStageMetric

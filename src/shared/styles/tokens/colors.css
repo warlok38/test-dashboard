@@ -41,6 +41,7 @@
   --color-chart-brush-handle-bg: var(--palette-accent-primary);
   --color-chart-brush-handle-grip: var(--palette-neutral-000);
   --color-chart-brush-label: var(--color-text-muted);
+  --color-chart-plan: #808080;
 
   /* Тёмная полоса Header1 — светлый текст */
   --color-text-on-header-primary: #f6f0e4f5;

@@ -1,5 +1,11 @@
 import { formatNumber } from '@/shared/utils/formatNumber'
 
+const PRECISE_INDICATORS = new Set(['Содержание', 'Содержание Au', 'Катодный осадок'])
+
+export function getSummaryFractionDigits(indicatorName: string) {
+  return PRECISE_INDICATORS.has(indicatorName) ? 2 : 1
+}
+
 export function formatSummaryNumber(value: number | null | undefined, fractionDigits = 1) {
   if (value === null || value === undefined || Number.isNaN(value)) {
     return '-'

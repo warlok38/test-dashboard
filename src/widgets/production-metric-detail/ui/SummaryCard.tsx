@@ -9,7 +9,7 @@ import styles from '../ProductionMetricDetail.module.css'
 import { renderFactValueLabel, renderPlanValueLabel } from './BarValueLabel'
 
 const FACT_COLOR = 'var(--color-kpi-fact)'
-const PLAN_COLOR = 'var(--color-kpi-plan)'
+const PLAN_COLOR = 'var(--color-chart-plan)'
 
 type SummaryCardProps = {
   unit: BusinessUnitSummary

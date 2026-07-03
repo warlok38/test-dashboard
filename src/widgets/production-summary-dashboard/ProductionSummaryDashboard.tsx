@@ -33,13 +33,14 @@ export function ProductionSummaryDashboard({
   const { data: summary, error, isFetching, isLoading } = useGetSummaryQuery(summaryQuery)
   const miningStage = getMiningStage(summary)
   const deposits = groupCardsByDeposit(miningStage?.cards ?? [])
-  const enrichmentDeposits = groupCardsByDeposit(summary?.by_enrichment?.cards ?? [])
+  const zifItems = groupCardsByDeposit(summary?.by_zif?.cards ?? [])
   const firstIndicator = getFirstStageIndicator(miningStage)
   const activeIndicator = miningStage?.cards.some((card) => card.indicator_name === indicator)
     ? indicator
     : firstIndicator
   const isInitialLoading = isLoading && !summary
   const shouldShowDeposits = showDeposits ?? !showGraph
+  const shouldShowZif = showDeposits ?? true
   const graphQuery =
     showGraph && activeIndicator
       ? {
@@ -82,8 +83,11 @@ export function ProductionSummaryDashboard({
       )}
       <CollapsibleStagePanel
         activeIndicator={activeIndicator}
+        collapseLabel="Свернуть добычу"
+        emptyStateLabel="Нет данных по добыче"
         selectableIndicators={showGraph}
         stage={miningStage}
+        titleId="mining-title"
       />
       {showGraph && (
         <GraphPanel
@@ -94,8 +98,15 @@ export function ProductionSummaryDashboard({
       {shouldShowDeposits && (
         <DepositGrid items={deposits} title="Месторождения" titleId="deposits-title" />
       )}
-      {/* <StaticStagePanel title="Минеральные ресурсы" /> */}
-      <DepositGrid items={enrichmentDeposits} title="Обогащение" titleId="enrichment-title" />
+      {shouldShowDeposits && (
+        <CollapsibleStagePanel
+          collapseLabel="Свернуть обогащение"
+          emptyStateLabel="Нет данных по обогащению"
+          stage={summary?.by_enrichment}
+          titleId="enrichment-title"
+        />
+      )}
+      {shouldShowZif && <DepositGrid items={zifItems} title="ЗИФ" titleId="zif-title" />}
     </section>
   )
 }

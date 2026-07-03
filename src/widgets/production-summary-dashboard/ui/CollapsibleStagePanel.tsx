@@ -7,23 +7,35 @@ import { KpiCard } from './KpiCard'
 
 type CollapsibleStagePanelProps = {
   activeIndicator?: string
+  collapseLabel?: string
+  emptyStateLabel?: string
   selectableIndicators?: boolean
   stage: StageSummary | undefined
+  titleId?: string
 }
 
 export function CollapsibleStagePanel({
   activeIndicator,
+  collapseLabel,
+  emptyStateLabel,
   selectableIndicators = false,
-  stage
+  stage,
+  titleId = 'stage-title'
 }: CollapsibleStagePanelProps) {
+  const title = stage?.display_name ?? 'Раздел'
+
   return (
-    <section className={styles.stagePanel} aria-labelledby="mining-title">
+    <section className={styles.stagePanel} aria-labelledby={titleId}>
       <header className={styles.stageHeader}>
         <div className={styles.stageTitle}>
-          <h1 id="mining-title">{stage?.display_name ?? 'Добыча'}</h1>
+          <h1 id={titleId}>{title}</h1>
           <span className={styles.stageBadge}>{getStageHealthText(stage)}</span>
         </div>
-        <button type="button" className={styles.iconButton} aria-label="Свернуть добычу">
+        <button
+          type="button"
+          className={styles.iconButton}
+          aria-label={collapseLabel ?? `Свернуть ${title}`}
+        >
           <DownOutlined />
         </button>
       </header>
@@ -39,7 +51,7 @@ export function CollapsibleStagePanel({
           ))}
         </div>
       ) : (
-        <div className={styles.emptyState}>Нет данных по добыче</div>
+        <div className={styles.emptyState}>{emptyStateLabel ?? `Нет данных: ${title}`}</div>
       )}
     </section>
   )

@@ -40,37 +40,44 @@ const details = [
 
 const enrichmentDetails = [
   {
-    gtk_or_zif: 'Олимпиада',
-    plan_value: 42.4,
-    fact_value: 44.6,
+    gtk_or_zif: 'ВЗИФ/СЛ',
+    plan_value: 271.74,
+    fact_value: 257.9,
     deviation_pct: 5.2,
     severity: 'info'
   },
   {
-    gtk_or_zif: 'Наталка',
-    plan_value: 27.8,
-    fact_value: 26.4,
-    deviation_pct: -5.2,
-    severity: 'warning'
-  },
-  {
-    gtk_or_zif: 'Благодатное',
-    plan_value: 18.7,
-    fact_value: 19.7,
-    deviation_pct: 5.2,
-    severity: 'info'
-  },
-  {
-    gtk_or_zif: 'Куранах',
-    plan_value: 9.6,
-    fact_value: 9.1,
+    gtk_or_zif: 'НЗИФ',
+    plan_value: 271.74,
+    fact_value: 257.9,
     deviation_pct: -5.2,
     severity: 'critical'
   },
   {
-    gtk_or_zif: 'Сухой Лог',
-    plan_value: 6.3,
-    fact_value: 6.6,
+    gtk_or_zif: 'КВ',
+    plan_value: 271.74,
+    fact_value: 257.9,
+    deviation_pct: 5.2,
+    severity: 'info'
+  },
+  {
+    gtk_or_zif: 'КЗИФ',
+    plan_value: 271.74,
+    fact_value: 257.9,
+    deviation_pct: -5.2,
+    severity: 'warning'
+  },
+  {
+    gtk_or_zif: 'СЛ+ПВ',
+    plan_value: 271.74,
+    fact_value: 257.9,
+    deviation_pct: 5.2,
+    severity: 'info'
+  },
+  {
+    gtk_or_zif: 'ВЗИФ',
+    plan_value: 271.74,
+    fact_value: 257.9,
     deviation_pct: 5.2,
     severity: 'info'
   }
@@ -169,42 +176,81 @@ export const summaryMock: AlarmSummaryResponse = {
     info: 1,
     cards: [
       {
-        indicator_name: 'Переработка руды',
-        plan_value: 104.8,
-        fact_value: 106.3,
-        deviation_pct: 1.4,
+        indicator_name: 'Выпуск',
+        plan_value: 523.3,
+        fact_value: 550.5,
+        deviation_pct: 5.2,
         severity: 'info',
-        measure_unit: 'тыс. т',
+        measure_unit: 'е.и.',
         details: enrichmentDetails
       },
       {
-        indicator_name: 'Извлечение Au',
-        plan_value: 83.5,
-        fact_value: 82.1,
-        deviation_pct: -1.7,
-        severity: 'warning',
-        measure_unit: '%',
+        indicator_name: 'Переработка',
+        plan_value: 19.4,
+        fact_value: 18.4,
+        deviation_pct: -5.2,
+        severity: 'critical',
+        measure_unit: 'е.и.',
         details: enrichmentDetails.map((item) => ({
           ...item,
-          plan_value: item.gtk_or_zif === 'Куранах' ? 78.2 : 84.1,
-          fact_value: item.gtk_or_zif === 'Куранах' ? 74.1 : 85.2,
-          deviation_pct: item.gtk_or_zif === 'Куранах' ? -5.2 : 1.3,
-          severity: item.gtk_or_zif === 'Куранах' ? 'critical' : 'info'
+          plan_value: 8.46,
+          fact_value: 8.9
         }))
       },
       {
-        indicator_name: 'Выпуск золота',
-        plan_value: 14.9,
-        fact_value: 15.4,
-        deviation_pct: 3.4,
+        indicator_name: 'Катодный осадок',
+        plan_value: 1.35,
+        fact_value: 1.42,
+        deviation_pct: 5.2,
         severity: 'info',
-        measure_unit: 'т',
+        measure_unit: 'е.и.',
         details: enrichmentDetails.map((item) => ({
           ...item,
-          plan_value: 2.98,
-          fact_value: item.gtk_or_zif === 'Наталка' ? 2.83 : 3.08,
-          deviation_pct: item.gtk_or_zif === 'Наталка' ? -5.2 : 3.4,
-          severity: item.gtk_or_zif === 'Наталка' ? 'warning' : 'info'
+          plan_value: 2.45,
+          fact_value: 2.58
+        }))
+      }
+    ]
+  },
+  by_zif: {
+    display_name: 'ЗИФ',
+    critical: 1,
+    warning: 1,
+    info: 4,
+    cards: [
+      {
+        indicator_name: 'Выпуск',
+        plan_value: 523.3,
+        fact_value: 550.5,
+        deviation_pct: 5.2,
+        severity: 'info',
+        measure_unit: 'е.и.',
+        details: enrichmentDetails
+      },
+      {
+        indicator_name: 'Переработка',
+        plan_value: 19.4,
+        fact_value: 18.4,
+        deviation_pct: -5.2,
+        severity: 'critical',
+        measure_unit: 'е.и.',
+        details: enrichmentDetails.map((item) => ({
+          ...item,
+          plan_value: 8.46,
+          fact_value: 8.9
+        }))
+      },
+      {
+        indicator_name: 'Катодный осадок',
+        plan_value: 1.35,
+        fact_value: 1.42,
+        deviation_pct: 5.2,
+        severity: 'info',
+        measure_unit: 'е.и.',
+        details: enrichmentDetails.map((item) => ({
+          ...item,
+          plan_value: 2.45,
+          fact_value: 2.58
         }))
       }
     ]

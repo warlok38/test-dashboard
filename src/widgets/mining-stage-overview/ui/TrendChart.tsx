@@ -5,7 +5,7 @@ import { type MiningStageMetric } from '@/entities/production-stage'
 import { formatMetricNumber, getVisibleTickIndexes } from '../lib'
 
 const FACT_COLOR = 'var(--color-kpi-fact)'
-const PLAN_COLOR = 'var(--color-kpi-plan)'
+const PLAN_COLOR = 'var(--color-chart-plan)'
 
 type TrendChartProps = {
   height?: number

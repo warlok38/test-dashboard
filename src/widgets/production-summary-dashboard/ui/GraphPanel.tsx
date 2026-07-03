@@ -4,12 +4,14 @@ import { ReloadOutlined } from '@ant-design/icons'
 import { Alert, Button, Segmented, Skeleton, Tooltip as AntTooltip } from 'antd'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+import isoWeek from 'dayjs/plugin/isoWeek'
 import { useEffect, useMemo, useState } from 'react'
 import {
+  Bar,
   Brush,
   CartesianGrid,
+  ComposedChart,
   Line,
-  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -23,23 +25,22 @@ import { DATE_DISPLAY_FORMAT } from '@/shared/constants'
 import styles from '../ProductionSummaryDashboard.module.css'
 
 const GRAPH_DATE_FORMAT = 'YYYY-MM-DD'
-const DEFAULT_VISIBLE_DAYS = 30
-const MIN_VISIBLE_DAYS = 7
-const MAX_VISIBLE_DAYS = 365
 const MAX_X_AXIS_TICKS = 8
 const FACT_COLOR = 'var(--color-kpi-fact)'
-const PLAN_COLOR = 'var(--color-kpi-plan)'
+const PLAN_COLOR = 'var(--color-chart-plan)'
 const GRID_COLOR = 'var(--palette-dashboard-grid-border)'
 const DOT_FILL_COLOR = 'var(--color-bg-card)'
 const BRUSH_TRACK_FILL_COLOR = 'var(--color-chart-brush-track-bg)'
 const BRUSH_TRACK_STROKE_COLOR = 'var(--color-chart-brush-track-border)'
 const BRUSH_HANDLE_FILL_COLOR = 'var(--color-chart-brush-handle-bg)'
 const BRUSH_HANDLE_GRIP_COLOR = 'var(--color-chart-brush-handle-grip)'
-const RANGE_PRESETS = [
-  { label: 'Неделя', value: 7 },
-  { label: 'Месяц', value: 30 },
-  { label: 'Квартал', value: 90 },
-  { label: 'Год', value: MAX_VISIBLE_DAYS }
+type GraphPeriod = 'week-to-date' | 'month-to-date' | 'year-to-date'
+
+const DEFAULT_VISIBLE_PERIOD: GraphPeriod = 'month-to-date'
+const RANGE_PRESETS: Array<{ label: string; title: string; value: GraphPeriod }> = [
+  { label: 'СНН', title: 'С начала недели', value: 'week-to-date' },
+  { label: 'СНМ', title: 'С начала месяца', value: 'month-to-date' },
+  { label: 'СНГ', title: 'С начала года', value: 'year-to-date' }
 ]
 const MONTH_LABELS = [
   'янв',
@@ -57,6 +58,7 @@ const MONTH_LABELS = [
 ]
 
 dayjs.extend(customParseFormat)
+dayjs.extend(isoWeek)
 
 type GraphPanelQuery = Pick<GraphQuery, 'indicator' | 'gtk'>
 
@@ -72,6 +74,11 @@ type GraphRange = {
 type BrushRange = {
   startIndex?: number
   endIndex?: number
+}
+
+type VisibleIndexes = {
+  startIndex: number
+  endIndex: number
 }
 
 type BrushTravellerProps = {
@@ -134,15 +141,37 @@ function getInitialLoadedRange(dateToValue: string | undefined): GraphRange {
   const dateTo = parseGraphDate(dateToValue) ?? dayjs().startOf('day')
 
   return {
-    dateFrom: formatGraphDate(dateTo.subtract(MAX_VISIBLE_DAYS - 1, 'day')),
+    dateFrom: formatGraphDate(dateTo.startOf('year')),
     dateTo: formatGraphDate(dateTo)
   }
 }
 
-function findDateIndex(data: GraphPoint[], date: string) {
+function findStartDateIndex(data: GraphPoint[], date: string) {
   const index = data.findIndex((point) => point.date === date)
 
-  return index === -1 ? null : index
+  if (index !== -1) {
+    return index
+  }
+
+  const nextIndex = data.findIndex((point) => point.date > date)
+
+  return nextIndex === -1 ? null : nextIndex
+}
+
+function findEndDateIndex(data: GraphPoint[], date: string) {
+  const exactIndex = data.findIndex((point) => point.date === date)
+
+  if (exactIndex !== -1) {
+    return exactIndex
+  }
+
+  for (let index = data.length - 1; index >= 0; index -= 1) {
+    if (data[index].date < date) {
+      return index
+    }
+  }
+
+  return null
 }
 
 function createRangeFromIndexes(data: GraphPoint[], startIndex: number, endIndex: number) {
@@ -152,46 +181,86 @@ function createRangeFromIndexes(data: GraphPoint[], startIndex: number, endIndex
   }
 }
 
-function getVisibleIndexes(data: GraphPoint[], visibleRange: GraphRange | null) {
+function getVisibleIndexes(
+  data: GraphPoint[],
+  visibleRange: GraphRange | null
+): VisibleIndexes | null {
   if (data.length === 0) {
     return null
   }
 
   if (!visibleRange) {
-    const endIndex = data.length - 1
-    const startIndex = Math.max(0, endIndex - DEFAULT_VISIBLE_DAYS + 1)
-
-    return { startIndex, endIndex }
+    return createVisibleIndexesFromPeriod(data, DEFAULT_VISIBLE_PERIOD)
   }
 
-  const startIndex = findDateIndex(data, visibleRange.dateFrom)
-  const endIndex = findDateIndex(data, visibleRange.dateTo)
+  const startIndex = findStartDateIndex(data, visibleRange.dateFrom)
+  const endIndex = findEndDateIndex(data, visibleRange.dateTo)
 
-  if (startIndex === null || endIndex === null) {
+  if (startIndex === null || endIndex === null || startIndex > endIndex) {
     return null
   }
 
   return { startIndex, endIndex }
 }
 
-function getRangeSize(range: GraphRange) {
-  const dateFrom = parseGraphDate(range.dateFrom)
-  const dateTo = parseGraphDate(range.dateTo)
-
-  if (!dateFrom || !dateTo) {
-    return DEFAULT_VISIBLE_DAYS
+function getPeriodStartDate(dateTo: dayjs.Dayjs, period: GraphPeriod) {
+  if (period === 'week-to-date') {
+    return dateTo.startOf('isoWeek')
   }
 
-  return Math.max(MIN_VISIBLE_DAYS, dateTo.diff(dateFrom, 'day') + 1)
+  if (period === 'year-to-date') {
+    return dateTo.startOf('year')
+  }
+
+  return dateTo.startOf('month')
+}
+
+function createVisibleRangeFromPeriod(data: GraphPoint[], period: GraphPeriod) {
+  const dateTo = parseGraphDate(data[data.length - 1]?.date)
+
+  if (!dateTo) {
+    return null
+  }
+
+  const loadedStartDate = parseGraphDate(data[0]?.date)
+  const periodStartDate = getPeriodStartDate(dateTo, period)
+  const dateFrom =
+    loadedStartDate && periodStartDate.isBefore(loadedStartDate) ? loadedStartDate : periodStartDate
+
+  return {
+    dateFrom: formatGraphDate(dateFrom),
+    dateTo: formatGraphDate(dateTo)
+  }
+}
+
+function createVisibleIndexesFromPeriod(
+  data: GraphPoint[],
+  period: GraphPeriod
+): VisibleIndexes | null {
+  const range = createVisibleRangeFromPeriod(data, period)
+
+  if (!range) {
+    return null
+  }
+
+  return getVisibleIndexes(data, range)
 }
 
 function getPresetValue(range: GraphRange | null) {
   if (!range) {
-    return DEFAULT_VISIBLE_DAYS
+    return DEFAULT_VISIBLE_PERIOD
   }
 
-  const rangeSize = getRangeSize(range)
-  const preset = RANGE_PRESETS.find((item) => item.value === rangeSize)
+  const dateFrom = parseGraphDate(range.dateFrom)
+  const dateTo = parseGraphDate(range.dateTo)
+
+  if (!dateFrom || !dateTo) {
+    return undefined
+  }
+
+  const preset = RANGE_PRESETS.find(
+    (item) => formatGraphDate(getPeriodStartDate(dateTo, item.value)) === formatGraphDate(dateFrom)
+  )
 
   return preset?.value
 }
@@ -278,10 +347,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
       return
     }
 
-    const endIndex = data.length - 1
-    const startIndex = Math.max(0, endIndex - DEFAULT_VISIBLE_DAYS + 1)
-
-    setVisibleRange(createRangeFromIndexes(data, startIndex, endIndex))
+    setVisibleRange(createVisibleRangeFromPeriod(data, DEFAULT_VISIBLE_PERIOD))
   }, [data, visibleRange])
 
   const updateVisibleRange = (range: BrushRange) => {
@@ -295,16 +361,12 @@ export function GraphPanel({ query }: GraphPanelProps) {
     setVisibleRange(createRangeFromIndexes(data, startIndex, endIndex))
   }
 
-  const updateVisibleRangeByDays = (days: number) => {
-    if (!visibleIndexes) {
+  const updateVisibleRangeByPeriod = (period: GraphPeriod) => {
+    if (data.length === 0) {
       return
     }
 
-    const nextSize = Math.min(MAX_VISIBLE_DAYS, Math.max(MIN_VISIBLE_DAYS, days), data.length)
-    const endIndex = visibleIndexes.endIndex
-    const startIndex = Math.max(0, endIndex - nextSize + 1)
-
-    setVisibleRange(createRangeFromIndexes(data, startIndex, endIndex))
+    setVisibleRange(createVisibleRangeFromPeriod(data, period))
   }
 
   const resetVisibleRange = () => {
@@ -314,10 +376,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
       return
     }
 
-    const endIndex = data.length - 1
-    const startIndex = Math.max(0, endIndex - DEFAULT_VISIBLE_DAYS + 1)
-
-    setVisibleRange(createRangeFromIndexes(data, startIndex, endIndex))
+    setVisibleRange(createVisibleRangeFromPeriod(data, DEFAULT_VISIBLE_PERIOD))
   }
 
   const renderFactDot = (dotProps: DotItemDotProps) => {
@@ -360,7 +419,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
     return (
       <div className={styles.chartBox}>
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: -16 }}>
+          <ComposedChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: -16 }}>
             <CartesianGrid stroke={GRID_COLOR} vertical={false} />
             <XAxis
               dataKey="date"
@@ -372,15 +431,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
             />
             <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
             <Tooltip labelFormatter={(label) => formatShortDate(String(label))} />
-            <Line
-              type="monotone"
-              dataKey="plan"
-              name="План"
-              stroke={PLAN_COLOR}
-              strokeWidth={2}
-              dot={false}
-              connectNulls={false}
-            />
+            <Bar dataKey="plan" name="План" fill={PLAN_COLOR} radius={[3, 3, 0, 0]} />
             <Line
               type="monotone"
               dataKey="fact"
@@ -402,7 +453,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
               traveller={renderBrushTraveller}
               travellerWidth={8}
             />
-          </LineChart>
+          </ComposedChart>
         </ResponsiveContainer>
       </div>
     )
@@ -421,7 +472,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
               options={RANGE_PRESETS}
               size="small"
               value={selectedPreset}
-              onChange={(value) => updateVisibleRangeByDays(Number(value))}
+              onChange={(value) => updateVisibleRangeByPeriod(value as GraphPeriod)}
             />
             <AntTooltip title="По умолчанию">
               <Button
