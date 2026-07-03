@@ -6,26 +6,21 @@ import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import isoWeek from 'dayjs/plugin/isoWeek'
 import { useEffect, useMemo, useState } from 'react'
-import {
-  Bar,
-  Brush,
-  CartesianGrid,
-  ComposedChart,
-  Line,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis
-} from 'recharts'
+import { Bar, Brush, CartesianGrid, ComposedChart, Line, Tooltip, XAxis, YAxis } from 'recharts'
 import { type DotItemDotProps } from 'recharts/types/util/types'
 
 import { type GraphPoint, type GraphQuery, useGetGraphQuery } from '@/entities/production-summary'
 import { DATE_DISPLAY_FORMAT } from '@/shared/constants'
+import { ChartFrame } from '@/shared/ui'
 
 import styles from '../ProductionSummaryDashboard.module.css'
 
 const GRAPH_DATE_FORMAT = 'YYYY-MM-DD'
 const MAX_X_AXIS_TICKS = 8
+const COMPACT_POINT_LIMIT = 10
+const COMPACT_POINT_WIDTH = 150
+const COMPACT_BAR_SIZE = 64
+const CHART_HORIZONTAL_MARGIN = 32
 const FACT_COLOR = 'var(--color-kpi-fact)'
 const PLAN_COLOR = 'var(--color-chart-plan)'
 const GRID_COLOR = 'var(--palette-dashboard-grid-border)'
@@ -293,6 +288,21 @@ function getXAxisTicks(
   return ticks.includes(lastDate) ? ticks : [...ticks, lastDate]
 }
 
+function getVisiblePointCount(visibleIndexes: VisibleIndexes) {
+  return visibleIndexes.endIndex - visibleIndexes.startIndex + 1
+}
+
+function getCompactXAxisPadding(chartWidth: number, visiblePointCount: number) {
+  if (visiblePointCount > COMPACT_POINT_LIMIT) {
+    return 0
+  }
+
+  const compactWidth = visiblePointCount * COMPACT_POINT_WIDTH
+  const availableWidth = Math.max(chartWidth - CHART_HORIZONTAL_MARGIN, 0)
+
+  return Math.max(availableWidth - compactWidth, 0)
+}
+
 function isGraphPoint(value: unknown): value is GraphPoint {
   return Boolean(
     value && typeof value === 'object' && 'date' in value && typeof value.date === 'string'
@@ -379,7 +389,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
     setVisibleRange(createVisibleRangeFromPeriod(data, DEFAULT_VISIBLE_PERIOD))
   }
 
-  const renderFactDot = (dotProps: DotItemDotProps) => {
+  const renderPlanDot = (dotProps: DotItemDotProps) => {
     const { cx, cy, payload } = dotProps
 
     if (typeof cx !== 'number' || typeof cy !== 'number' || !isGraphPoint(payload)) {
@@ -391,7 +401,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
     }
 
     return (
-      <circle cx={cx} cy={cy} fill={DOT_FILL_COLOR} r={3} stroke={FACT_COLOR} strokeWidth={3} />
+      <circle cx={cx} cy={cy} fill={DOT_FILL_COLOR} r={3} stroke={PLAN_COLOR} strokeWidth={3} />
     )
   }
 
@@ -416,46 +426,65 @@ export function GraphPanel({ query }: GraphPanelProps) {
       return <Skeleton active paragraph={{ rows: 6 }} title={false} />
     }
 
+    const visiblePointCount = getVisiblePointCount(visibleIndexes)
+    const barSize = visiblePointCount <= COMPACT_POINT_LIMIT ? COMPACT_BAR_SIZE : undefined
+
     return (
-      <div className={styles.chartBox}>
-        <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: -16 }}>
-            <CartesianGrid stroke={GRID_COLOR} vertical={false} />
-            <XAxis
-              dataKey="date"
-              tickLine={false}
-              axisLine={false}
-              tick={{ fontSize: 12 }}
-              ticks={xAxisTicks}
-              tickFormatter={formatShortDate}
-            />
-            <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
-            <Tooltip labelFormatter={(label) => formatShortDate(String(label))} />
-            <Bar dataKey="plan" name="План" fill={PLAN_COLOR} radius={[3, 3, 0, 0]} />
-            <Line
-              type="monotone"
-              dataKey="fact"
-              name="Факт"
-              stroke={FACT_COLOR}
-              strokeWidth={3}
-              dot={renderFactDot}
-              connectNulls={false}
-            />
-            <Brush
-              className={styles.chartBrush}
-              dataKey="date"
-              endIndex={visibleIndexes.endIndex}
-              fill={BRUSH_TRACK_FILL_COLOR}
-              height={24}
-              onChange={updateVisibleRange}
-              startIndex={visibleIndexes.startIndex}
-              stroke={BRUSH_TRACK_STROKE_COLOR}
-              traveller={renderBrushTraveller}
-              travellerWidth={8}
-            />
-          </ComposedChart>
-        </ResponsiveContainer>
-      </div>
+      <ChartFrame className={styles.chartBox}>
+        {({ width, height }) => {
+          const compactXAxisPadding = getCompactXAxisPadding(width, visiblePointCount)
+
+          return (
+            <ComposedChart
+              data={data}
+              height={height}
+              margin={{ top: 8, right: 16, bottom: 0, left: -16 }}
+              width={width}
+            >
+              <CartesianGrid stroke={GRID_COLOR} vertical={false} />
+              <XAxis
+                dataKey="date"
+                tickLine={false}
+                axisLine={false}
+                tick={{ fontSize: 12 }}
+                ticks={xAxisTicks}
+                tickFormatter={formatShortDate}
+                padding={{ left: compactXAxisPadding, right: 0 }}
+              />
+              <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
+              <Tooltip labelFormatter={(label) => formatShortDate(String(label))} />
+              <Bar
+                dataKey="fact"
+                name="Факт"
+                fill={FACT_COLOR}
+                radius={[3, 3, 0, 0]}
+                barSize={barSize}
+              />
+              <Line
+                type="monotone"
+                dataKey="plan"
+                name="План"
+                stroke={PLAN_COLOR}
+                strokeWidth={3}
+                dot={renderPlanDot}
+                connectNulls={false}
+              />
+              <Brush
+                className={styles.chartBrush}
+                dataKey="date"
+                endIndex={visibleIndexes.endIndex}
+                fill={BRUSH_TRACK_FILL_COLOR}
+                height={24}
+                onChange={updateVisibleRange}
+                startIndex={visibleIndexes.startIndex}
+                stroke={BRUSH_TRACK_STROKE_COLOR}
+                traveller={renderBrushTraveller}
+                travellerWidth={8}
+              />
+            </ComposedChart>
+          )
+        }}
+      </ChartFrame>
     )
   }
 
