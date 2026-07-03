@@ -211,48 +211,5 @@ export const summaryMock: AlarmSummaryResponse = {
         }))
       }
     ]
-  },
-  by_zif: {
-    display_name: 'ЗИФ',
-    critical: 1,
-    warning: 1,
-    info: 4,
-    cards: [
-      {
-        indicator_name: 'Выпуск',
-        plan_value: 523.3,
-        fact_value: 550.5,
-        deviation_pct: 5.2,
-        severity: 'info',
-        measure_unit: 'е.и.',
-        details: enrichmentDetails
-      },
-      {
-        indicator_name: 'Переработка',
-        plan_value: 19.4,
-        fact_value: 18.4,
-        deviation_pct: -5.2,
-        severity: 'critical',
-        measure_unit: 'е.и.',
-        details: enrichmentDetails.map((item) => ({
-          ...item,
-          plan_value: 8.46,
-          fact_value: 8.9
-        }))
-      },
-      {
-        indicator_name: 'Катодный осадок',
-        plan_value: 1.35,
-        fact_value: 1.42,
-        deviation_pct: 5.2,
-        severity: 'info',
-        measure_unit: 'е.и.',
-        details: enrichmentDetails.map((item) => ({
-          ...item,
-          plan_value: 2.45,
-          fact_value: 2.58
-        }))
-      }
-    ]
   }
 }

@@ -33,7 +33,7 @@ export function ProductionSummaryDashboard({
   const { data: summary, error, isFetching, isLoading } = useGetSummaryQuery(summaryQuery)
   const miningStage = getMiningStage(summary)
   const deposits = groupCardsByDeposit(miningStage?.cards ?? [])
-  const zifItems = groupCardsByDeposit(summary?.by_zif?.cards ?? [])
+  const zifItems = groupCardsByDeposit(summary?.by_enrichment?.cards ?? [])
   const firstIndicator = getFirstStageIndicator(miningStage)
   const activeIndicator = miningStage?.cards.some((card) => card.indicator_name === indicator)
     ? indicator
