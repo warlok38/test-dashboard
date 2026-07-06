@@ -2,16 +2,14 @@ import {
   type BaseQueryFn,
   type FetchArgs,
   type FetchBaseQueryError,
-  createApi,
-  fetchBaseQuery
+  createApi
 } from '@reduxjs/toolkit/query/react'
 
+import { createAuthBaseQuery } from '@/entities/auth'
 import { mockBaseQuery } from '@/shared/mocks/api/mockBaseQuery'
 
 import { isMockDataSource } from './dataSource'
 import { API_TAG_TYPES } from './tagTypes'
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3001/api'
 
 function serializeParams(params: Record<string, unknown>) {
   const searchParams = new URLSearchParams()
@@ -35,8 +33,7 @@ function serializeParams(params: Record<string, unknown>) {
   return searchParams.toString()
 }
 
-const backendBaseQuery = fetchBaseQuery({
-  baseUrl: API_BASE_URL,
+const authBaseQuery = createAuthBaseQuery({
   paramsSerializer: serializeParams
 })
 
@@ -49,7 +46,7 @@ const baseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> =
     return mockBaseQuery(args, api, extraOptions)
   }
 
-  return backendBaseQuery(args, api, extraOptions)
+  return authBaseQuery(args, api, extraOptions)
 }
 
 export const mainApi = createApi({
