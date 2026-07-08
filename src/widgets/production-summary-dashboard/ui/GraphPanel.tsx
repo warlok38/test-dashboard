@@ -6,7 +6,7 @@ import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import isoWeek from 'dayjs/plugin/isoWeek'
 import { useEffect, useMemo, useState } from 'react'
-import { Bar, Brush, CartesianGrid, ComposedChart, Tooltip, XAxis, YAxis } from 'recharts'
+import { Bar, CartesianGrid, ComposedChart, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { type GraphPoint, type GraphQuery, useGetGraphQuery } from '@/entities/production-summary'
 import { DATE_DISPLAY_FORMAT } from '@/shared/constants'
@@ -23,10 +23,6 @@ const CHART_HORIZONTAL_MARGIN = 32
 const FACT_COLOR = 'var(--color-kpi-fact)'
 const PLAN_COLOR = 'var(--color-chart-plan)'
 const GRID_COLOR = 'var(--palette-dashboard-grid-border)'
-const BRUSH_TRACK_FILL_COLOR = 'var(--color-chart-brush-track-bg)'
-const BRUSH_TRACK_STROKE_COLOR = 'var(--color-chart-brush-track-border)'
-const BRUSH_HANDLE_FILL_COLOR = 'var(--color-chart-brush-handle-bg)'
-const BRUSH_HANDLE_GRIP_COLOR = 'var(--color-chart-brush-handle-grip)'
 type GraphPeriod = 'week-to-date' | 'month-to-date' | 'year-to-date'
 
 const DEFAULT_VISIBLE_PERIOD: GraphPeriod = 'month-to-date'
@@ -64,46 +60,9 @@ type GraphRange = {
   dateTo: string
 }
 
-type BrushRange = {
-  startIndex?: number
-  endIndex?: number
-}
-
 type VisibleIndexes = {
   startIndex: number
   endIndex: number
-}
-
-type BrushTravellerProps = {
-  x: number
-  y: number
-  width: number
-  height: number
-}
-
-function renderBrushTraveller({ x, y, width, height }: BrushTravellerProps) {
-  const lineY = Math.floor(y + height / 2) - 1
-
-  return (
-    <g>
-      <rect
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        fill={BRUSH_HANDLE_FILL_COLOR}
-        stroke="none"
-      />
-      <line x1={x + 1} y1={lineY} x2={x + width - 1} y2={lineY} stroke={BRUSH_HANDLE_GRIP_COLOR} />
-      <line
-        x1={x + 1}
-        y1={lineY + 2}
-        x2={x + width - 1}
-        y2={lineY + 2}
-        stroke={BRUSH_HANDLE_GRIP_COLOR}
-      />
-    </g>
-  )
 }
 
 function parseGraphDate(value: string | undefined) {
@@ -165,13 +124,6 @@ function findEndDateIndex(data: GraphPoint[], date: string) {
   }
 
   return null
-}
-
-function createRangeFromIndexes(data: GraphPoint[], startIndex: number, endIndex: number) {
-  return {
-    dateFrom: data[startIndex].date,
-    dateTo: data[endIndex].date
-  }
 }
 
 function getVisibleIndexes(
@@ -351,17 +303,6 @@ export function GraphPanel({ query }: GraphPanelProps) {
     setVisibleRange(createVisibleRangeFromPeriod(data, DEFAULT_VISIBLE_PERIOD))
   }, [data, visibleRange])
 
-  const updateVisibleRange = (range: BrushRange) => {
-    const startIndex = range.startIndex ?? visibleIndexes?.startIndex
-    const endIndex = range.endIndex ?? visibleIndexes?.endIndex
-
-    if (startIndex === undefined || endIndex === undefined) {
-      return
-    }
-
-    setVisibleRange(createRangeFromIndexes(data, startIndex, endIndex))
-  }
-
   const updateVisibleRangeByPeriod = (period: GraphPeriod) => {
     if (data.length === 0) {
       return
@@ -402,7 +343,9 @@ export function GraphPanel({ query }: GraphPanelProps) {
     }
 
     const visiblePointCount = getVisiblePointCount(visibleIndexes)
-    const barSize = visiblePointCount <= COMPACT_POINT_LIMIT ? COMPACT_BAR_SIZE : undefined
+    const isCompactRange = visiblePointCount <= COMPACT_POINT_LIMIT
+    const chartData = data.slice(visibleIndexes.startIndex, visibleIndexes.endIndex + 1)
+    const barSize = isCompactRange ? COMPACT_BAR_SIZE : undefined
 
     return (
       <ChartFrame className={styles.chartBox}>
@@ -412,7 +355,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
           return (
             <ComposedChart
               barGap={0}
-              data={data}
+              data={chartData}
               height={height}
               margin={{ top: 8, right: 16, bottom: 0, left: -16 }}
               width={width}
@@ -425,7 +368,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
                 tick={{ fontSize: 12 }}
                 ticks={xAxisTicks}
                 tickFormatter={formatShortDate}
-                padding={{ left: compactXAxisPadding, right: 0 }}
+                padding={{ left: 0, right: compactXAxisPadding }}
               />
               <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
               <Tooltip labelFormatter={(label) => formatShortDate(String(label))} />
@@ -442,18 +385,6 @@ export function GraphPanel({ query }: GraphPanelProps) {
                 fill={FACT_COLOR}
                 radius={[3, 3, 0, 0]}
                 barSize={barSize}
-              />
-              <Brush
-                className={styles.chartBrush}
-                dataKey="date"
-                endIndex={visibleIndexes.endIndex}
-                fill={BRUSH_TRACK_FILL_COLOR}
-                height={24}
-                onChange={updateVisibleRange}
-                startIndex={visibleIndexes.startIndex}
-                stroke={BRUSH_TRACK_STROKE_COLOR}
-                traveller={renderBrushTraveller}
-                travellerWidth={8}
               />
             </ComposedChart>
           )

@@ -352,15 +352,6 @@
   height: 20rem;
 }
 
-.chartBrush :global(.recharts-brush-slide) {
-  fill: var(--color-chart-brush-selection-bg);
-  fill-opacity: 1;
-}
-
-.chartBrush :global(.recharts-brush-texts text) {
-  fill: var(--color-chart-brush-label);
-}
-
 @media (max-width: 1200px) {
   .kpiGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
