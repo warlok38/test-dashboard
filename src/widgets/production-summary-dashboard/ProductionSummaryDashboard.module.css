@@ -166,6 +166,15 @@
   line-height: 1.2;
 }
 
+.planValue {
+  display: block;
+  margin-top: 0.125rem;
+  color: var(--color-kpi-plan);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
 .deviation {
   display: block;
   margin-top: 0.125rem;

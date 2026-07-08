@@ -45,6 +45,9 @@ export function KpiCard({ active = false, card, selectable = false }: KpiCardPro
         <span className={styles.metricUnit}>{card.measure_unit}</span>
       </div>
       <b className={styles.metricValue}>{formatSummaryNumber(card.fact_value, fractionDigits)}</b>
+      <span className={styles.planValue}>
+        План: {formatSummaryNumber(card.plan_value, fractionDigits)}
+      </span>
       <span
         className={classNames(styles.deviation, styles[getDeviationClassName(card.deviation_pct)])}
       >

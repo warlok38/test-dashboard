@@ -6,8 +6,7 @@ import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import isoWeek from 'dayjs/plugin/isoWeek'
 import { useEffect, useMemo, useState } from 'react'
-import { Bar, Brush, CartesianGrid, ComposedChart, Line, Tooltip, XAxis, YAxis } from 'recharts'
-import { type DotItemDotProps } from 'recharts/types/util/types'
+import { Bar, Brush, CartesianGrid, ComposedChart, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { type GraphPoint, type GraphQuery, useGetGraphQuery } from '@/entities/production-summary'
 import { DATE_DISPLAY_FORMAT } from '@/shared/constants'
@@ -19,12 +18,11 @@ const GRAPH_DATE_FORMAT = 'YYYY-MM-DD'
 const MAX_X_AXIS_TICKS = 8
 const COMPACT_POINT_LIMIT = 10
 const COMPACT_POINT_WIDTH = 150
-const COMPACT_BAR_SIZE = 64
+const COMPACT_BAR_SIZE = 32
 const CHART_HORIZONTAL_MARGIN = 32
 const FACT_COLOR = 'var(--color-kpi-fact)'
 const PLAN_COLOR = 'var(--color-chart-plan)'
 const GRID_COLOR = 'var(--palette-dashboard-grid-border)'
-const DOT_FILL_COLOR = 'var(--color-bg-card)'
 const BRUSH_TRACK_FILL_COLOR = 'var(--color-chart-brush-track-bg)'
 const BRUSH_TRACK_STROKE_COLOR = 'var(--color-chart-brush-track-border)'
 const BRUSH_HANDLE_FILL_COLOR = 'var(--color-chart-brush-handle-bg)'
@@ -303,12 +301,6 @@ function getCompactXAxisPadding(chartWidth: number, visiblePointCount: number) {
   return Math.max(availableWidth - compactWidth, 0)
 }
 
-function isGraphPoint(value: unknown): value is GraphPoint {
-  return Boolean(
-    value && typeof value === 'object' && 'date' in value && typeof value.date === 'string'
-  )
-}
-
 export function GraphPanel({ query }: GraphPanelProps) {
   const [loadedRange, setLoadedRange] = useState(() => getInitialLoadedRange(undefined))
   const [visibleRange, setVisibleRange] = useState<GraphRange | null>(null)
@@ -343,7 +335,6 @@ export function GraphPanel({ query }: GraphPanelProps) {
           }),
     [data, visibleEndIndex, visibleStartIndex]
   )
-  const xAxisTickSet = useMemo(() => new Set(xAxisTicks), [xAxisTicks])
   const rangeLabel = formatRangeLabel(visibleRange)
   const selectedPreset = getPresetValue(visibleRange)
 
@@ -389,22 +380,6 @@ export function GraphPanel({ query }: GraphPanelProps) {
     setVisibleRange(createVisibleRangeFromPeriod(data, DEFAULT_VISIBLE_PERIOD))
   }
 
-  const renderPlanDot = (dotProps: DotItemDotProps) => {
-    const { cx, cy, payload } = dotProps
-
-    if (typeof cx !== 'number' || typeof cy !== 'number' || !isGraphPoint(payload)) {
-      return null
-    }
-
-    if (!xAxisTickSet.has(payload.date)) {
-      return null
-    }
-
-    return (
-      <circle cx={cx} cy={cy} fill={DOT_FILL_COLOR} r={3} stroke={PLAN_COLOR} strokeWidth={3} />
-    )
-  }
-
   const renderGraphContent = () => {
     if (!query) {
       return <div className={styles.emptyState}>Нет показателя для графика</div>
@@ -436,6 +411,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
 
           return (
             <ComposedChart
+              barGap={0}
               data={data}
               height={height}
               margin={{ top: 8, right: 16, bottom: 0, left: -16 }}
@@ -454,20 +430,18 @@ export function GraphPanel({ query }: GraphPanelProps) {
               <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
               <Tooltip labelFormatter={(label) => formatShortDate(String(label))} />
               <Bar
+                dataKey="plan"
+                name="План"
+                fill={PLAN_COLOR}
+                radius={[3, 3, 0, 0]}
+                barSize={barSize}
+              />
+              <Bar
                 dataKey="fact"
                 name="Факт"
                 fill={FACT_COLOR}
                 radius={[3, 3, 0, 0]}
                 barSize={barSize}
-              />
-              <Line
-                type="monotone"
-                dataKey="plan"
-                name="План"
-                stroke={PLAN_COLOR}
-                strokeWidth={3}
-                dot={renderPlanDot}
-                connectNulls={false}
               />
               <Brush
                 className={styles.chartBrush}
