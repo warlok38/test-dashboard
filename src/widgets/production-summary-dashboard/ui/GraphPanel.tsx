@@ -1,7 +1,7 @@
 'use client'
 
 import { ReloadOutlined } from '@ant-design/icons'
-import { Alert, Button, Segmented, Skeleton, Tooltip as AntTooltip } from 'antd'
+import { Button, Segmented, Skeleton, Tooltip as AntTooltip } from 'antd'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import isoWeek from 'dayjs/plugin/isoWeek'
@@ -11,7 +11,7 @@ import { type DotItemDotProps } from 'recharts/types/util/types'
 
 import { type GraphPoint, type GraphQuery, useGetGraphQuery } from '@/entities/production-summary'
 import { DATE_DISPLAY_FORMAT } from '@/shared/constants'
-import { ChartFrame } from '@/shared/ui'
+import { ApiErrorAlert, ChartFrame } from '@/shared/ui'
 
 import styles from '../ProductionSummaryDashboard.module.css'
 
@@ -411,7 +411,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
     }
 
     if (error) {
-      return <Alert showIcon type="error" title="Не удалось загрузить график" />
+      return <ApiErrorAlert error={error} title="Не удалось загрузить график" />
     }
 
     if (isLoading) {

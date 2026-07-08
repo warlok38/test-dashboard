@@ -1,7 +1,5 @@
 'use client'
 
-import { Alert } from 'antd'
-
 import {
   getFirstStageIndicator,
   getMiningStage,
@@ -9,6 +7,7 @@ import {
   type SummaryQuery,
   useGetSummaryQuery
 } from '@/entities/production-summary'
+import { ApiErrorAlert } from '@/shared/ui'
 
 import styles from './ProductionSummaryDashboard.module.css'
 import {
@@ -62,7 +61,7 @@ export function ProductionSummaryDashboard({
   if (error && !summary) {
     return (
       <section className={styles.dashboard} aria-label="Сводка производства">
-        <Alert showIcon type="error" title="Не удалось загрузить сводку производства" />
+        <ApiErrorAlert error={error} title="Не удалось загрузить сводку производства" />
       </section>
     )
   }
@@ -75,8 +74,8 @@ export function ProductionSummaryDashboard({
         </div>
       )}
       {error && (
-        <Alert
-          showIcon
+        <ApiErrorAlert
+          error={error}
           type="warning"
           title="Не удалось обновить сводку, показаны последние загруженные данные"
         />

@@ -1,6 +1,6 @@
 export type DataSource = 'backend' | 'mock'
 
-export const DATA_SOURCE: DataSource = 'mock'
+export const DATA_SOURCE: DataSource = 'backend'
 // process.env.NEXT_PUBLIC_DATA_SOURCE === 'mock' ? 'mock' : 'backend'
 
 export function isMockDataSource() {

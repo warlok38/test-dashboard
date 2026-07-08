@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { Alert, Empty, Skeleton } from 'antd'
+import { Empty, Skeleton } from 'antd'
 import { useSearchParams } from 'next/navigation'
 
 import {
@@ -9,6 +9,7 @@ import {
   useGetProductionStagesQuery
 } from '@/entities/production-stage'
 import { useScreen } from '@/shared/hooks/useScreen'
+import { ApiErrorAlert } from '@/shared/ui'
 
 import { getColumnWidth, getRows } from './lib'
 import { DesktopDashboardTable, MobileDashboardList } from './ui'
@@ -38,7 +39,7 @@ export function IndustrialDashboardTable() {
   if (error) {
     return (
       <div className={styles.dashboard}>
-        <Alert showIcon type="error" title="Не удалось загрузить сводку по стадиям производства" />
+        <ApiErrorAlert error={error} title="Не удалось загрузить сводку по стадиям производства" />
       </div>
     )
   }
