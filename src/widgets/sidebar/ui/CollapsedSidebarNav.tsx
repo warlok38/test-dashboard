@@ -1,17 +1,16 @@
 import classNames from 'classnames'
 import Link from 'next/link'
 
-import { getCollapsedItemHref, getHrefWithQuery, isCollapsedItemActive } from '../lib'
+import { getCollapsedItemHref, isCollapsedItemActive } from '../lib'
 import { type SidebarMenuItem } from '../sidebarConfig'
 import styles from '../Sidebar.module.css'
 
 type CollapsedSidebarNavProps = {
   items: SidebarMenuItem[]
   pathname: string
-  queryString: string
 }
 
-export function CollapsedSidebarNav({ items, pathname, queryString }: CollapsedSidebarNavProps) {
+export function CollapsedSidebarNav({ items, pathname }: CollapsedSidebarNavProps) {
   return (
     <nav className={styles.rail} aria-label="Разделы панели">
       {items.map((item) => {
@@ -42,7 +41,7 @@ export function CollapsedSidebarNav({ items, pathname, queryString }: CollapsedS
         return (
           <Link
             key={item.key}
-            href={getHrefWithQuery(href, queryString)}
+            href={href}
             className={classNames(styles.railItem, isActive && styles.railItemActive)}
             title={item.label}
             aria-label={item.label}

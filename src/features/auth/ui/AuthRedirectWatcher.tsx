@@ -3,9 +3,9 @@
 import { useEffect } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
-import { selectAuth } from '@/entities/auth'
+import { selectAuth } from '@/shared/auth'
 import { HTTP_ERROR_CODES } from '@/shared/errors'
-import { useAppSelector } from '@/shared/store'
+import { useAppSelector } from '@/shared/hooks'
 
 import {
   getAuthErrorHref,

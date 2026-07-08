@@ -1,8 +1,8 @@
 'use client'
 
-import { selectAuthError } from '@/entities/auth'
+import { selectAuthError } from '@/shared/auth'
 import { DEFAULT_ERROR_MESSAGES, HTTP_ERROR_CODES } from '@/shared/errors'
-import { useAppSelector } from '@/shared/store'
+import { useAppSelector } from '@/shared/hooks'
 
 import { ReloadPageButton } from './ReloadPageButton'
 

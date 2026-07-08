@@ -5,10 +5,7 @@ import {
   createApi
 } from '@reduxjs/toolkit/query/react'
 
-import { createAuthBaseQuery } from '@/entities/auth'
-import { mockBaseQuery } from '@/shared/mocks/api/mockBaseQuery'
-
-import { isMockDataSource } from './dataSource'
+import { createAuthBaseQuery } from './authBaseQuery'
 import { API_TAG_TYPES } from './tagTypes'
 
 function serializeParams(params: Record<string, unknown>) {
@@ -42,10 +39,6 @@ const baseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> =
   api,
   extraOptions
 ) => {
-  if (isMockDataSource()) {
-    return mockBaseQuery(args, api, extraOptions)
-  }
-
   return authBaseQuery(args, api, extraOptions)
 }
 

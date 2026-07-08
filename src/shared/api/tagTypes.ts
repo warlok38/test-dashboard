@@ -1,12 +1,7 @@
 export const API_TAGS = {
-  businessUnits: 'BusinessUnits',
   gtk: 'Gtk',
   summary: 'Summary',
-  graph: 'Graph',
-  productionStages: 'ProductionStages',
-  productionStageMetrics: 'ProductionStageMetrics',
-  productionMetricDetail: 'ProductionMetricDetail',
-  productionMetricComments: 'ProductionMetricComments'
+  graph: 'Graph'
 } as const
 
 export const API_TAG_TYPES = Object.values(API_TAGS)

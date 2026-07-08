@@ -4,8 +4,8 @@ import type { ReactNode } from 'react'
 import { Spin } from 'antd'
 import { usePathname } from 'next/navigation'
 
-import { selectAuth } from '@/entities/auth'
-import { useAppSelector } from '@/shared/store'
+import { selectAuth } from '@/shared/auth'
+import { useAppSelector } from '@/shared/hooks'
 
 import { isAuthStatusPath } from '../lib/redirect'
 import styles from './AuthContentGate.module.css'
