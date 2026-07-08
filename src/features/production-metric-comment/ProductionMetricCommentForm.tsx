@@ -3,6 +3,7 @@
 import { Button, Form, Input, message } from 'antd'
 
 import { useAddProductionMetricCommentMutation } from '@/entities/production-stage'
+import { getErrorMessage } from '@/shared/errors'
 
 import styles from './ProductionMetricCommentForm.module.css'
 
@@ -39,8 +40,8 @@ export function ProductionMetricCommentForm({
 
       messageApi.success('Комментарий отправлен')
       form.setFieldValue('text', '')
-    } catch {
-      messageApi.error('Не удалось отправить комментарий')
+    } catch (error) {
+      messageApi.error(getErrorMessage(error, 'Не удалось отправить комментарий'))
     }
   }
 

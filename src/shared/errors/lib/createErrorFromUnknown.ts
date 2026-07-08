@@ -8,7 +8,15 @@ function isFetchBaseQueryErrorLike(error: unknown): error is FetchBaseQueryError
   return typeof error === 'object' && error !== null && 'status' in error
 }
 
+function isHttpErrorLike(error: unknown): error is HttpErrorType {
+  return typeof error === 'object' && error !== null && 'statusCode' in error && 'message' in error
+}
+
 export function createErrorFromUnknown(error: unknown): HttpErrorType {
+  if (isHttpErrorLike(error)) {
+    return error
+  }
+
   if (isFetchBaseQueryErrorLike(error)) {
     return createErrorFromRtkError(error)
   }

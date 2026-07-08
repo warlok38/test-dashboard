@@ -3,7 +3,7 @@
 import type { PropsWithChildren } from 'react'
 import { Provider } from 'react-redux'
 
-import { AuthRedirectWatcher, InitApp } from '@/features/auth'
+import { AuthBootstrap, AuthRedirectWatcher } from '@/features/auth'
 import { store } from '@/shared/store'
 import type { ThemeMode } from '@/shared/theme'
 import { ThemeProvider } from '@/shared/theme'
@@ -16,10 +16,10 @@ export function Providers({ children, initialThemeMode }: ProvidersProps) {
   return (
     <Provider store={store}>
       <ThemeProvider initialMode={initialThemeMode}>
-        <InitApp>
+        <AuthBootstrap>
           <AuthRedirectWatcher />
           {children}
-        </InitApp>
+        </AuthBootstrap>
       </ThemeProvider>
     </Provider>
   )

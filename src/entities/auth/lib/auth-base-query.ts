@@ -7,10 +7,16 @@ import {
 } from '@reduxjs/toolkit/query/react'
 
 import { API_BASE_URL } from '@/shared/api/config'
+import {
+  createErrorFromRtkError,
+  createHttpErrorFromResponse,
+  httpErrorToFetchBaseQueryError
+} from '@/shared/errors'
 
 import { authActions } from '../model/auth-slice'
 import type { AuthResponse } from '../model/types'
-import { getToken, removeToken, setToken } from './token'
+import { clearAuthSession, saveAuthSession } from './auth-session'
+import { getToken } from './token'
 
 type ParamsSerializer = (params: Record<string, unknown>) => string
 
@@ -18,51 +24,69 @@ type CreateAuthBaseQueryOptions = {
   paramsSerializer: ParamsSerializer
 }
 
-const AUTH_ERROR: FetchBaseQueryError = {
-  status: 401,
-  data: 'Unauthorized'
+type AuthResult =
+  | {
+      data: AuthResponse
+    }
+  | {
+      error: FetchBaseQueryError
+    }
+
+type BaseQueryResult = Awaited<
+  ReturnType<BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError>>
+>
+type UnauthorizedBaseQueryResult = BaseQueryResult & {
+  error: FetchBaseQueryError
 }
 
-let authPromise: Promise<AuthResponse | null> | null = null
+const AUTH_FETCH_ERROR: FetchBaseQueryError = {
+  status: 'FETCH_ERROR',
+  error: 'Не удалось выполнить запрос авторизации'
+}
 
-async function authorizeByKerb() {
-  if (!authPromise) {
-    authPromise = fetch(`${API_BASE_URL}/auth/kerb`, {
+let authResultPromise: Promise<AuthResult> | null = null
+
+async function authorizeByKerbWithError(): Promise<AuthResult> {
+  if (!authResultPromise) {
+    authResultPromise = fetch(`${API_BASE_URL}/auth/kerb`, {
       method: 'POST',
       credentials: 'include'
     })
       .then(async (response) => {
         if (!response.ok) {
-          return null
+          const error = await createHttpErrorFromResponse(response)
+
+          return {
+            error: httpErrorToFetchBaseQueryError(error)
+          }
         }
 
-        return response.json() as Promise<AuthResponse>
+        return {
+          data: (await response.json()) as AuthResponse
+        }
       })
-      .catch(() => null)
+      .catch(() => ({
+        error: AUTH_FETCH_ERROR
+      }))
       .finally(() => {
-        authPromise = null
+        authResultPromise = null
       })
   }
 
-  return authPromise
+  return authResultPromise
 }
 
 function saveAuth(data: AuthResponse, api: BaseQueryApi) {
-  setToken(data.token)
-
-  api.dispatch(
-    authActions.authSuccess({
-      token: data.token,
-      userName: data.name,
-      userAvatar: data.avatar,
-      isAuthorized: true
-    })
-  )
+  api.dispatch(authActions.authSuccess(saveAuthSession(data)))
 }
 
-function failAuth(api: BaseQueryApi) {
-  removeToken()
-  api.dispatch(authActions.authFailed())
+function failAuth(error: FetchBaseQueryError, api: BaseQueryApi) {
+  clearAuthSession()
+  api.dispatch(authActions.authFailed(createErrorFromRtkError(error)))
+}
+
+function isUnauthorizedResult(result: BaseQueryResult): result is UnauthorizedBaseQueryResult {
+  return result.error?.status === 401
 }
 
 export function createAuthBaseQuery({
@@ -86,22 +110,28 @@ export function createAuthBaseQuery({
   return async (args, api, extraOptions) => {
     const firstResult = await rawBaseQuery(args, api, extraOptions)
 
-    if (firstResult.error?.status !== 401) {
+    if (!isUnauthorizedResult(firstResult)) {
       return firstResult
     }
 
-    const authData = await authorizeByKerb()
+    const authResult = await authorizeByKerbWithError()
 
-    if (!authData) {
-      failAuth(api)
+    if ('error' in authResult) {
+      failAuth(authResult.error, api)
 
       return {
-        error: AUTH_ERROR
+        error: authResult.error
       }
     }
 
-    saveAuth(authData, api)
+    saveAuth(authResult.data, api)
 
-    return rawBaseQuery(args, api, extraOptions)
+    const retryResult = await rawBaseQuery(args, api, extraOptions)
+
+    if (isUnauthorizedResult(retryResult)) {
+      failAuth(retryResult.error, api)
+    }
+
+    return retryResult
   }
 }

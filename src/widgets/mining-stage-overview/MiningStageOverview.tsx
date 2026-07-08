@@ -1,12 +1,13 @@
 'use client'
 
-import { Alert, Empty, Skeleton } from 'antd'
+import { Empty, Skeleton } from 'antd'
 import { useSearchParams } from 'next/navigation'
 
 import {
   getProductionStageFiltersFromSearchParams,
   useGetProductionStageMetricsQuery
 } from '@/entities/production-stage'
+import { ApiErrorAlert } from '@/shared/ui'
 
 import styles from './MiningStageOverview.module.css'
 import { MiningMetricCard } from './ui'
@@ -38,7 +39,7 @@ export function MiningStageOverview({ stageSlug }: MiningStageOverviewProps) {
   if (error) {
     return (
       <section className={styles.overview} aria-label="Обзор показателей добычи">
-        <Alert showIcon type="error" title="Не удалось загрузить показатели стадии" />
+        <ApiErrorAlert error={error} title="Не удалось загрузить показатели стадии" />
       </section>
     )
   }

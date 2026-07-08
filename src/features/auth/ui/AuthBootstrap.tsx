@@ -2,14 +2,14 @@
 
 import { useEffect, useRef, type ReactNode } from 'react'
 
-import { useAuth } from '../model/useAuth'
+import { useAuthBootstrap } from '../model/useAuthBootstrap'
 
-type InitAppProps = {
+type AuthBootstrapProps = {
   children: ReactNode
 }
 
-export function InitApp({ children }: InitAppProps) {
-  const { initApp } = useAuth()
+export function AuthBootstrap({ children }: AuthBootstrapProps) {
+  const { bootstrapAuth } = useAuthBootstrap()
   const initializedRef = useRef(false)
 
   useEffect(() => {
@@ -18,8 +18,8 @@ export function InitApp({ children }: InitAppProps) {
     }
 
     initializedRef.current = true
-    void initApp()
-  }, [initApp])
+    void bootstrapAuth()
+  }, [bootstrapAuth])
 
   return children
 }

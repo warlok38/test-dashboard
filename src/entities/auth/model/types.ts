@@ -1,3 +1,5 @@
+import type { HttpErrorType } from '@/shared/errors'
+
 export type AuthUser = {
   token: string
   userName: string
@@ -8,6 +10,7 @@ export type AuthUser = {
 export type AuthState = AuthUser & {
   isInitializing: boolean
   isInitialized: boolean
+  authError: HttpErrorType | null
 }
 
 export type AuthResponse = {

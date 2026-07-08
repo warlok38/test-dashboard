@@ -1,6 +1,6 @@
 'use client'
 
-import { Alert, Skeleton } from 'antd'
+import { Skeleton } from 'antd'
 import { useSearchParams } from 'next/navigation'
 
 import {
@@ -8,6 +8,7 @@ import {
   useGetProductionMetricDetailQuery
 } from '@/entities/production-stage'
 import { ProductionMetricCommentForm } from '@/features/production-metric-comment'
+import { ApiErrorAlert } from '@/shared/ui'
 
 import styles from './ProductionMetricDetail.module.css'
 import { SummaryCard, TotalPanel } from './ui'
@@ -40,7 +41,7 @@ export function ProductionMetricDetail({ stageSlug, metricSlug }: ProductionMetr
   if (error || !detail) {
     return (
       <section className={styles.detail} aria-labelledby="metric-detail-title">
-        <Alert showIcon type="error" title="Не удалось загрузить детализацию показателя" />
+        <ApiErrorAlert error={error} title="Не удалось загрузить детализацию показателя" />
       </section>
     )
   }

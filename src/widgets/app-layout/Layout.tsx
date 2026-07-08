@@ -1,5 +1,9 @@
+'use client'
+
 import { Suspense, type ReactNode } from 'react'
-import { AuthContentGate } from '@/features/auth'
+import { usePathname } from 'next/navigation'
+import { isAuthStatusPath } from '@/features/auth/lib/redirect'
+import { AuthContentGate } from '@/features/auth/ui/AuthContentGate'
 import { AppFooter } from '@/widgets/app-footer'
 import { Header } from '@/widgets/header'
 import { Sidebar, SidebarProvider } from '@/widgets/sidebar'
@@ -10,20 +14,25 @@ type LayoutProps = {
 }
 
 export function Layout({ children }: LayoutProps) {
+  const pathname = usePathname()
+  const isAuthStatusPage = isAuthStatusPath(pathname)
+
   return (
     <SidebarProvider>
       <div className={styles.layout}>
         <Header />
         <section className={styles.contentArea}>
           <AuthContentGate>
-            <Suspense fallback={null}>
-              <Sidebar />
-            </Suspense>
+            {!isAuthStatusPage && (
+              <Suspense fallback={null}>
+                <Sidebar />
+              </Suspense>
+            )}
             <div className={styles.contentColumn}>
               <main className={styles.mainContent} data-main-content-scroll>
                 {children}
               </main>
-              <AppFooter />
+              {!isAuthStatusPage && <AppFooter />}
             </div>
           </AuthContentGate>
         </section>

@@ -1,7 +1,16 @@
 const FORBIDDEN_PATH = '/forbidden'
+const AUTH_ERROR_PATH = '/auth-error'
 
 export function isForbiddenPath(pathname: string) {
   return pathname === FORBIDDEN_PATH || pathname.startsWith(`${FORBIDDEN_PATH}/`)
+}
+
+export function isAuthErrorPath(pathname: string) {
+  return pathname === AUTH_ERROR_PATH || pathname.startsWith(`${AUTH_ERROR_PATH}/`)
+}
+
+export function isAuthStatusPath(pathname: string) {
+  return isForbiddenPath(pathname) || isAuthErrorPath(pathname)
 }
 
 export function getCurrentPathWithSearch(pathname: string, searchParams: URLSearchParams) {
@@ -10,18 +19,26 @@ export function getCurrentPathWithSearch(pathname: string, searchParams: URLSear
   return query ? `${pathname}?${query}` : pathname
 }
 
-export function getForbiddenHref(pathname: string, searchParams: URLSearchParams) {
+function getAuthStatusHref(targetPath: string, pathname: string, searchParams: URLSearchParams) {
   const currentPath = getCurrentPathWithSearch(pathname, searchParams)
 
-  if (isForbiddenPath(pathname)) {
-    return FORBIDDEN_PATH
+  if (isAuthStatusPath(pathname) || currentPath === '/') {
+    return targetPath
   }
 
-  return `${FORBIDDEN_PATH}?from=${encodeURIComponent(currentPath)}`
+  return `${targetPath}?from=${encodeURIComponent(currentPath)}`
+}
+
+export function getForbiddenHref(pathname: string, searchParams: URLSearchParams) {
+  return getAuthStatusHref(FORBIDDEN_PATH, pathname, searchParams)
+}
+
+export function getAuthErrorHref(pathname: string, searchParams: URLSearchParams) {
+  return getAuthStatusHref(AUTH_ERROR_PATH, pathname, searchParams)
 }
 
 export function getSafeForbiddenReturnPath(from: string | null) {
-  if (!from || !from.startsWith('/') || from.startsWith('//') || isForbiddenPath(from)) {
+  if (!from || !from.startsWith('/') || from.startsWith('//') || isAuthStatusPath(from)) {
     return '/'
   }
 

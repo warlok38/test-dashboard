@@ -1,5 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
+import type { HttpErrorType } from '@/shared/errors'
+
 import type { AuthState, AuthUser } from './types'
 
 const initialState: AuthState = {
@@ -8,7 +10,8 @@ const initialState: AuthState = {
   userAvatar: null,
   isAuthorized: false,
   isInitializing: false,
-  isInitialized: false
+  isInitialized: false,
+  authError: null
 }
 
 const authSlice = createSlice({
@@ -17,6 +20,7 @@ const authSlice = createSlice({
   reducers: {
     authStarted: (state) => {
       state.isInitializing = true
+      state.authError = null
     },
     authSuccess: (state, action: PayloadAction<AuthUser>) => {
       state.token = action.payload.token
@@ -25,14 +29,16 @@ const authSlice = createSlice({
       state.isAuthorized = action.payload.isAuthorized
       state.isInitializing = false
       state.isInitialized = true
+      state.authError = null
     },
-    authFailed: (state) => {
+    authFailed: (state, action: PayloadAction<HttpErrorType | undefined>) => {
       state.token = ''
       state.userName = ''
       state.userAvatar = null
       state.isAuthorized = false
       state.isInitializing = false
       state.isInitialized = true
+      state.authError = action.payload ?? null
     }
   }
 })

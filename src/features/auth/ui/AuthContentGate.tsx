@@ -2,10 +2,12 @@
 
 import type { ReactNode } from 'react'
 import { Spin } from 'antd'
+import { usePathname } from 'next/navigation'
 
-import { selectIsAuthInitialized, selectIsAuthInitializing } from '@/entities/auth'
+import { selectAuth } from '@/entities/auth'
 import { useAppSelector } from '@/shared/store'
 
+import { isAuthStatusPath } from '../lib/redirect'
 import styles from './AuthContentGate.module.css'
 
 type AuthContentGateProps = {
@@ -13,10 +15,11 @@ type AuthContentGateProps = {
 }
 
 export function AuthContentGate({ children }: AuthContentGateProps) {
-  const isInitialized = useAppSelector(selectIsAuthInitialized)
-  const isInitializing = useAppSelector(selectIsAuthInitializing)
+  const pathname = usePathname()
+  const { isAuthorized, isInitialized, isInitializing } = useAppSelector(selectAuth)
+  const shouldBlockProtectedContent = isInitialized && !isAuthorized && !isAuthStatusPath(pathname)
 
-  if (!isInitialized) {
+  if (!isInitialized || shouldBlockProtectedContent) {
     return (
       <div className={styles.loading}>
         <Spin />

@@ -1,3 +1,4 @@
+import { ReloadPageButton } from '@/features/auth/ui/ReloadPageButton'
 import { PageShell, PageSurface } from '@/shared/ui'
 
 import styles from './page.module.css'
@@ -13,6 +14,9 @@ export default function ForbiddenPage() {
               Не удалось подтвердить авторизацию. Обновите страницу или обратитесь к администратору,
               если доступ должен быть открыт.
             </p>
+            <div className={styles.actions}>
+              <ReloadPageButton />
+            </div>
           </div>
         </section>
       </PageSurface>
