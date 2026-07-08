@@ -29,7 +29,6 @@ export default function GtkPage({ params, searchParams }: GtkPageProps) {
           { label: 'Главная', href: '/', icon: homeBreadcrumbIcon },
           { label: `Производство · ${gtkName}` }
         ]}
-        showBusinessUnitFilter={false}
       />
       <PageSurface variant="constrained">
         <ProductionSummaryDashboard

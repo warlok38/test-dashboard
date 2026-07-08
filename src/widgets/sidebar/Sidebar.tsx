@@ -3,7 +3,7 @@
 import { CloseOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons'
 import { Drawer } from 'antd'
 import classNames from 'classnames'
-import { usePathname, useSearchParams } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
 import { getGtkHrefByName, getGtkSlugByName, useGetGtkQuery } from '@/entities/production-summary'
@@ -35,7 +35,6 @@ type SidebarContentProps = {
 
 function SidebarContent({ collapsed = false, variant = 'desktop' }: SidebarContentProps) {
   const pathname = usePathname()
-  const searchParams = useSearchParams()
   const { closeMobileSidebar, toggleCollapsed } = useSidebar()
   const { data: gtkNames = [], error: gtkError, isLoading: isGtkLoading } = useGetGtkQuery()
   const isDrawer = variant === 'drawer'
@@ -102,7 +101,6 @@ function SidebarContent({ collapsed = false, variant = 'desktop' }: SidebarConte
     setOpenKeys(routeOpenKeys)
   }, [routeOpenKeys])
 
-  const queryString = searchParams.toString()
   const onRouteClick = useMemo(
     () => (isDrawer ? closeMobileSidebar : undefined),
     [closeMobileSidebar, isDrawer]
@@ -134,18 +132,13 @@ function SidebarContent({ collapsed = false, variant = 'desktop' }: SidebarConte
       {!isDrawer && <SidebarDateTime collapsed={isCollapsed} />}
 
       {isCollapsed ? (
-        <CollapsedSidebarNav
-          items={primarySidebarItems}
-          pathname={pathname}
-          queryString={queryString}
-        />
+        <CollapsedSidebarNav items={primarySidebarItems} pathname={pathname} />
       ) : (
         <SidebarMenu
           items={primarySidebarItems}
           onOpenChange={setOpenKeys}
           onRouteClick={onRouteClick}
           openKeys={openKeys}
-          queryString={queryString}
           selectedKey={selectedKey}
         />
       )}
@@ -153,18 +146,13 @@ function SidebarContent({ collapsed = false, variant = 'desktop' }: SidebarConte
       <div className={styles.spacer} />
 
       {isCollapsed ? (
-        <CollapsedSidebarNav
-          items={footerSidebarItems}
-          pathname={pathname}
-          queryString={queryString}
-        />
+        <CollapsedSidebarNav items={footerSidebarItems} pathname={pathname} />
       ) : (
         <SidebarMenu
           items={footerSidebarItems}
           onOpenChange={setOpenKeys}
           onRouteClick={onRouteClick}
           openKeys={openKeys}
-          queryString={queryString}
           selectedKey={selectedKey}
         />
       )}

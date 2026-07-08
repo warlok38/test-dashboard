@@ -4,9 +4,10 @@ import type { PropsWithChildren } from 'react'
 import { Provider } from 'react-redux'
 
 import { AuthBootstrap, AuthRedirectWatcher } from '@/features/auth'
-import { store } from '@/shared/store'
 import type { ThemeMode } from '@/shared/theme'
 import { ThemeProvider } from '@/shared/theme'
+
+import { store } from './store'
 
 type ProvidersProps = PropsWithChildren<{
   initialThemeMode?: ThemeMode

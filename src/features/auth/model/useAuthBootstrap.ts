@@ -2,9 +2,9 @@
 
 import { useCallback } from 'react'
 
-import { authActions, clearAuthSession, saveAuthSession, useAuthMutation } from '@/entities/auth'
+import { authActions, clearAuthSession, saveAuthSession, useAuthMutation } from '@/shared/auth'
 import { createErrorFromUnknown } from '@/shared/errors'
-import { useAppDispatch } from '@/shared/store'
+import { useAppDispatch } from '@/shared/hooks'
 
 export function useAuthBootstrap() {
   const dispatch = useAppDispatch()

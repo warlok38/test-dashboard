@@ -1,7 +1,6 @@
 import { Menu, type MenuProps } from 'antd'
 import Link from 'next/link'
 
-import { getHrefWithQuery } from '../lib'
 import { type SidebarMenuItem } from '../sidebarConfig'
 import styles from '../Sidebar.module.css'
 
@@ -10,11 +9,10 @@ type SidebarMenuProps = {
   onOpenChange: (openKeys: string[]) => void
   onRouteClick?: () => void
   openKeys: string[]
-  queryString: string
   selectedKey?: string
 }
 
-function getMenuLabel(item: SidebarMenuItem, queryString: string, onRouteClick?: () => void) {
+function getMenuLabel(item: SidebarMenuItem, onRouteClick?: () => void) {
   if (item.isSkeleton) {
     return <span className={styles.menuSkeletonLine} aria-hidden="true" />
   }
@@ -33,7 +31,7 @@ function getMenuLabel(item: SidebarMenuItem, queryString: string, onRouteClick?:
     }
 
     return (
-      <Link href={getHrefWithQuery(item.href, queryString)} onClick={onRouteClick}>
+      <Link href={item.href} onClick={onRouteClick}>
         {item.label}
       </Link>
     )
@@ -42,19 +40,15 @@ function getMenuLabel(item: SidebarMenuItem, queryString: string, onRouteClick?:
   return item.label
 }
 
-function getMenuItems(
-  items: SidebarMenuItem[],
-  queryString: string,
-  onRouteClick?: () => void
-): MenuProps['items'] {
+function getMenuItems(items: SidebarMenuItem[], onRouteClick?: () => void): MenuProps['items'] {
   return items.map((item) => {
     const Icon = item.icon
 
     return {
       key: item.key,
       icon: Icon ? <Icon /> : undefined,
-      label: getMenuLabel(item, queryString, onRouteClick),
-      children: item.children ? getMenuItems(item.children, queryString, onRouteClick) : undefined,
+      label: getMenuLabel(item, onRouteClick),
+      children: item.children ? getMenuItems(item.children, onRouteClick) : undefined,
       disabled: item.disabled
     }
   })
@@ -65,13 +59,12 @@ export function SidebarMenu({
   onOpenChange,
   onRouteClick,
   openKeys,
-  queryString,
   selectedKey
 }: SidebarMenuProps) {
   return (
     <Menu
       className={styles.menu}
-      items={getMenuItems(items, queryString, onRouteClick)}
+      items={getMenuItems(items, onRouteClick)}
       mode="inline"
       openKeys={openKeys}
       selectedKeys={selectedKey ? [selectedKey] : []}

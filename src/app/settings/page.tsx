@@ -14,7 +14,6 @@ export default function SettingsPage() {
           { label: 'Главная', href: '/', icon: homeBreadcrumbIcon },
           { label: 'Настройки', icon: <SettingOutlined /> }
         ]}
-        showBusinessUnitFilter={false}
         showDateFilter={false}
       />
 

@@ -1,13 +1,5 @@
 import { type SidebarMenuItem } from '../sidebarConfig'
 
-export function getHrefWithQuery(href: string, queryString: string) {
-  if (!queryString || !href.startsWith('/production-stages')) {
-    return href
-  }
-
-  return `${href}?${queryString}`
-}
-
 export function getCollapsedItemHref(item: SidebarMenuItem) {
   return item.href ?? item.children?.find((child) => child.href)?.href
 }

@@ -6,7 +6,6 @@ import { Suspense, useState, type ReactNode } from 'react'
 
 import { Breadcrumbs, type BreadcrumbItem } from '@/shared/ui'
 
-import { BusinessUnitFilter } from '@/features/business-unit-filter'
 import { DateRangeFilter } from '@/features/date-range-filter'
 import styles from './ContentHeader.module.css'
 import { useHeaderVisibility } from './lib'
@@ -17,26 +16,15 @@ export type ContentHeaderBreadcrumb = BreadcrumbItem
 type ContentHeaderProps = {
   breadcrumbs: ContentHeaderBreadcrumb[]
   actions?: ReactNode
-  showBusinessUnitFilter?: boolean
   showDateFilter?: boolean
 }
 
-export function ContentHeader({
-  breadcrumbs,
-  actions,
-  showBusinessUnitFilter = true,
-  showDateFilter = true
-}: ContentHeaderProps) {
+export function ContentHeader({ breadcrumbs, actions, showDateFilter = true }: ContentHeaderProps) {
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
   const { headerRef, isHeaderHidden } = useHeaderVisibility(isMobileFilterOpen)
-  const hasDefaultActions = showBusinessUnitFilter || showDateFilter
+  const hasDefaultActions = showDateFilter
   const renderDefaultActions = () =>
-    hasDefaultActions ? (
-      <>
-        {showBusinessUnitFilter && <BusinessUnitFilter />}
-        {showDateFilter && <DateRangeFilter variant="borderless" />}
-      </>
-    ) : null
+    hasDefaultActions ? <DateRangeFilter variant="borderless" /> : null
   const resolvedActions = actions ?? renderDefaultActions()
   const shouldRenderResponsiveDefaultActions = !actions && hasDefaultActions
   return (

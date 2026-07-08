@@ -1,6 +1,4 @@
-export { DATA_SOURCE, isMockDataSource } from './dataSource'
 export { mainApi } from './mainApi'
 export { API_ROUTES } from './routes'
 export { API_TAGS, API_TAG_TYPES } from './tagTypes'
-export type { DataSource } from './dataSource'
 export type { ApiTagType } from './tagTypes'
