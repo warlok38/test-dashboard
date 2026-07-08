@@ -5,11 +5,11 @@
 ## Основные участники
 
 - `features/auth/AuthBootstrap` запускает первичную проверку авторизации при старте приложения.
-- `features/auth/useAuthBootstrap` вызывает `POST /auth/kerb`, сохраняет успешную сессию или нормализует ошибку авторизации.
+- `features/auth/useAuthBootstrap` выбирает способ первичной авторизации по `runMode`: в `development` использует `kerbToken` из env, в `production` вызывает `POST /auth/kerb`.
 - `shared/auth/authSlice` хранит состояние авторизации: пользователь, флаги инициализации и `authError`.
 - `features/auth/AuthContentGate` не даёт защищённому UI смонтироваться, пока авторизация не завершена или пользователь не допущен.
 - `features/auth/AuthRedirectWatcher` переводит пользователя на нужный служебный экран.
-- `shared/api/createAuthBaseQuery` добавляет bearer token в API-запросы и выполняет повторную Kerberos-авторизацию после `401` от защищённого API.
+- `shared/api/createAuthBaseQuery` добавляет bearer token из Redux state в API-запросы и выполняет повторную Kerberos-авторизацию после `401` от защищённого API.
 
 ## Расположение по FSD
 
@@ -17,6 +17,7 @@
 
 - `src/shared/auth` — инфраструктура auth-сессии: RTK Query endpoint `POST /auth/kerb`, token/session helpers, Redux slice, selectors и auth-типы.
 - `src/shared/api` — общий API-клиент приложения: `mainApi`, `createAuthBaseQuery`, API routes и RTK Query tag types.
+- `src/shared/constants/general.ts` — app-wide runtime constants: `kerbToken` и derived run mode flags.
 - `src/features/auth` — сценарий авторизации в UI: bootstrap при старте, gate защищённого контента, redirect watcher и служебный auth error UI.
 - `src/app/store.ts` — композиция Redux store: подключает `shared/auth` и `shared/api`.
 
@@ -24,7 +25,19 @@ Auth не находится в `entities`, потому что сейчас э�
 
 ## Первичная авторизация
 
-При загрузке приложения `AuthBootstrap` вызывает `POST /auth/kerb`.
+При загрузке приложения `AuthBootstrap` выбирает flow по `runMode`.
+
+В `development` режиме:
+
+- `/auth/kerb` не вызывается;
+- токен берётся из `kerbToken`, который пробрасывается через `nextConfig.env` из `KERB_TOKEN`;
+- токен не сохраняется в `localStorage`;
+- пользователь записывается в Redux как development session, приложение считается авторизованным;
+- `createAuthBaseQuery` берёт токен из Redux state и ставит его в `Authorization` для остальных API-запросов.
+
+Если `RUN_MODE=development`, но `KERB_TOKEN` не задан, bootstrap завершается auth error, чтобы не запускать production-авторизацию случайно.
+
+В `production` режиме `AuthBootstrap` вызывает `POST /auth/kerb`.
 
 Если ответ успешный, токен сохраняется в `localStorage`, пользователь записывается в Redux, приложение считается авторизованным и защищённый UI отображается.
 
@@ -42,7 +55,9 @@ Auth не находится в `entities`, потому что сейчас э�
 
 Для обычных API-запросов используется `shared/api/createAuthBaseQuery`.
 
-Если защищённый API возвращает `401`, фронт пробует заново вызвать `POST /auth/kerb`.
+Если защищённый API возвращает `401` в `production` режиме, фронт пробует заново вызвать `POST /auth/kerb`.
+
+В `development` режиме повторная авторизация не выполняется. Если защищённый API вернул `401`, это означает, что `KERB_TOKEN` не принят backend'ом или устарел. Фронт сохраняет ошибку авторизации и переводит пользователя на служебный экран.
 
 - Повторная авторизация выполняется напрямую через `fetch`, а не через `mainApi` и не через `createAuthBaseQuery`.
 - Если несколько API-запросов одновременно получили `401`, они используют один общий `authResultPromise`, а не запускают несколько параллельных `/auth/kerb`.
@@ -89,13 +104,18 @@ flowchart TD
 
   subgraph InitialAuth["Первичная авторизация"]
     Start --> Bootstrap["AuthBootstrap"]
-    Bootstrap --> Kerb["POST /auth/kerb"]
+    Bootstrap --> Mode{"runMode"}
+    Mode -->|development| DevToken["kerbToken из env"]
+    Mode -->|production| Kerb["POST /auth/kerb"]
+    DevToken -->|KERB_TOKEN задан| SaveDev["authSuccess без localStorage"]
+    DevToken -->|KERB_TOKEN отсутствует| AuthFail["authFailed(authError)"]
     Kerb -->|200| SaveInitial["saveAuthSession + authSuccess"]
     Kerb -->|401 или 403| AccessFail["authFailed(authError)"]
     Kerb -->|500, 504, network, unknown| AuthFail["authFailed(authError)"]
   end
 
   subgraph ProtectedApp["Защищённое приложение"]
+    SaveDev --> ProtectedUI["Показать защищённый UI"]
     SaveInitial --> ProtectedUI["Показать защищённый UI"]
     ProtectedUI --> ApiRequest["GET защищённого API"]
     ApiRequest -->|2xx| DataState["Показать данные"]

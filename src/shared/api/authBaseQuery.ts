@@ -7,6 +7,7 @@ import {
 } from '@reduxjs/toolkit/query/react'
 
 import { API_BASE_URL } from '@/shared/api/config'
+import { isDevelopmentRunMode } from '@/shared/constants'
 import {
   authActions,
   clearAuthSession,
@@ -39,6 +40,11 @@ type BaseQueryResult = Awaited<
 >
 type UnauthorizedBaseQueryResult = BaseQueryResult & {
   error: FetchBaseQueryError
+}
+type StateWithAuthToken = {
+  auth?: {
+    token?: string
+  }
 }
 
 const AUTH_FETCH_ERROR: FetchBaseQueryError = {
@@ -91,6 +97,10 @@ function failAuth(error: FetchBaseQueryError, api: BaseQueryApi) {
   api.dispatch(authActions.authFailed(createErrorFromRtkError(error)))
 }
 
+function getAuthTokenFromState(state: unknown) {
+  return (state as StateWithAuthToken).auth?.token || null
+}
+
 export function createAuthBaseQuery({
   paramsSerializer
 }: CreateAuthBaseQueryOptions): BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> {
@@ -98,8 +108,8 @@ export function createAuthBaseQuery({
     baseUrl: API_BASE_URL,
     credentials: 'include',
     paramsSerializer,
-    prepareHeaders: (headers) => {
-      const token = getToken()
+    prepareHeaders: (headers, { getState }) => {
+      const token = getAuthTokenFromState(getState()) ?? (isDevelopmentRunMode ? null : getToken())
 
       if (token) {
         headers.set('Authorization', `Bearer ${token}`)
@@ -113,6 +123,12 @@ export function createAuthBaseQuery({
     const firstResult = await rawBaseQuery(args, api, extraOptions)
 
     if (!isUnauthorizedResult(firstResult)) {
+      return firstResult
+    }
+
+    if (isDevelopmentRunMode) {
+      failAuth(firstResult.error, api)
+
       return firstResult
     }
 

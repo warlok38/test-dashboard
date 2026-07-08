@@ -10,6 +10,15 @@ export function mapAuthResponseToUser(data: AuthResponse): AuthUser {
   }
 }
 
+export function createAuthUserFromToken(token: string): AuthUser {
+  return {
+    token,
+    userName: 'Development user',
+    userAvatar: null,
+    isAuthorized: true
+  }
+}
+
 export function saveAuthSession(data: AuthResponse): AuthUser {
   setToken(data.token)
 

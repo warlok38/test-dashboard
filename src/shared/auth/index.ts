@@ -1,5 +1,10 @@
 export { authApi, useAuthMutation } from './api/auth-api'
-export { clearAuthSession, mapAuthResponseToUser, saveAuthSession } from './lib/auth-session'
+export {
+  clearAuthSession,
+  createAuthUserFromToken,
+  mapAuthResponseToUser,
+  saveAuthSession
+} from './lib/auth-session'
 export { getToken, removeToken, setToken } from './lib/token'
 export { authActions, authReducer } from './model/auth-slice'
 export {

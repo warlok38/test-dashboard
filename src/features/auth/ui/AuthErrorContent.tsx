@@ -27,7 +27,7 @@ function getAuthErrorTitle(statusCode: string | number | undefined, message: str
     return `${statusCode} ${message ?? DEFAULT_ERROR_MESSAGES.Default}`
   }
 
-  return 'Ошибка авторизации'
+  return message ?? 'Ошибка авторизации'
 }
 
 export function AuthErrorContent({
