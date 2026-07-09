@@ -321,14 +321,6 @@
   letter-spacing: 0;
 }
 
-.graphRange {
-  margin-top: var(--space-1);
-  color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-  line-height: 1.2;
-}
-
 .graphMeta {
   display: flex;
   align-items: center;
@@ -347,9 +339,84 @@
   gap: var(--space-2);
 }
 
+.graphViewControls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.graphPeriodControl,
+.seriesViewControl {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.seriesViewLabel {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.seriesViewIconLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.seriesViewIcon {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+}
+
 .chartBox {
   width: 100%;
   height: 20rem;
+}
+
+.graphWheelArea {
+  position: relative;
+  min-width: 0;
+}
+
+.graphUpdatingOverlay {
+  position: absolute;
+  z-index: 2;
+  top: var(--space-2);
+  right: var(--space-2);
+  padding: 0.125rem var(--space-2);
+  border: var(--border-width-hairline) solid var(--palette-border-soft);
+  border-radius: var(--radius-2);
+  background: color-mix(in srgb, var(--color-bg-card) 88%, transparent);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1.4;
+  box-shadow: var(--color-shadow-card);
+  pointer-events: none;
+}
+
+.graphBrush :global(.recharts-brush-slide) {
+  fill: var(--color-scrollbar-thumb-visible);
+  fill-opacity: 1;
+  stroke: var(--color-scrollbar-thumb-visible);
+  cursor: grab;
+}
+
+.graphBrush :global(.recharts-brush-slide:active) {
+  cursor: grabbing;
+}
+
+.graphBrush :global(.recharts-brush-traveller) {
+  display: none;
+}
+
+.graphBrush :global(.recharts-brush-texts) {
+  display: none;
 }
 
 @media (max-width: 1200px) {
@@ -372,5 +439,11 @@
   .graphMeta {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .graphViewControls,
+  .graphPeriodControl,
+  .graphControls {
+    flex-wrap: wrap;
   }
 }

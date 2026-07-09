@@ -44,6 +44,8 @@ export function ProductionSummaryDashboard({
     showGraph && activeIndicator
       ? {
           indicator: activeIndicator,
+          ...(query.date_from ? { date_from: query.date_from } : {}),
+          ...(query.date_to ? { date_to: query.date_to } : {}),
           ...(query.gtk ? { gtk: query.gtk } : {})
         }
       : undefined
@@ -88,12 +90,7 @@ export function ProductionSummaryDashboard({
         stage={miningStage}
         titleId="mining-title"
       />
-      {showGraph && (
-        <GraphPanel
-          key={`${graphQuery?.gtk ?? ''}:${graphQuery?.indicator ?? ''}`}
-          query={graphQuery}
-        />
-      )}
+      {showGraph && <GraphPanel query={graphQuery} />}
       {shouldShowDeposits && (
         <DepositGrid items={deposits} title="Месторождения" titleId="deposits-title" />
       )}

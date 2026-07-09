@@ -17,6 +17,7 @@ export type {
   AlarmSummaryResponse,
   DepositMetricView,
   DepositSummaryView,
+  GraphPeriod,
   GraphPoint,
   GraphQuery,
   GtkName,

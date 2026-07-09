@@ -53,8 +53,11 @@ export type GraphQuery = {
   date?: string
   date_from?: string
   date_to?: string
+  period?: GraphPeriod
   gtk?: string
 }
+
+export type GraphPeriod = 'day' | 'month' | 'year'
 
 export type GraphPoint = {
   date: string
