@@ -44,6 +44,14 @@ type BrushState = BrushRange & {
   graphPeriod: GraphPeriod
   lastDataDate: string | undefined
 }
+type AxisTickPayload = {
+  value?: string | number
+}
+type AxisTickProps = {
+  x?: number | string
+  y?: number | string
+  payload?: AxisTickPayload
+}
 
 const DEFAULT_GRAPH_PERIOD: GraphPeriod = 'day'
 const GRAPH_PERIOD_OPTIONS: Array<{ label: string; value: GraphPeriod }> = [
@@ -118,6 +126,7 @@ dayjs.extend(customParseFormat)
 type GraphPanelQuery = Pick<GraphQuery, 'indicator' | 'gtk' | 'date_from' | 'date_to'>
 
 type GraphPanelProps = {
+  measureUnit?: string
   query: GraphPanelQuery | undefined
 }
 
@@ -147,6 +156,45 @@ function formatGraphTick(value: string, period: GraphPeriod) {
   }
 
   return `${date.format('DD')} ${MONTH_LABELS[date.month()]}`
+}
+
+function formatCompactAxisNumber(value: string | number | undefined) {
+  const numberValue = Number(value)
+
+  if (!Number.isFinite(numberValue)) {
+    return value === undefined ? '' : String(value)
+  }
+
+  if (Math.abs(numberValue) >= 1_000_000) {
+    return `${Number((numberValue / 1_000_000).toFixed(1)).toString()}m`
+  }
+
+  if (Math.abs(numberValue) >= 10_000) {
+    return `${Number((numberValue / 1_000).toFixed(1)).toString()}k`
+  }
+
+  return numberValue.toString()
+}
+
+function formatFullAxisNumber(value: string | number | undefined) {
+  const numberValue = Number(value)
+
+  if (!Number.isFinite(numberValue)) {
+    return value === undefined ? '' : String(value)
+  }
+
+  return numberValue.toString()
+}
+
+function YAxisTick({ x = 0, y = 0, payload }: AxisTickProps) {
+  const fullValue = formatFullAxisNumber(payload?.value)
+
+  return (
+    <text className={styles.graphYAxisTick} dy={4} fill="currentColor" textAnchor="end" x={x} y={y}>
+      <title>{fullValue}</title>
+      {formatCompactAxisNumber(payload?.value)}
+    </text>
+  )
 }
 
 function getXAxisTicks(data: GraphPoint[], visibleRange?: BrushRange) {
@@ -293,7 +341,7 @@ function useDelayedFlag(isActive: boolean, delayMs: number) {
   return isDelayedActive
 }
 
-export function GraphPanel({ query }: GraphPanelProps) {
+export function GraphPanel({ measureUnit, query }: GraphPanelProps) {
   const [graphPeriod, setGraphPeriod] = useState<GraphPeriod>(DEFAULT_GRAPH_PERIOD)
   const [seriesView, setSeriesView] = useState<Record<GraphSeriesKey, GraphSeriesView>>({
     plan: 'bar',
@@ -481,7 +529,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
                   tickCount={Y_AXIS_TICK_COUNT}
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontSize: 12 }}
+                  tick={YAxisTick}
                 />
                 <Tooltip
                   isAnimationActive={false}
@@ -520,7 +568,10 @@ export function GraphPanel({ query }: GraphPanelProps) {
     <section className={styles.graphPanel} aria-labelledby="graph-title">
       <header className={styles.graphHeader}>
         <div>
-          <h2 id="graph-title">{query?.indicator ?? 'График'}</h2>
+          <h2 className={styles.graphTitle} id="graph-title">
+            <span>{query?.indicator ?? 'График'}</span>
+            {measureUnit ? <span className={styles.graphTitleUnit}>{measureUnit}</span> : null}
+          </h2>
         </div>
         <div className={styles.graphMeta}>
           <label className={styles.graphPeriodControl}>

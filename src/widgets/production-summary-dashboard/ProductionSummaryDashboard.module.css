@@ -321,6 +321,18 @@
   letter-spacing: 0;
 }
 
+.graphTitle {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.graphTitleUnit {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
 .graphMeta {
   display: flex;
   align-items: center;
@@ -398,6 +410,11 @@
   line-height: 1.4;
   box-shadow: var(--color-shadow-card);
   pointer-events: none;
+}
+
+.graphYAxisTick {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
 }
 
 .graphBrush :global(.recharts-brush-slide) {
