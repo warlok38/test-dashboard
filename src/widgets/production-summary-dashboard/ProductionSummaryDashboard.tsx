@@ -37,9 +37,6 @@ export function ProductionSummaryDashboard({
   const activeIndicator = miningStage?.cards.some((card) => card.indicator_name === indicator)
     ? indicator
     : firstIndicator
-  const activeIndicatorCard = miningStage?.cards.find(
-    (card) => card.indicator_name === activeIndicator
-  )
   const isInitialLoading = isLoading && !summary
   const shouldShowDeposits = showDeposits ?? !showGraph
   const shouldShowZif = showDeposits ?? true
@@ -93,9 +90,7 @@ export function ProductionSummaryDashboard({
         stage={miningStage}
         titleId="mining-title"
       />
-      {showGraph && (
-        <GraphPanel measureUnit={activeIndicatorCard?.measure_unit} query={graphQuery} />
-      )}
+      {showGraph && <GraphPanel query={graphQuery} />}
       {shouldShowDeposits && (
         <DepositGrid items={deposits} title="Месторождения" titleId="deposits-title" />
       )}

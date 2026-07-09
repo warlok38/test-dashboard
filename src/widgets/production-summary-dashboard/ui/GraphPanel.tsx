@@ -126,7 +126,6 @@ dayjs.extend(customParseFormat)
 type GraphPanelQuery = Pick<GraphQuery, 'indicator' | 'gtk' | 'date_from' | 'date_to'>
 
 type GraphPanelProps = {
-  measureUnit?: string
   query: GraphPanelQuery | undefined
 }
 
@@ -341,7 +340,7 @@ function useDelayedFlag(isActive: boolean, delayMs: number) {
   return isDelayedActive
 }
 
-export function GraphPanel({ measureUnit, query }: GraphPanelProps) {
+export function GraphPanel({ query }: GraphPanelProps) {
   const [graphPeriod, setGraphPeriod] = useState<GraphPeriod>(DEFAULT_GRAPH_PERIOD)
   const [seriesView, setSeriesView] = useState<Record<GraphSeriesKey, GraphSeriesView>>({
     plan: 'bar',
@@ -354,6 +353,7 @@ export function GraphPanel({ measureUnit, query }: GraphPanelProps) {
   })
   const [lastSuccessfulData, setLastSuccessfulData] = useState<GraphPoint[] | undefined>()
   const data = currentData ?? lastSuccessfulData ?? EMPTY_GRAPH_DATA
+  const measureUnit = data[0]?.measure_unit
   const isInitialLoading = isLoading && !currentData && !lastSuccessfulData
   const shouldShowUpdatingOverlay = useDelayedFlag(
     isFetching && Boolean(lastSuccessfulData),

@@ -62,6 +62,7 @@ export type GraphPeriod = 'day' | 'month' | 'year'
 export type GraphPoint = {
   date: string
   fact: number | null
+  measure_unit: string
   plan: number | null
 }
 
