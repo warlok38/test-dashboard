@@ -13,6 +13,7 @@ export type SummaryQuery = {
 
 export type SummaryIndicatorDetail = {
   gtk_or_zif: string
+  display_name: string
   plan_value: number | null
   fact_value: number | null
   deviation_pct: number | null
@@ -83,4 +84,27 @@ export type DepositSummaryView = {
   status: SummarySeverity
   statusLabel: string
   metrics: DepositMetricView[]
+}
+
+export type GeneralSummaryCard = {
+  indicator_name: string
+  plan_value: number
+  fact_value: number
+  deviation_pct: number
+  measure_unit: string
+  cards: GeneralSummaryCard[] | null
+}
+
+export type GeneralSummaryResponse = {
+  production_date_from: string
+  production_date_to: string
+  shift: number
+  cards: GeneralSummaryCard[]
+}
+
+export type GeneralSummaryParams = {
+  date_from?: string
+  date_to?: string
+  shift?: number
+  gtk?: string
 }

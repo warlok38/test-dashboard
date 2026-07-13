@@ -1,6 +1,8 @@
 import { API_ROUTES, API_TAGS, mainApi } from '@/shared/api'
 
 import {
+  GeneralSummaryParams,
+  GeneralSummaryResponse,
   type AlarmSummaryResponse,
   type GraphPoint,
   type GraphQuery,
@@ -27,8 +29,16 @@ export const productionSummaryApi = mainApi.injectEndpoints({
         params
       }),
       providesTags: [API_TAGS.graph]
+    }),
+    getGeneralSummary: build.query<GeneralSummaryResponse, GeneralSummaryParams>({
+      query: (params) => ({
+        url: API_ROUTES.generalSummary,
+        params
+      }),
+      providesTags: [API_TAGS.generalSummary]
     })
   })
 })
 
-export const { useGetGtkQuery, useGetSummaryQuery, useGetGraphQuery } = productionSummaryApi
+export const { useGetGtkQuery, useGetSummaryQuery, useGetGraphQuery, useGetGeneralSummaryQuery } =
+  productionSummaryApi

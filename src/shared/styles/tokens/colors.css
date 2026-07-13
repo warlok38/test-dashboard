@@ -30,7 +30,7 @@
   --color-shadow-card: var(--palette-shadow-card);
 
   --color-kpi-fact: var(--palette-accent-primary);
-  --color-kpi-plan: #5d605d;
+  --color-kpi-plan: #808080;
   --color-kpi-delta-positive: var(--palette-status-success);
   --color-kpi-delta-negative: var(--palette-status-danger);
   --color-kpi-neutral: var(--color-text-muted);

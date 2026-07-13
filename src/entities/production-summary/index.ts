@@ -2,7 +2,8 @@ export {
   productionSummaryApi,
   useGetGraphQuery,
   useGetGtkQuery,
-  useGetSummaryQuery
+  useGetSummaryQuery,
+  useGetGeneralSummaryQuery
 } from './api/productionSummaryApi'
 export {
   getGtkHrefByName,
@@ -26,5 +27,8 @@ export type {
   SummaryIndicatorCard,
   SummaryIndicatorDetail,
   SummaryQuery,
-  SummarySeverity
+  SummarySeverity,
+  GeneralSummaryCard,
+  GeneralSummaryParams,
+  GeneralSummaryResponse
 } from './model/types'

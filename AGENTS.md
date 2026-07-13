@@ -3,6 +3,7 @@
 ## General
 
 - Prioritize clean, efficient, and maintainable code.
+- Accessibility is not a requirement for this project. Do not add or maintain ARIA attributes, keyboard navigation, or other a11y-specific behavior unless explicitly requested for a task.
 - Follow best practices and patterns already used in this project before introducing new ones.
 - If a task is ambiguous and a reasonable assumption would be risky, ask a clarifying question.
 - Favor KISS and apply SOLID principles where they improve maintainability.

@@ -16,7 +16,6 @@ export default function Home({ searchParams }: HomePageProps) {
       <PageSurface variant="constrained">
         <ProductionSummaryDashboard
           query={getSummaryQueryFromSearchParams(searchParams)}
-          showDeposits
           showGraph
         />
       </PageSurface>

@@ -42,6 +42,7 @@ type BrushRange = {
 type BrushState = BrushRange & {
   dataLength: number
   graphPeriod: GraphPeriod
+  dataKey: string | undefined
   lastDataDate: string | undefined
 }
 type AxisTickPayload = {
@@ -127,6 +128,10 @@ type GraphPanelQuery = Pick<GraphQuery, 'indicator' | 'gtk' | 'date_from' | 'dat
 
 type GraphPanelProps = {
   query: GraphPanelQuery | undefined
+}
+type LastSuccessfulGraphData = {
+  data: GraphPoint[]
+  dataKey: string | undefined
 }
 
 function parseGraphDate(value: string | undefined) {
@@ -246,6 +251,20 @@ function getGraphQuery(query: GraphPanelQuery | undefined, period: GraphPeriod) 
   } satisfies GraphQuery
 }
 
+function getGraphDataKey(query: GraphQuery | undefined) {
+  if (!query) {
+    return undefined
+  }
+
+  return [
+    query.gtk ?? '',
+    query.indicator,
+    query.period ?? '',
+    query.date_from ?? '',
+    query.date_to ?? ''
+  ].join(':')
+}
+
 function getYAxisMax(data: GraphPoint[]) {
   const maxValue = Math.max(...data.flatMap((point) => [point.fact ?? 0, point.plan ?? 0]), 0)
 
@@ -284,6 +303,7 @@ function createBrushState(
   range: BrushRange | undefined,
   dataLength: number,
   graphPeriod: GraphPeriod,
+  dataKey: string | undefined,
   lastDataDate: string | undefined
 ): BrushState | undefined {
   if (!range) {
@@ -294,6 +314,7 @@ function createBrushState(
     ...range,
     dataLength,
     graphPeriod,
+    dataKey,
     lastDataDate
   }
 }
@@ -348,13 +369,17 @@ export function GraphPanel({ query }: GraphPanelProps) {
   })
   const [brushRange, setBrushRange] = useState<BrushState | undefined>()
   const graphQuery = useMemo(() => getGraphQuery(query, graphPeriod), [graphPeriod, query])
+  const graphDataKey = useMemo(() => getGraphDataKey(graphQuery), [graphQuery])
   const { currentData, error, isFetching, isLoading } = useGetGraphQuery(graphQuery as GraphQuery, {
     skip: !graphQuery
   })
-  const [lastSuccessfulData, setLastSuccessfulData] = useState<GraphPoint[] | undefined>()
-  const data = currentData ?? lastSuccessfulData ?? EMPTY_GRAPH_DATA
+  const [lastSuccessfulData, setLastSuccessfulData] = useState<
+    LastSuccessfulGraphData | undefined
+  >()
+  const data = currentData ?? lastSuccessfulData?.data ?? EMPTY_GRAPH_DATA
+  const dataKey = currentData ? graphDataKey : lastSuccessfulData?.dataKey
   const measureUnit = data[0]?.measure_unit
-  const isInitialLoading = isLoading && !currentData && !lastSuccessfulData
+  const isInitialLoading = isLoading && !currentData && !lastSuccessfulData?.data
   const shouldShowUpdatingOverlay = useDelayedFlag(
     isFetching && Boolean(lastSuccessfulData),
     GRAPH_LOADING_OVERLAY_DELAY_MS
@@ -366,6 +391,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
   const isBrushRangeActual =
     brushRange?.dataLength === data.length &&
     brushRange.graphPeriod === graphPeriod &&
+    brushRange.dataKey === dataKey &&
     brushRange.lastDataDate === lastDataDate
   const effectiveBrushRange = getEffectiveBrushRange(
     shouldUseBrush,
@@ -380,9 +406,12 @@ export function GraphPanel({ query }: GraphPanelProps) {
 
   useEffect(() => {
     if (currentData) {
-      setLastSuccessfulData(currentData)
+      setLastSuccessfulData({
+        data: currentData,
+        dataKey: graphDataKey
+      })
     }
-  }, [currentData])
+  }, [currentData, graphDataKey])
 
   useEffect(() => {
     if (!shouldUseBrush) {
@@ -395,9 +424,12 @@ export function GraphPanel({ query }: GraphPanelProps) {
       return
     }
 
-    setBrushRange(createBrushState(defaultBrushRange, data.length, graphPeriod, lastDataDate))
+    setBrushRange(
+      createBrushState(defaultBrushRange, data.length, graphPeriod, dataKey, lastDataDate)
+    )
   }, [
     data.length,
+    dataKey,
     defaultBrushRange,
     graphPeriod,
     isBrushRangeActual,
@@ -457,7 +489,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
       data.length
     )
 
-    setBrushRange(createBrushState(nextRange, data.length, graphPeriod, lastDataDate))
+    setBrushRange(createBrushState(nextRange, data.length, graphPeriod, dataKey, lastDataDate))
   }
 
   const handleChartWheel = (event: WheelEvent<HTMLDivElement>) => {
@@ -476,7 +508,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
       data.length
     )
 
-    setBrushRange(createBrushState(nextRange, data.length, graphPeriod, lastDataDate))
+    setBrushRange(createBrushState(nextRange, data.length, graphPeriod, dataKey, lastDataDate))
   }
 
   const renderGraphContent = () => {
@@ -539,6 +571,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
                 {renderSeries('line', barSize)}
                 {shouldUseBrush ? (
                   <Brush
+                    key={dataKey}
                     dataKey="date"
                     endIndex={effectiveBrushRange?.endIndex}
                     fill={BRUSH_TRACK_COLOR}

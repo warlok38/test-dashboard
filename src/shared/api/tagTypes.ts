@@ -1,7 +1,8 @@
 export const API_TAGS = {
   gtk: 'Gtk',
   summary: 'Summary',
-  graph: 'Graph'
+  graph: 'Graph',
+  generalSummary: 'GeneralSummary'
 } as const
 
 export const API_TAG_TYPES = Object.values(API_TAGS)

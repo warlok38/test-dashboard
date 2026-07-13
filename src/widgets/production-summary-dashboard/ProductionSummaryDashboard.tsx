@@ -1,49 +1,49 @@
 'use client'
 
+import { Spin } from 'antd'
+
 import {
-  getFirstStageIndicator,
-  getMiningStage,
-  groupCardsByDeposit,
+  type GeneralSummaryCard,
   type SummaryQuery,
-  useGetSummaryQuery
+  useGetGeneralSummaryQuery
 } from '@/entities/production-summary'
 import { ApiErrorAlert } from '@/shared/ui'
 
 import styles from './ProductionSummaryDashboard.module.css'
-import {
-  CollapsibleStagePanel,
-  DepositGrid,
-  GraphPanel,
-  ProductionSummaryDashboardSkeleton
-} from './ui'
+import { GeneralSummary, GraphPanel } from './ui'
 
-type ProductionSummaryDashboardProps = {
+type SummaryDashboardProps = {
   query: SummaryQuery
-  showDeposits?: boolean
   showGraph?: boolean
 }
 
-export function ProductionSummaryDashboard({
-  query,
-  showDeposits,
-  showGraph = false
-}: ProductionSummaryDashboardProps) {
-  const { indicator, ...summaryQuery } = query
-  const { data: summary, error, isFetching, isLoading } = useGetSummaryQuery(summaryQuery)
-  const miningStage = getMiningStage(summary)
-  const deposits = groupCardsByDeposit(miningStage?.cards ?? [])
-  const zifItems = groupCardsByDeposit(summary?.by_enrichment?.cards ?? [])
-  const firstIndicator = getFirstStageIndicator(miningStage)
-  const activeIndicator = miningStage?.cards.some((card) => card.indicator_name === indicator)
+function getSelectedGeneralSummaryIndicator(
+  cards: GeneralSummaryCard[],
+  indicator: string | undefined
+) {
+  const indicators = cards[0]?.cards ?? []
+
+  return indicators.some((card) => card.indicator_name === indicator)
     ? indicator
-    : firstIndicator
-  const isInitialLoading = isLoading && !summary
-  const shouldShowDeposits = showDeposits ?? !showGraph
-  const shouldShowZif = showDeposits ?? true
+    : indicators[0]?.indicator_name
+}
+
+export function ProductionSummaryDashboard({ query, showGraph = false }: SummaryDashboardProps) {
+  const { indicator, ...summaryQuery } = query
+  const {
+    data: generalSummary,
+    error: generalSummaryError,
+    isLoading: isGeneralSummaryLoading
+  } = useGetGeneralSummaryQuery(summaryQuery)
+
+  const generalSummaryCards = generalSummary?.cards || []
+  const selectedIndicator = getSelectedGeneralSummaryIndicator(generalSummaryCards, indicator)
+
+  const isInitialLoading = isGeneralSummaryLoading && !generalSummary
   const graphQuery =
-    showGraph && activeIndicator
+    showGraph && selectedIndicator
       ? {
-          indicator: activeIndicator,
+          indicator: selectedIndicator,
           ...(query.date_from ? { date_from: query.date_from } : {}),
           ...(query.date_to ? { date_to: query.date_to } : {}),
           ...(query.gtk ? { gtk: query.gtk } : {})
@@ -52,57 +52,31 @@ export function ProductionSummaryDashboard({
 
   if (isInitialLoading) {
     return (
-      <section className={styles.dashboard} aria-label="Сводка производства">
-        <ProductionSummaryDashboardSkeleton showDeposits={shouldShowDeposits} />
-        {/* <StaticStagePanel title="Минеральные ресурсы" /> */}
-        {/* <StaticStagePanel title="Обогащение" /> */}
+      <section className={styles.dashboard}>
+        <div className={styles.initialLoading}>
+          <Spin />
+          <span>Загружаем данные...</span>
+        </div>
       </section>
     )
   }
 
-  if (error && !summary) {
+  if (generalSummaryError && !generalSummary) {
     return (
-      <section className={styles.dashboard} aria-label="Сводка производства">
-        <ApiErrorAlert error={error} title="Не удалось загрузить сводку производства" />
+      <section className={styles.dashboard}>
+        <ApiErrorAlert error={generalSummaryError} title="Не удалось загрузить общие показатели" />
       </section>
     )
   }
 
   return (
-    <section className={styles.dashboard} aria-label="Сводка производства">
-      {isFetching && (
-        <div className={styles.refreshStatus} role="status" aria-live="polite">
-          Обновляем показатели
-        </div>
-      )}
-      {error && (
-        <ApiErrorAlert
-          error={error}
-          type="warning"
-          title="Не удалось обновить сводку, показаны последние загруженные данные"
-        />
-      )}
-      <CollapsibleStagePanel
-        activeIndicator={activeIndicator}
-        collapseLabel="Свернуть добычу"
-        emptyStateLabel="Нет данных по добыче"
-        selectableIndicators={showGraph}
-        stage={miningStage}
-        titleId="mining-title"
+    <section className={styles.dashboard}>
+      <GeneralSummary
+        cards={generalSummaryCards}
+        activeIndicator={selectedIndicator}
+        loading={isGeneralSummaryLoading}
       />
       {showGraph && <GraphPanel query={graphQuery} />}
-      {shouldShowDeposits && (
-        <DepositGrid items={deposits} title="Месторождения" titleId="deposits-title" />
-      )}
-      {shouldShowDeposits && (
-        <CollapsibleStagePanel
-          collapseLabel="Свернуть обогащение"
-          emptyStateLabel="Нет данных по обогащению"
-          stage={summary?.by_enrichment}
-          titleId="enrichment-title"
-        />
-      )}
-      {shouldShowZif && <DepositGrid items={zifItems} title="ЗИФ" titleId="zif-title" />}
     </section>
   )
 }

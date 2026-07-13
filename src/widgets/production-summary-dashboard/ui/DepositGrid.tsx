@@ -55,7 +55,7 @@ export function DepositGrid({ items, title, titleId }: DepositGridProps) {
                       )}
                     </b>
                     <span className={styles.planValue}>
-                      План:{' '}
+                      План:
                       {formatSummaryNumber(
                         metric.planValue,
                         getSummaryFractionDigits(metric.title)
