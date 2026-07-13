@@ -6,6 +6,8 @@ import {
   type AlarmSummaryResponse,
   type GraphPoint,
   type GraphQuery,
+  type GraphWithDetailsResponse,
+  type GraphWithGtkResponse,
   type GtkName,
   type SummaryQuery
 } from '../model/types'
@@ -30,6 +32,20 @@ export const productionSummaryApi = mainApi.injectEndpoints({
       }),
       providesTags: [API_TAGS.graph]
     }),
+    getGraphWithGtk: build.query<GraphWithGtkResponse, GraphQuery>({
+      query: (params) => ({
+        url: API_ROUTES.graphWithGtk,
+        params
+      }),
+      providesTags: [API_TAGS.graphWithGtk]
+    }),
+    getGraphWithDetails: build.query<GraphWithDetailsResponse, GraphQuery>({
+      query: (params) => ({
+        url: API_ROUTES.graphWithDetails,
+        params
+      }),
+      providesTags: [API_TAGS.graphWithDetails]
+    }),
     getGeneralSummary: build.query<GeneralSummaryResponse, GeneralSummaryParams>({
       query: (params) => ({
         url: API_ROUTES.generalSummary,
@@ -40,5 +56,11 @@ export const productionSummaryApi = mainApi.injectEndpoints({
   })
 })
 
-export const { useGetGtkQuery, useGetSummaryQuery, useGetGraphQuery, useGetGeneralSummaryQuery } =
-  productionSummaryApi
+export const {
+  useGetGtkQuery,
+  useGetSummaryQuery,
+  useGetGraphQuery,
+  useGetGraphWithDetailsQuery,
+  useGetGraphWithGtkQuery,
+  useGetGeneralSummaryQuery
+} = productionSummaryApi

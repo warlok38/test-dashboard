@@ -67,6 +67,41 @@ export type GraphPoint = {
   plan: number | null
 }
 
+export type GraphWithGtkMetadata = {
+  period: GraphPeriod
+  start_date: string
+  end_date: string
+}
+
+export type GraphWithGtkDetail = {
+  indicator: string
+  gtk: string
+  unit: string
+  points: GraphPoint[]
+}
+
+export type GraphWithGtkResponse = {
+  metadata: GraphWithGtkMetadata
+  details: GraphWithGtkDetail[]
+}
+
+export type GraphWithDetailsMetadata = {
+  period: GraphPeriod
+  start_date: string
+  end_date: string
+}
+
+export type GraphWithDetailsDetail = {
+  indicator: string
+  unit: string
+  points: GraphPoint[]
+}
+
+export type GraphWithDetailsResponse = {
+  metadata: GraphWithDetailsMetadata
+  details: GraphWithDetailsDetail[]
+}
+
 export type DepositMetricView = {
   id: string
   title: string

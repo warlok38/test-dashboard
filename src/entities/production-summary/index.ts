@@ -1,6 +1,8 @@
 export {
   productionSummaryApi,
   useGetGraphQuery,
+  useGetGraphWithDetailsQuery,
+  useGetGraphWithGtkQuery,
   useGetGtkQuery,
   useGetSummaryQuery,
   useGetGeneralSummaryQuery
@@ -21,6 +23,12 @@ export type {
   GraphPeriod,
   GraphPoint,
   GraphQuery,
+  GraphWithDetailsDetail,
+  GraphWithDetailsMetadata,
+  GraphWithDetailsResponse,
+  GraphWithGtkDetail,
+  GraphWithGtkMetadata,
+  GraphWithGtkResponse,
   GtkName,
   GtkSlug,
   StageSummary,

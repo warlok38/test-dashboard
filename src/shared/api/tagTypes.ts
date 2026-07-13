@@ -2,6 +2,8 @@ export const API_TAGS = {
   gtk: 'Gtk',
   summary: 'Summary',
   graph: 'Graph',
+  graphWithGtk: 'GraphWithGtk',
+  graphWithDetails: 'GraphWithDetails',
   generalSummary: 'GeneralSummary'
 } as const
 
