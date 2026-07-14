@@ -17,9 +17,11 @@ type ChartFrameSize = {
 }
 
 const SKELETON_BARS = [36, 62, 48, 78, 54, 68, 42]
+const CHART_RESIZE_DEBOUNCE_MS = 120
 
 export function ChartFrame({ className, children }: ChartFrameProps) {
   const rootRef = useRef<HTMLDivElement | null>(null)
+  const resizeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [size, setSize] = useState({ width: 0, height: 0 })
   const hasMeasuredSize = size.width > 0 && size.height > 0
 
@@ -30,22 +32,55 @@ export function ChartFrame({ className, children }: ChartFrameProps) {
       return
     }
 
-    const updateSize = () => {
-      const { width, height } = root.getBoundingClientRect()
-
-      setSize({
+    const commitSize = ({ width, height }: ChartFrameSize) => {
+      const nextSize = {
         width: Math.floor(width),
         height: Math.floor(height)
-      })
+      }
+
+      if (nextSize.width <= 0 || nextSize.height <= 0) {
+        return
+      }
+
+      setSize((currentSize) =>
+        currentSize.width === nextSize.width && currentSize.height === nextSize.height
+          ? currentSize
+          : nextSize
+      )
     }
 
-    updateSize()
+    commitSize(root.getBoundingClientRect())
 
-    const observer = new ResizeObserver(updateSize)
+    const scheduleSizeCommit = ([entry]: ResizeObserverEntry[]) => {
+      if (!entry) {
+        return
+      }
+
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current)
+      }
+
+      const nextSize = {
+        width: entry.contentRect.width,
+        height: entry.contentRect.height
+      }
+
+      resizeTimeoutRef.current = setTimeout(() => {
+        commitSize(nextSize)
+        resizeTimeoutRef.current = null
+      }, CHART_RESIZE_DEBOUNCE_MS)
+    }
+
+    const observer = new ResizeObserver(scheduleSizeCommit)
     observer.observe(root)
 
     return () => {
       observer.disconnect()
+
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current)
+        resizeTimeoutRef.current = null
+      }
     }
   }, [])
 
@@ -73,7 +108,7 @@ export function ChartFrame({ className, children }: ChartFrameProps) {
   }
 
   return (
-    <div ref={rootRef} className={className}>
+    <div ref={rootRef} className={`${styles.frame} ${className}`}>
       {renderChart()}
     </div>
   )
