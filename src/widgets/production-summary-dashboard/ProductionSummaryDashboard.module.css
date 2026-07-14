@@ -498,6 +498,12 @@
   font-size: var(--font-size-base);
 }
 
+.graphPanelStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
 .graphPanel {
   padding: var(--space-4) var(--space-5);
   border: var(--border-width-hairline) solid var(--palette-border-soft);
@@ -696,6 +702,58 @@
   line-height: 1.2;
 }
 
+.detailGraphsSection {
+  min-width: 0;
+}
+
+.detailGraphsSectionTitle {
+  margin: 0 0 var(--space-3);
+  color: var(--color-status-danger);
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.detailGraphsSectionBody {
+  min-width: 0;
+}
+
+.detailGraphList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.detailGraphCard {
+  min-width: 0;
+  padding: var(--space-4) var(--space-5);
+  border: var(--border-width-hairline) solid var(--palette-border-soft);
+  border-radius: var(--radius-5);
+  background: var(--color-bg-card);
+  box-shadow: var(--color-shadow-card);
+}
+
+.detailGraphHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.detailGraphTitle {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-text-strong);
+  font-size: var(--font-size-2xl);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
 @media (--screen-tablet) {
   .kpiGrid,
   .depositGrid,
@@ -798,6 +856,10 @@
     padding: var(--space-3) var(--space-4);
   }
 
+  .graphPanelStack {
+    gap: var(--space-4);
+  }
+
   .graphHeader {
     gap: var(--space-3);
     margin-bottom: var(--space-2);
@@ -826,6 +888,23 @@
 
   .depositGraphTitle {
     margin-bottom: var(--space-1);
+  }
+
+  .detailGraphsSectionTitle {
+    margin-bottom: var(--space-2);
+  }
+
+  .detailGraphList {
+    gap: var(--space-3);
+  }
+
+  .detailGraphCard {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .detailGraphHeader {
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
   }
 }
 
@@ -857,7 +936,8 @@
   }
 
   .graphHeader,
-  .graphMeta {
+  .graphMeta,
+  .detailGraphHeader {
     align-items: flex-start;
     flex-direction: column;
   }

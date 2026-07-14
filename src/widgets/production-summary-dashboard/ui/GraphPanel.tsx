@@ -61,6 +61,13 @@ type GraphPanelProps = {
   query: GraphPanelQuery | undefined
 }
 
+type GraphControlsProps = {
+  graphPeriod: GraphPeriod
+  seriesView: Record<GraphSeriesKey, GraphSeriesView>
+  onGraphPeriodChange: (period: GraphPeriod) => void
+  onSeriesViewChange: (seriesKey: GraphSeriesKey, view: GraphSeriesView) => void
+}
+
 type LastSuccessfulGraphData = {
   data: GraphPoint[]
   dataKey: string | undefined
@@ -106,6 +113,40 @@ function getGraphDataKey(query: GraphQuery | undefined) {
     query.date_from ?? '',
     query.date_to ?? ''
   ].join(':')
+}
+
+function GraphControls({
+  graphPeriod,
+  seriesView,
+  onGraphPeriodChange,
+  onSeriesViewChange
+}: GraphControlsProps) {
+  return (
+    <div className={styles.graphMeta}>
+      <label className={styles.graphPeriodControl}>
+        <span className={styles.seriesViewLabel}>Детализация</span>
+        <Segmented
+          options={GRAPH_PERIOD_OPTIONS}
+          size="small"
+          value={graphPeriod}
+          onChange={(value) => onGraphPeriodChange(value as GraphPeriod)}
+        />
+      </label>
+      <div className={styles.graphViewControls}>
+        {GRAPH_SERIES_CONFIGS.map((series) => (
+          <label className={styles.seriesViewControl} key={series.key}>
+            <span className={styles.seriesViewLabel}>{series.name}</span>
+            <Segmented
+              options={SERIES_VIEW_OPTIONS}
+              size="small"
+              value={seriesView[series.key]}
+              onChange={(value) => onSeriesViewChange(series.key, value as GraphSeriesView)}
+            />
+          </label>
+        ))}
+      </div>
+    </div>
+  )
 }
 
 function useDelayedFlag(isActive: boolean, delayMs: number) {
@@ -305,19 +346,22 @@ export function GraphPanel({ query }: GraphPanelProps) {
     }
 
     return (
-      <div className={styles.depositGraphGrid}>
+      <div className={styles.detailGraphList}>
         {graphDetails.map((detail) => (
-          <article className={styles.depositGraphCard} key={detail.indicator}>
-            <h3 className={styles.depositGraphTitle}>
-              <span>{detail.indicator}</span>
-            </h3>
+          <article className={styles.detailGraphCard} key={detail.indicator}>
+            <header className={styles.detailGraphHeader}>
+              <h3 className={styles.detailGraphTitle}>
+                <span>{detail.indicator}</span>
+                {detail.unit ? <span className={styles.graphTitleUnit}>{detail.unit}</span> : null}
+              </h3>
+            </header>
             <GraphChart
               data={detail.points}
               dataKey={`${graphDetailsDataKey}:details:${detail.indicator}`}
+              emptyText="Нет данных по детальному показателю"
               graphPeriod={graphPeriod}
               isUpdating={shouldShowDetailsUpdatingOverlay}
               seriesView={seriesView}
-              size="compact"
             />
           </article>
         ))}
@@ -326,50 +370,34 @@ export function GraphPanel({ query }: GraphPanelProps) {
   }
 
   return (
-    <section className={styles.graphPanel}>
-      <header className={styles.graphHeader}>
-        <div>
-          <h2 className={styles.graphTitle}>
-            <span>{query?.indicator ?? 'График'}</span>
-            {measureUnit ? <span className={styles.graphTitleUnit}>{measureUnit}</span> : null}
-          </h2>
-        </div>
-        <div className={styles.graphMeta}>
-          <label className={styles.graphPeriodControl}>
-            <span className={styles.seriesViewLabel}>Детализация</span>
-            <Segmented
-              options={GRAPH_PERIOD_OPTIONS}
-              size="small"
-              value={graphPeriod}
-              onChange={(value) => setGraphPeriod(value as GraphPeriod)}
-            />
-          </label>
-          <div className={styles.graphViewControls}>
-            {GRAPH_SERIES_CONFIGS.map((series) => (
-              <label className={styles.seriesViewControl} key={series.key}>
-                <span className={styles.seriesViewLabel}>{series.name}</span>
-                <Segmented
-                  options={SERIES_VIEW_OPTIONS}
-                  size="small"
-                  value={seriesView[series.key]}
-                  onChange={(value) => updateSeriesView(series.key, value as GraphSeriesView)}
-                />
-              </label>
-            ))}
+    <div className={styles.graphPanelStack}>
+      <section className={styles.graphPanel}>
+        <header className={styles.graphHeader}>
+          <div>
+            <h2 className={styles.graphTitle}>
+              <span>{query?.indicator ?? 'График'}</span>
+              {measureUnit ? <span className={styles.graphTitleUnit}>{measureUnit}</span> : null}
+            </h2>
           </div>
+          <GraphControls
+            graphPeriod={graphPeriod}
+            seriesView={seriesView}
+            onGraphPeriodChange={setGraphPeriod}
+            onSeriesViewChange={updateSeriesView}
+          />
+        </header>
+        {renderGraphContent()}
+        <div className={styles.graphNestedSections}>
+          <section className={styles.graphNestedSection}>
+            <h2 className={styles.graphSectionTitle}>Месторождения</h2>
+            <div className={styles.graphSectionBody}>{renderDepositsContent()}</div>
+          </section>
         </div>
-      </header>
-      {renderGraphContent()}
-      <div className={styles.graphNestedSections}>
-        <section className={styles.graphNestedSection}>
-          <h2 className={styles.graphSectionTitle}>Месторождения</h2>
-          <div className={styles.graphSectionBody}>{renderDepositsContent()}</div>
-        </section>
-        <section className={styles.graphNestedSection}>
-          <h2 className={styles.graphSectionTitle}>Детальные показатели</h2>
-          <div className={styles.graphSectionBody}>{renderDetailsContent()}</div>
-        </section>
-      </div>
-    </section>
+      </section>
+      <section className={styles.detailGraphsSection}>
+        <h2 className={styles.detailGraphsSectionTitle}>Детальные показатели</h2>
+        <div className={styles.detailGraphsSectionBody}>{renderDetailsContent()}</div>
+      </section>
+    </div>
   )
 }
