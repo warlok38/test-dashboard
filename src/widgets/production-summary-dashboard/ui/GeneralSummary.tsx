@@ -1,11 +1,14 @@
+import { DownOutlined, UpOutlined } from '@ant-design/icons'
 import classNames from 'classnames'
-
-import { GeneralSummaryCard } from '@/entities/production-summary'
-
-import styles from '../ProductionSummaryDashboard.module.css'
+import { Empty } from 'antd'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
-import { Spin } from 'antd'
+
+import { type GeneralSummaryCard } from '@/entities/production-summary'
+import { Loader } from '@/shared/ui'
+import { formatNumber } from '@/shared/utils/formatNumber'
+
+import styles from '../ProductionSummaryDashboard.module.css'
 
 type GeneralSummaryProps = {
   cards: GeneralSummaryCard[]
@@ -19,12 +22,20 @@ export function GeneralSummary({
   loading
 }: GeneralSummaryProps) {
   const [isShowAll, setIsShowAll] = useState(false)
-  if (cards.length === 0 || loading) {
+  const showAllLabel = isShowAll ? 'Скрыть все' : 'Показать все'
+
+  if (loading && cards.length === 0) {
     return (
-      <div className={classNames(styles.generalSummaryWrapper, styles.generalSummaryWrapperEmpty)}>
-        <Spin spinning={loading} description="Загружаем показатели...">
-          {loading ? '' : 'Нет показателей'}
-        </Spin>
+      <div className={classNames(styles.generalSummaryWrapper, styles.generalSummaryState)}>
+        <Loader description="Загружаем показатели..." />
+      </div>
+    )
+  }
+
+  if (cards.length === 0) {
+    return (
+      <div className={classNames(styles.generalSummaryWrapper, styles.generalSummaryState)}>
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Нет показателей" />
       </div>
     )
   }
@@ -32,65 +43,76 @@ export function GeneralSummary({
   const detailCards = cards[0].cards?.find((card) => card.indicator_name === activeIndicator)?.cards
 
   return (
-    <div className={styles.generalSummaryWrapper}>
-      <div className={styles.generalSummary}>
-        <div className={styles.generalSummaryTopIndicator}>
-          <Card card={cards[0]} selectable={false} size="lg" />
-        </div>
-        <div className={styles.generalSummaryIndicatorsWrapper}>
-          <div className={styles.generalSummaryIndicators}>
-            {cards[0].cards?.map((card) => (
-              <Card
-                key={card.indicator_name + '-1'}
-                card={card}
-                active={card.indicator_name === activeIndicator}
-              />
-            ))}
+    <Loader
+      spinning={Boolean(loading)}
+      description="Обновляем показатели..."
+      classNames={{ root: styles.generalSummarySpin }}
+    >
+      <div className={styles.generalSummaryWrapper}>
+        <div className={styles.generalSummary}>
+          <div className={styles.generalSummaryTopIndicator}>
+            <Card card={cards[0]} selectable={false} size="lg" />
           </div>
-          {isShowAll ? (
-            cards[0].cards?.map((card) => (
+          <div className={styles.generalSummaryIndicatorsWrapper}>
+            <div className={styles.generalSummaryIndicators}>
+              {cards[0].cards?.map((card) => (
+                <Card
+                  key={card.indicator_name + '-1'}
+                  card={card}
+                  active={card.indicator_name === activeIndicator}
+                />
+              ))}
+            </div>
+            {isShowAll ? (
+              cards[0].cards?.map((card) => (
+                <div
+                  key={card.indicator_name + '-3'}
+                  className={classNames(
+                    styles.generalSummaryIndicators,
+                    styles.generalSummaryDetailIndicators
+                  )}
+                >
+                  {card.cards?.map((cardDetail) => (
+                    <Card
+                      key={cardDetail.indicator_name + '-3-1'}
+                      card={cardDetail}
+                      size="sm"
+                      active={card.indicator_name === activeIndicator}
+                      selectable={false}
+                    />
+                  ))}
+                </div>
+              ))
+            ) : (
               <div
-                key={card.indicator_name + '-3'}
                 className={classNames(
                   styles.generalSummaryIndicators,
                   styles.generalSummaryDetailIndicators
                 )}
               >
-                {card.cards?.map((cardDetail) => (
+                {detailCards?.map((card) => (
                   <Card
-                    key={cardDetail.indicator_name + '-3-1'}
-                    card={cardDetail}
+                    key={card.indicator_name + '-2'}
+                    card={card}
                     size="sm"
-                    active={card.indicator_name === activeIndicator}
                     selectable={false}
+                    active={true}
                   />
                 ))}
               </div>
-            ))
-          ) : (
-            <div
-              className={classNames(
-                styles.generalSummaryIndicators,
-                styles.generalSummaryDetailIndicators
-              )}
-            >
-              {detailCards?.map((card) => (
-                <Card
-                  key={card.indicator_name + '-2'}
-                  card={card}
-                  size="sm"
-                  selectable={false}
-                  active={true}
-                />
-              ))}
-            </div>
-          )}
+            )}
+          </div>
+        </div>
+        <div
+          className={styles.generalSummaryShowAll}
+          title={showAllLabel}
+          onClick={() => setIsShowAll(!isShowAll)}
+        >
+          <span>{showAllLabel}</span>
+          {isShowAll ? <UpOutlined /> : <DownOutlined />}
         </div>
       </div>
-      <div className={styles.generalSummaryShowAll} onClick={() => setIsShowAll(!isShowAll)}>
-        {isShowAll ? 'Скрыть' : 'Показать'}&nbsp;все
-      </div>
-    </div>
+    </Loader>
   )
 }
 
@@ -166,7 +188,7 @@ export function Card({ active = false, card, selectable = true, size = 'md' }: C
           styles[getCardClassname('generalSummaryCardFact')]
         )}
       >
-        {card.fact_value}
+        {formatNumber(card.fact_value)}
       </div>
       <div className={styles.generalSummaryCardPlanWrapper}>
         <div
@@ -175,7 +197,7 @@ export function Card({ active = false, card, selectable = true, size = 'md' }: C
             styles[getCardClassname('generalSummaryCardPlan')]
           )}
         >
-          {card.plan_value}
+          {formatNumber(card.plan_value)}
         </div>
         {card.deviation_pct !== 0 && (
           <div

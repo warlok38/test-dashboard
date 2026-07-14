@@ -35,7 +35,8 @@
   --palette-bg-elevated: #ffffff;
   --palette-shadow-card: 0 0.0625rem 0.25rem rgb(0 0 0 / 14%);
 
-  --palette-dashboard-grid-border: #eceff1;
+  --palette-dashboard-card-border: #d0d0d0;
+  --palette-dashboard-grid-border: #e2e5e7;
   --palette-dashboard-progress-track: #dfe5e8;
 
   --palette-status-success: #188a3b;
@@ -79,6 +80,7 @@ html[data-theme='dark'] {
   --palette-bg-elevated: #1f1f1d;
   --palette-shadow-card: 0 0.0625rem 0.25rem rgb(0 0 0 / 34%);
 
+  --palette-dashboard-card-border: #3a3832;
   --palette-dashboard-grid-border: #34322c;
   --palette-dashboard-progress-track: #3a3832;
 
