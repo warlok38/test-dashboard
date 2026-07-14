@@ -147,8 +147,10 @@ function GtkBreakdownPopover({ breakdowns }: { breakdowns: GeneralSummaryGtkBrea
   return (
     <div className={styles.generalSummaryGtkList}>
       {breakdowns.map((breakdown) => (
-        <div key={breakdown.gtk} className={styles.generalSummaryGtkRow}>
-          <span className={styles.generalSummaryGtkLetter}>{getGtkLetter(breakdown.gtk)}:</span>
+        <div key={breakdown.gtk_or_zif} className={styles.generalSummaryGtkRow}>
+          <span className={styles.generalSummaryGtkLetter}>
+            {getGtkLetter(breakdown.gtk_or_zif)}:
+          </span>
           <span className={styles.generalSummaryGtkFact}>
             {formatNullableNumber(breakdown.fact_value)}
           </span>
@@ -271,13 +273,13 @@ export function Card({ active = false, card, selectable = true, size = 'md' }: C
     </div>
   )
 
-  if (!card.by_gtks?.length) {
+  if (!card.details?.length) {
     return cardNode
   }
 
   return (
     <Popover
-      content={<GtkBreakdownPopover breakdowns={card.by_gtks} />}
+      content={<GtkBreakdownPopover breakdowns={card.details} />}
       mouseEnterDelay={HOVER_DELAY_SECONDS}
       mouseLeaveDelay={0}
       placement="bottomLeft"

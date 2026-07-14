@@ -396,7 +396,7 @@
 
 .generalSummaryGtkDeviation {
   min-width: 4.5rem;
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   font-weight: 500;
 }
 
