@@ -1,10 +1,13 @@
 import { DownOutlined, UpOutlined } from '@ant-design/icons'
 import classNames from 'classnames'
-import { Empty } from 'antd'
+import { Empty, Popover } from 'antd'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
-import { type GeneralSummaryCard } from '@/entities/production-summary'
+import {
+  type GeneralSummaryCard,
+  type GeneralSummaryGtkBreakdown
+} from '@/entities/production-summary'
 import { Loader } from '@/shared/ui'
 import { formatNumber } from '@/shared/utils/formatNumber'
 
@@ -124,6 +127,45 @@ type CardProps = {
 }
 
 const INDICATOR_PARAM = 'indicator'
+const HOVER_DELAY_SECONDS = 0.5
+
+function getGtkLetter(gtk: string) {
+  return gtk.trim().charAt(0).toUpperCase()
+}
+
+function formatNullableNumber(value: number | null | undefined) {
+  return value === null || value === undefined ? '-' : formatNumber(value)
+}
+
+function formatNullableDeviation(value: number | null | undefined) {
+  return value === null || value === undefined
+    ? '-'
+    : formatNumber(value, { showSign: true, suffix: '%' })
+}
+
+function GtkBreakdownPopover({ breakdowns }: { breakdowns: GeneralSummaryGtkBreakdown[] }) {
+  return (
+    <div className={styles.generalSummaryGtkList}>
+      {breakdowns.map((breakdown) => (
+        <div key={breakdown.gtk} className={styles.generalSummaryGtkRow}>
+          <span className={styles.generalSummaryGtkLetter}>{getGtkLetter(breakdown.gtk)}:</span>
+          <span className={styles.generalSummaryGtkFact}>
+            {formatNullableNumber(breakdown.fact_value)}
+          </span>
+          <span
+            className={classNames(styles.generalSummaryGtkDeviation, {
+              [styles.generalSummaryGtkDeviationPositive]: (breakdown.deviation_pct ?? 0) > 0,
+              [styles.generalSummaryGtkDeviationNegative]: (breakdown.deviation_pct ?? 0) < 0,
+              [styles.generalSummaryGtkDeviationNeutral]: !breakdown.deviation_pct
+            })}
+          >
+            {formatNullableDeviation(breakdown.deviation_pct)}
+          </span>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 export function Card({ active = false, card, selectable = true, size = 'md' }: CardProps) {
   const router = useRouter()
@@ -151,7 +193,7 @@ export function Card({ active = false, card, selectable = true, size = 'md' }: C
     return cn
   }
 
-  return (
+  const cardNode = (
     <div
       className={classNames(
         styles.generalSummaryCardWrapper,
@@ -227,5 +269,24 @@ export function Card({ active = false, card, selectable = true, size = 'md' }: C
         )}
       </div>
     </div>
+  )
+
+  if (!card.by_gtks?.length) {
+    return cardNode
+  }
+
+  return (
+    <Popover
+      content={<GtkBreakdownPopover breakdowns={card.by_gtks} />}
+      mouseEnterDelay={HOVER_DELAY_SECONDS}
+      mouseLeaveDelay={0}
+      placement="bottomLeft"
+      classNames={{
+        root: styles.generalSummaryGtkPopoverRoot,
+        content: styles.generalSummaryGtkPopoverContent
+      }}
+    >
+      {cardNode}
+    </Popover>
   )
 }

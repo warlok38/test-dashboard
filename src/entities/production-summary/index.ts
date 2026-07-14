@@ -37,6 +37,7 @@ export type {
   SummaryQuery,
   SummarySeverity,
   GeneralSummaryCard,
+  GeneralSummaryGtkBreakdown,
   GeneralSummaryParams,
   GeneralSummaryResponse
 } from './model/types'

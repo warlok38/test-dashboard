@@ -127,7 +127,15 @@ export type GeneralSummaryCard = {
   fact_value: number
   deviation_pct: number
   measure_unit: string
+  by_gtks?: GeneralSummaryGtkBreakdown[] | null
   cards: GeneralSummaryCard[] | null
+}
+
+export type GeneralSummaryGtkBreakdown = {
+  gtk: string
+  plan_value: number | null
+  fact_value: number | null
+  deviation_pct: number | null
 }
 
 export type GeneralSummaryResponse = {

@@ -347,6 +347,77 @@
   color: var(--color-kpi-delta-negative);
 }
 
+.generalSummaryGtkPopoverRoot {
+  max-width: calc(100vw - var(--space-8));
+}
+
+.generalSummaryGtkPopoverContent {
+  padding: 0;
+}
+
+.generalSummaryGtkList {
+  display: table;
+  width: max-content;
+  max-width: calc(100vw - var(--space-8));
+  padding: 0 var(--space-1);
+}
+
+.generalSummaryGtkRow {
+  display: table-row;
+}
+
+.generalSummaryGtkLetter {
+  display: table-cell;
+  min-width: 2rem;
+  padding: var(--space-2) var(--space-3) var(--space-2) 0;
+  border-top: var(--border-width-hairline) solid var(--palette-border-soft);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.generalSummaryGtkFact,
+.generalSummaryGtkDeviation {
+  display: table-cell;
+  padding: var(--space-2) 0;
+  border-top: var(--border-width-hairline) solid var(--palette-border-soft);
+  line-height: 1.1;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.generalSummaryGtkFact {
+  padding-right: var(--space-4);
+  color: var(--color-kpi-fact);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.generalSummaryGtkDeviation {
+  min-width: 4.5rem;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+}
+
+.generalSummaryGtkRow:first-child .generalSummaryGtkLetter,
+.generalSummaryGtkRow:first-child .generalSummaryGtkFact,
+.generalSummaryGtkRow:first-child .generalSummaryGtkDeviation {
+  border-top: none;
+}
+
+.generalSummaryGtkDeviationPositive {
+  color: var(--color-kpi-delta-positive);
+}
+
+.generalSummaryGtkDeviationNegative {
+  color: var(--color-kpi-delta-negative);
+}
+
+.generalSummaryGtkDeviationNeutral {
+  color: var(--color-kpi-neutral);
+}
+
 .metricTitle {
   display: flex;
   align-items: baseline;
