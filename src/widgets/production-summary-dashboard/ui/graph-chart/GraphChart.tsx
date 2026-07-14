@@ -37,6 +37,9 @@ const EMPTY_AXIS_COLOR = 'var(--palette-dashboard-grid-border)'
 const EMPTY_GRID_LINES = [0.25, 0.5, 0.75]
 const BRUSH_TRACK_COLOR = 'var(--color-bg-card)'
 const BRUSH_BORDER_COLOR = 'var(--color-chart-brush-track-border)'
+const TOOLTIP_BACKGROUND_COLOR = 'var(--color-chart-tooltip-bg)'
+const TOOLTIP_BORDER_COLOR = 'var(--color-chart-tooltip-border)'
+const TOOLTIP_LABEL_COLOR = 'var(--color-chart-tooltip-label)'
 
 export type GraphSeriesKey = 'plan' | 'fact'
 export type GraphSeriesView = 'bar' | 'line'
@@ -487,8 +490,15 @@ export function GraphChart({
                 tick={YAxisTick}
               />
               <Tooltip
+                contentStyle={{
+                  backgroundColor: TOOLTIP_BACKGROUND_COLOR,
+                  borderColor: TOOLTIP_BORDER_COLOR,
+                  borderRadius: 'var(--radius-5)',
+                  boxShadow: 'var(--color-shadow-card)'
+                }}
                 isAnimationActive={false}
                 labelFormatter={(label) => formatGraphTick(String(label), graphPeriod)}
+                labelStyle={{ color: TOOLTIP_LABEL_COLOR }}
               />
               {renderSeries('bar', barSize)}
               {renderSeries('line', barSize)}
