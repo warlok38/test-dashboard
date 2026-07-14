@@ -61,8 +61,20 @@ type GraphPanelProps = {
   query: GraphPanelQuery | undefined
 }
 
+type GraphControlsProps = {
+  graphPeriod: GraphPeriod
+  seriesView: Record<GraphSeriesKey, GraphSeriesView>
+  onGraphPeriodChange: (period: GraphPeriod) => void
+  onSeriesViewChange: (seriesKey: GraphSeriesKey, view: GraphSeriesView) => void
+}
+
 type LastSuccessfulGraphData = {
   data: GraphPoint[]
+  dataKey: string | undefined
+}
+
+type LastSuccessfulDetailsData<T> = {
+  details: T[]
   dataKey: string | undefined
 }
 
@@ -103,6 +115,40 @@ function getGraphDataKey(query: GraphQuery | undefined) {
   ].join(':')
 }
 
+function GraphControls({
+  graphPeriod,
+  seriesView,
+  onGraphPeriodChange,
+  onSeriesViewChange
+}: GraphControlsProps) {
+  return (
+    <div className={styles.graphMeta}>
+      <label className={styles.graphPeriodControl}>
+        <span className={styles.seriesViewLabel}>Детализация</span>
+        <Segmented
+          options={GRAPH_PERIOD_OPTIONS}
+          size="small"
+          value={graphPeriod}
+          onChange={(value) => onGraphPeriodChange(value as GraphPeriod)}
+        />
+      </label>
+      <div className={styles.graphViewControls}>
+        {GRAPH_SERIES_CONFIGS.map((series) => (
+          <label className={styles.seriesViewControl} key={series.key}>
+            <span className={styles.seriesViewLabel}>{series.name}</span>
+            <Segmented
+              options={SERIES_VIEW_OPTIONS}
+              size="small"
+              value={seriesView[series.key]}
+              onChange={(value) => onSeriesViewChange(series.key, value as GraphSeriesView)}
+            />
+          </label>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function useDelayedFlag(isActive: boolean, delayMs: number) {
   const [isDelayedActive, setIsDelayedActive] = useState(false)
 
@@ -139,6 +185,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
   const {
     currentData: graphWithGtkData,
     error: graphWithGtkError,
+    isFetching: isGraphWithGtkFetching,
     isLoading: isGraphWithGtkLoading
   } = useGetGraphWithGtkQuery(graphQuery as GraphQuery, {
     skip: !graphQuery
@@ -146,12 +193,19 @@ export function GraphPanel({ query }: GraphPanelProps) {
   const {
     currentData: graphWithDetailsData,
     error: graphWithDetailsError,
+    isFetching: isGraphWithDetailsFetching,
     isLoading: isGraphWithDetailsLoading
   } = useGetGraphWithDetailsQuery(graphQuery as GraphQuery, {
     skip: !graphQuery
   })
   const [lastSuccessfulData, setLastSuccessfulData] = useState<
     LastSuccessfulGraphData | undefined
+  >()
+  const [lastSuccessfulGtkData, setLastSuccessfulGtkData] = useState<
+    LastSuccessfulDetailsData<GraphWithGtkDetail> | undefined
+  >()
+  const [lastSuccessfulDetailsData, setLastSuccessfulDetailsData] = useState<
+    LastSuccessfulDetailsData<GraphWithDetailsDetail> | undefined
   >()
   const data = currentData ?? lastSuccessfulData?.data ?? EMPTY_GRAPH_DATA
   const dataKey = currentData ? graphDataKey : lastSuccessfulData?.dataKey
@@ -161,8 +215,26 @@ export function GraphPanel({ query }: GraphPanelProps) {
     isFetching && Boolean(lastSuccessfulData),
     GRAPH_LOADING_OVERLAY_DELAY_MS
   )
-  const depositDetails = graphWithGtkData?.details ?? EMPTY_GTK_DETAILS
-  const graphDetails = graphWithDetailsData?.details ?? EMPTY_GRAPH_DETAILS
+  const depositDetails =
+    graphWithGtkData?.details ?? lastSuccessfulGtkData?.details ?? EMPTY_GTK_DETAILS
+  const depositDetailsDataKey = graphWithGtkData ? graphDataKey : lastSuccessfulGtkData?.dataKey
+  const graphDetails =
+    graphWithDetailsData?.details ?? lastSuccessfulDetailsData?.details ?? EMPTY_GRAPH_DETAILS
+  const graphDetailsDataKey = graphWithDetailsData
+    ? graphDataKey
+    : lastSuccessfulDetailsData?.dataKey
+  const isInitialGtkLoading =
+    isGraphWithGtkLoading && !graphWithGtkData && !lastSuccessfulGtkData?.details
+  const isInitialDetailsLoading =
+    isGraphWithDetailsLoading && !graphWithDetailsData && !lastSuccessfulDetailsData?.details
+  const shouldShowGtkUpdatingOverlay = useDelayedFlag(
+    isGraphWithGtkFetching && Boolean(lastSuccessfulGtkData),
+    GRAPH_LOADING_OVERLAY_DELAY_MS
+  )
+  const shouldShowDetailsUpdatingOverlay = useDelayedFlag(
+    isGraphWithDetailsFetching && Boolean(lastSuccessfulDetailsData),
+    GRAPH_LOADING_OVERLAY_DELAY_MS
+  )
 
   useEffect(() => {
     if (currentData) {
@@ -172,6 +244,24 @@ export function GraphPanel({ query }: GraphPanelProps) {
       })
     }
   }, [currentData, graphDataKey])
+
+  useEffect(() => {
+    if (graphWithGtkData) {
+      setLastSuccessfulGtkData({
+        details: graphWithGtkData.details,
+        dataKey: graphDataKey
+      })
+    }
+  }, [graphWithGtkData, graphDataKey])
+
+  useEffect(() => {
+    if (graphWithDetailsData) {
+      setLastSuccessfulDetailsData({
+        details: graphWithDetailsData.details,
+        dataKey: graphDataKey
+      })
+    }
+  }, [graphWithDetailsData, graphDataKey])
 
   const updateSeriesView = (seriesKey: GraphSeriesKey, view: GraphSeriesView) => {
     setSeriesView((currentView) => ({
@@ -210,7 +300,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
       return <ApiErrorAlert error={graphWithGtkError} title="Не удалось загрузить месторождения" />
     }
 
-    if (isGraphWithGtkLoading) {
+    if (isInitialGtkLoading) {
       return <Skeleton active paragraph={{ rows: 4 }} title={false} />
     }
 
@@ -225,8 +315,9 @@ export function GraphPanel({ query }: GraphPanelProps) {
             <h3 className={styles.depositGraphTitle}>{detail.gtk}</h3>
             <GraphChart
               data={detail.points}
-              dataKey={`${graphDataKey}:${detail.gtk}`}
+              dataKey={`${depositDetailsDataKey}:${detail.gtk}`}
               graphPeriod={graphPeriod}
+              isUpdating={shouldShowGtkUpdatingOverlay}
               seriesView={seriesView}
               size="compact"
             />
@@ -246,7 +337,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
       )
     }
 
-    if (isGraphWithDetailsLoading) {
+    if (isInitialDetailsLoading) {
       return <Skeleton active paragraph={{ rows: 4 }} title={false} />
     }
 
@@ -255,19 +346,22 @@ export function GraphPanel({ query }: GraphPanelProps) {
     }
 
     return (
-      <div className={styles.depositGraphGrid}>
+      <div className={styles.detailGraphList}>
         {graphDetails.map((detail) => (
-          <article className={styles.depositGraphCard} key={detail.indicator}>
-            <h3 className={styles.depositGraphTitle}>
-              <span>{detail.indicator}</span>
-              <span className={styles.graphTitleUnit}>{detail.unit}</span>
-            </h3>
+          <article className={styles.detailGraphCard} key={detail.indicator}>
+            <header className={styles.detailGraphHeader}>
+              <h3 className={styles.detailGraphTitle}>
+                <span>{detail.indicator}</span>
+                {detail.unit ? <span className={styles.graphTitleUnit}>{detail.unit}</span> : null}
+              </h3>
+            </header>
             <GraphChart
               data={detail.points}
-              dataKey={`${graphDataKey}:details:${detail.indicator}`}
+              dataKey={`${graphDetailsDataKey}:details:${detail.indicator}`}
+              emptyText="Нет данных по детальному показателю"
               graphPeriod={graphPeriod}
+              isUpdating={shouldShowDetailsUpdatingOverlay}
               seriesView={seriesView}
-              size="compact"
             />
           </article>
         ))}
@@ -276,50 +370,34 @@ export function GraphPanel({ query }: GraphPanelProps) {
   }
 
   return (
-    <section className={styles.graphPanel}>
-      <header className={styles.graphHeader}>
-        <div>
-          <h2 className={styles.graphTitle}>
-            <span>{query?.indicator ?? 'График'}</span>
-            {measureUnit ? <span className={styles.graphTitleUnit}>{measureUnit}</span> : null}
-          </h2>
-        </div>
-        <div className={styles.graphMeta}>
-          <label className={styles.graphPeriodControl}>
-            <span className={styles.seriesViewLabel}>Детализация</span>
-            <Segmented
-              options={GRAPH_PERIOD_OPTIONS}
-              size="small"
-              value={graphPeriod}
-              onChange={(value) => setGraphPeriod(value as GraphPeriod)}
-            />
-          </label>
-          <div className={styles.graphViewControls}>
-            {GRAPH_SERIES_CONFIGS.map((series) => (
-              <label className={styles.seriesViewControl} key={series.key}>
-                <span className={styles.seriesViewLabel}>{series.name}</span>
-                <Segmented
-                  options={SERIES_VIEW_OPTIONS}
-                  size="small"
-                  value={seriesView[series.key]}
-                  onChange={(value) => updateSeriesView(series.key, value as GraphSeriesView)}
-                />
-              </label>
-            ))}
+    <div className={styles.graphPanelStack}>
+      <section className={styles.graphPanel}>
+        <header className={styles.graphHeader}>
+          <div>
+            <h2 className={styles.graphTitle}>
+              <span>{query?.indicator ?? 'График'}</span>
+              {measureUnit ? <span className={styles.graphTitleUnit}>{measureUnit}</span> : null}
+            </h2>
           </div>
+          <GraphControls
+            graphPeriod={graphPeriod}
+            seriesView={seriesView}
+            onGraphPeriodChange={setGraphPeriod}
+            onSeriesViewChange={updateSeriesView}
+          />
+        </header>
+        {renderGraphContent()}
+        <div className={styles.graphNestedSections}>
+          <section className={styles.graphNestedSection}>
+            <h2 className={styles.graphSectionTitle}>Месторождения</h2>
+            <div className={styles.graphSectionBody}>{renderDepositsContent()}</div>
+          </section>
         </div>
-      </header>
-      {renderGraphContent()}
-      <div className={styles.graphNestedSections}>
-        <section className={styles.graphNestedSection}>
-          <h2 className={styles.graphSectionTitle}>Месторождения</h2>
-          <div className={styles.graphSectionBody}>{renderDepositsContent()}</div>
-        </section>
-        <section className={styles.graphNestedSection}>
-          <h2 className={styles.graphSectionTitle}>Детальные показатели</h2>
-          <div className={styles.graphSectionBody}>{renderDetailsContent()}</div>
-        </section>
-      </div>
-    </section>
+      </section>
+      <section className={styles.detailGraphsSection}>
+        <h2 className={styles.detailGraphsSectionTitle}>Детальные показатели</h2>
+        <div className={styles.detailGraphsSectionBody}>{renderDetailsContent()}</div>
+      </section>
+    </div>
   )
 }
