@@ -57,6 +57,11 @@ When editing or adding Ant Design components:
 
 - Follow the existing CSS/module/global styling approach used in the touched files.
 - Keep layouts responsive for desktop and narrow screens.
+- Prefer existing design tokens from `src/shared/styles/tokens` for colors, spacing, typography, layout, and breakpoints instead of hardcoded values.
+- In CSS, use the custom media queries defined in `src/shared/styles/tokens/breakpoints.css`, such as `@media (--screen-mobile)`, `@media (--screen-tablet)`, `@media (--screen-medium)`, and `@media (--screen-large)`. Do not hardcode width breakpoints when an existing custom media query covers the case.
+- In client-side React components, use the shared `useScreen` hook for breakpoint checks instead of duplicating breakpoint values, reading `window.innerWidth`, or creating component-level `matchMedia` queries.
+- Use `BREAKPOINTS` or `mediaQueries` directly only in shared responsive infrastructure or non-React code where `useScreen` is not applicable.
+- If the existing breakpoint system does not cover a required responsive condition, propose extending the shared breakpoint tokens and explain the use case before making the change. Do not introduce a one-off component breakpoint without confirmation.
 - Avoid hardcoded one-off colors when an Ant Design token or existing CSS variable fits.
 
 ## State

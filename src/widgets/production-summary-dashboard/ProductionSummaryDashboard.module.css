@@ -114,7 +114,7 @@
   width: 100%;
   min-height: 6rem;
   padding: var(--space-3);
-  border: var(--border-width-hairline) solid var(--palette-dashboard-grid-border);
+  border: var(--border-width-hairline) solid var(--palette-dashboard-card-border);
   border-radius: var(--radius-5);
   color: inherit;
   font: inherit;
@@ -152,8 +152,15 @@
   border-radius: var(--radius-5);
 }
 
-.generalSummaryWrapperEmpty {
+.generalSummaryState {
+  align-items: center;
+  justify-content: center;
+  min-height: 10rem;
   padding: var(--space-8);
+}
+
+.generalSummarySpin {
+  width: 100%;
 }
 
 .generalSummary {
@@ -162,9 +169,11 @@
 
 .generalSummaryShowAll {
   display: flex;
+  gap: var(--space-2);
   align-items: center;
   justify-content: center;
   width: 100%;
+  color: var(--color-text-muted);
   cursor: pointer;
 }
 
@@ -194,8 +203,8 @@
   width: 100%;
   height: 100%;
   padding: var(--space-4) var(--space-5);
-  border-right: 1px solid #d0d0d0;
-  border-bottom: 1px solid #d0d0d0;
+  border-right: var(--border-width-hairline) solid var(--palette-dashboard-card-border);
+  border-bottom: var(--border-width-hairline) solid var(--palette-dashboard-card-border);
 }
 
 .generalSummaryCardSelectable {
@@ -203,7 +212,7 @@
 }
 
 .generalSummaryCardActive {
-  background-color: #fffbf0;
+  background-color: var(--color-bg-kpi-active);
 }
 
 .generalSummaryCardWrapperLarge {
@@ -218,6 +227,11 @@
 
 .generalSummaryCardWrapper:last-child.generalSummaryCardWrapper:not(:only-child) {
   border-right: none;
+}
+
+.generalSummaryTopIndicator .generalSummaryCardWrapper,
+.generalSummaryIndicators:last-child .generalSummaryCardWrapper {
+  border-bottom: none;
 }
 
 .generalSummaryCardTitleWrapper {
@@ -578,9 +592,25 @@
   height: 20rem;
 }
 
+.compactChartBox {
+  width: 100%;
+  height: 9rem;
+}
+
 .graphWheelArea {
   position: relative;
   min-width: 0;
+}
+
+.graphEmptyChartLabel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  pointer-events: none;
 }
 
 .graphUpdatingOverlay {
@@ -624,21 +654,205 @@
   display: none;
 }
 
-@media (max-width: 1200px) {
+.graphNestedSections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.graphNestedSection {
+  min-width: 0;
+}
+
+.graphSectionTitle {
+  margin: 0;
+  color: var(--color-text-strong);
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.graphSectionBody {
+  margin-top: var(--space-2);
+}
+
+.depositGraphGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.depositGraphCard {
+  min-width: 0;
+}
+
+.depositGraphTitle {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+@media (--screen-tablet) {
   .kpiGrid,
-  .depositGrid {
+  .depositGrid,
+  .depositGraphGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 760px) {
+@media (--screen-medium), (--screen-large) {
+  .dashboard {
+    gap: var(--space-4);
+    padding: var(--space-4);
+  }
+
+  .generalSummaryWrapper {
+    flex-direction: row;
+    overflow: hidden;
+  }
+
+  .generalSummary {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .generalSummaryShowAll {
+    flex: 0 0 var(--space-8);
+    width: var(--space-8);
+    padding: var(--space-2) var(--space-1);
+    border-left: var(--border-width-hairline) solid var(--palette-dashboard-card-border);
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
+    writing-mode: vertical-rl;
+  }
+
+  .generalSummaryCardWrapper {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .generalSummaryCardWrapperLarge {
+    padding: var(--space-5);
+  }
+
+  .generalSummaryCardWrapperSmall {
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .generalSummaryCardTitle {
+    font-size: var(--font-size-lg);
+  }
+
+  .generalSummaryCardTitleLarge {
+    font-size: var(--font-size-5xl);
+  }
+
+  .generalSummaryCardTitleSmall {
+    font-size: var(--font-size-sm);
+  }
+
+  .generalSummaryCardFact {
+    font-size: var(--font-size-5xl);
+  }
+
+  .generalSummaryCardFactLarge {
+    font-size: var(--font-size-11xl);
+  }
+
+  .generalSummaryCardFactSmall {
+    font-size: var(--font-size-xl);
+  }
+
+  .generalSummaryCardPlan {
+    font-size: var(--font-size-lg);
+  }
+
+  .generalSummaryCardPlanLarge {
+    font-size: var(--font-size-xl);
+  }
+
+  .generalSummaryCardPlanSmall {
+    font-size: var(--font-size-sm);
+  }
+
+  .generalSummaryCardDeviation {
+    font-size: var(--font-size-base);
+  }
+
+  .generalSummaryCardDeviationSmall {
+    font-size: var(--font-size-xs);
+  }
+
+  .generalSummaryCardDeviationPercent {
+    font-size: var(--font-size-sm);
+  }
+
+  .generalSummaryCardDeviationPercentSmall {
+    font-size: var(--font-size-xs);
+  }
+
+  .graphPanel {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .graphHeader {
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+  }
+
+  .chartBox {
+    height: 14rem;
+  }
+
+  .compactChartBox {
+    height: 6.5rem;
+  }
+
+  .graphNestedSections {
+    margin-top: var(--space-3);
+  }
+
+  .graphSectionBody {
+    margin-top: var(--space-1);
+  }
+
+  .depositGraphGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+
+  .depositGraphTitle {
+    margin-bottom: var(--space-1);
+  }
+}
+
+@media (--screen-medium) {
+  .dashboard {
+    gap: var(--space-3);
+    padding: var(--space-3);
+  }
+
+  .chartBox {
+    height: 15rem;
+  }
+
+  .compactChartBox {
+    height: 6rem;
+  }
+}
+
+@media (--screen-mobile) {
   .dashboard {
     padding: var(--space-4);
   }
 
   .kpiGrid,
   .depositGrid,
-  .depositMetrics {
+  .depositMetrics,
+  .depositGraphGrid {
     grid-template-columns: 1fr;
   }
 
