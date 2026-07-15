@@ -26,12 +26,6 @@ import {
 
 const GRAPH_LOADING_OVERLAY_DELAY_MS = 400
 
-const DEFAULT_GRAPH_PERIOD: GraphPeriod = 'day'
-const GRAPH_PERIOD_OPTIONS: Array<{ label: string; value: GraphPeriod }> = [
-  { label: 'Дни', value: 'day' },
-  { label: 'Месяцы', value: 'month' },
-  { label: 'Годы', value: 'year' }
-]
 const EMPTY_GRAPH_DATA: GraphPoint[] = []
 const EMPTY_GTK_DETAILS: GraphWithGtkDetail[] = []
 const EMPTY_GRAPH_DETAILS: GraphWithDetailsDetail[] = []
@@ -55,49 +49,40 @@ const SERIES_VIEW_OPTIONS: Array<{ label: ReactNode; value: GraphSeriesView }> =
   }
 ]
 
-type GraphPanelQuery = Pick<GraphQuery, 'indicator' | 'gtk' | 'date_from' | 'date_to'>
+type GraphPanelQuery = Pick<GraphQuery, 'indicator' | 'gtk' | 'shift' | 'production_date'>
 
 type GraphPanelProps = {
+  graphPeriod: GraphPeriod
   query: GraphPanelQuery | undefined
 }
 
 type GraphControlsProps = {
-  graphPeriod: GraphPeriod
   seriesView: Record<GraphSeriesKey, GraphSeriesView>
-  onGraphPeriodChange: (period: GraphPeriod) => void
   onSeriesViewChange: (seriesKey: GraphSeriesKey, view: GraphSeriesView) => void
 }
 
 type LastSuccessfulGraphData = {
   data: GraphPoint[]
   dataKey: string | undefined
+  graphPeriod: GraphPeriod
 }
 
 type LastSuccessfulDetailsData<T> = {
   details: T[]
   dataKey: string | undefined
+  graphPeriod: GraphPeriod
 }
 
-function getGraphQuery(query: GraphPanelQuery | undefined, period: GraphPeriod) {
+function getGraphQuery(query: GraphPanelQuery | undefined) {
   if (!query) {
     return undefined
   }
 
-  const shouldUseGlobalRange =
-    query.date_from !== undefined &&
-    query.date_to !== undefined &&
-    query.date_from !== query.date_to
-
   return {
     indicator: query.indicator,
-    period,
     ...(query.gtk ? { gtk: query.gtk } : {}),
-    ...(shouldUseGlobalRange
-      ? {
-          date_from: query.date_from,
-          date_to: query.date_to
-        }
-      : {})
+    ...(query.shift ? { shift: query.shift } : {}),
+    ...(query.production_date ? { production_date: query.production_date } : {})
   } satisfies GraphQuery
 }
 
@@ -106,13 +91,9 @@ function getGraphDataKey(query: GraphQuery | undefined) {
     return undefined
   }
 
-  return [
-    query.gtk ?? '',
-    query.indicator,
-    query.period ?? '',
-    query.date_from ?? '',
-    query.date_to ?? ''
-  ].join(':')
+  return [query.gtk ?? '', query.indicator, query.shift ?? '', query.production_date ?? ''].join(
+    ':'
+  )
 }
 
 function getDetailDepositGraphQuery(
@@ -129,23 +110,9 @@ function getDetailDepositGraphQuery(
   }
 }
 
-function GraphControls({
-  graphPeriod,
-  seriesView,
-  onGraphPeriodChange,
-  onSeriesViewChange
-}: GraphControlsProps) {
+function GraphControls({ seriesView, onSeriesViewChange }: GraphControlsProps) {
   return (
     <div className={styles.graphMeta}>
-      <label className={styles.graphPeriodControl}>
-        <span className={styles.seriesViewLabel}>Детализация</span>
-        <Segmented
-          options={GRAPH_PERIOD_OPTIONS}
-          size="small"
-          value={graphPeriod}
-          onChange={(value) => onGraphPeriodChange(value as GraphPeriod)}
-        />
-      </label>
       <div className={styles.graphViewControls}>
         {GRAPH_SERIES_CONFIGS.map((series) => (
           <label className={styles.seriesViewControl} key={series.key}>
@@ -217,6 +184,9 @@ function DetailDepositGraphs({
   const detailDepositDetailsDataKey = detailGraphWithGtkData
     ? detailGraphDataKey
     : lastSuccessfulDetailGtkData?.dataKey
+  const detailDepositGraphPeriod = detailGraphWithGtkData
+    ? graphPeriod
+    : (lastSuccessfulDetailGtkData?.graphPeriod ?? graphPeriod)
   const isInitialDetailGtkLoading =
     isDetailGraphWithGtkLoading && !detailGraphWithGtkData && !lastSuccessfulDetailGtkData?.details
   const shouldShowDetailGtkUpdatingOverlay = useDelayedFlag(
@@ -228,10 +198,11 @@ function DetailDepositGraphs({
     if (detailGraphWithGtkData) {
       setLastSuccessfulDetailGtkData({
         details: detailGraphWithGtkData.details,
-        dataKey: detailGraphDataKey
+        dataKey: detailGraphDataKey,
+        graphPeriod
       })
     }
-  }, [detailGraphDataKey, detailGraphWithGtkData])
+  }, [detailGraphDataKey, detailGraphWithGtkData, graphPeriod])
 
   if (detailGraphWithGtkError) {
     return (
@@ -261,7 +232,7 @@ function DetailDepositGraphs({
             data={depositDetail.points}
             dataKey={`${detailDepositDetailsDataKey}:detail-deposits:${depositDetail.gtk}`}
             emptyText="Нет данных по месторождению"
-            graphPeriod={graphPeriod}
+            graphPeriod={detailDepositGraphPeriod}
             isUpdating={shouldShowDetailGtkUpdatingOverlay}
             seriesView={seriesView}
             size="compact"
@@ -272,13 +243,12 @@ function DetailDepositGraphs({
   )
 }
 
-export function GraphPanel({ query }: GraphPanelProps) {
-  const [graphPeriod, setGraphPeriod] = useState<GraphPeriod>(DEFAULT_GRAPH_PERIOD)
+export function GraphPanel({ graphPeriod, query }: GraphPanelProps) {
   const [seriesView, setSeriesView] = useState<Record<GraphSeriesKey, GraphSeriesView>>({
     plan: 'bar',
     fact: 'bar'
   })
-  const graphQuery = useMemo(() => getGraphQuery(query, graphPeriod), [graphPeriod, query])
+  const graphQuery = useMemo(() => getGraphQuery(query), [query])
   const graphDataKey = useMemo(() => getGraphDataKey(graphQuery), [graphQuery])
   const { currentData, error, isFetching, isLoading } = useGetGraphQuery(graphQuery as GraphQuery, {
     skip: !graphQuery
@@ -310,6 +280,9 @@ export function GraphPanel({ query }: GraphPanelProps) {
   >()
   const data = currentData ?? lastSuccessfulData?.data ?? EMPTY_GRAPH_DATA
   const dataKey = currentData ? graphDataKey : lastSuccessfulData?.dataKey
+  const displayedGraphPeriod = currentData
+    ? graphPeriod
+    : (lastSuccessfulData?.graphPeriod ?? graphPeriod)
   const measureUnit = data[0]?.measure_unit
   const isInitialLoading = isLoading && !currentData && !lastSuccessfulData?.data
   const shouldShowUpdatingOverlay = useDelayedFlag(
@@ -319,11 +292,17 @@ export function GraphPanel({ query }: GraphPanelProps) {
   const depositDetails =
     graphWithGtkData?.details ?? lastSuccessfulGtkData?.details ?? EMPTY_GTK_DETAILS
   const depositDetailsDataKey = graphWithGtkData ? graphDataKey : lastSuccessfulGtkData?.dataKey
+  const depositGraphPeriod = graphWithGtkData
+    ? graphPeriod
+    : (lastSuccessfulGtkData?.graphPeriod ?? graphPeriod)
   const graphDetails =
     graphWithDetailsData?.details ?? lastSuccessfulDetailsData?.details ?? EMPTY_GRAPH_DETAILS
   const graphDetailsDataKey = graphWithDetailsData
     ? graphDataKey
     : lastSuccessfulDetailsData?.dataKey
+  const detailsGraphPeriod = graphWithDetailsData
+    ? graphPeriod
+    : (lastSuccessfulDetailsData?.graphPeriod ?? graphPeriod)
   const isInitialGtkLoading =
     isGraphWithGtkLoading && !graphWithGtkData && !lastSuccessfulGtkData?.details
   const isInitialDetailsLoading =
@@ -341,28 +320,31 @@ export function GraphPanel({ query }: GraphPanelProps) {
     if (currentData) {
       setLastSuccessfulData({
         data: currentData,
-        dataKey: graphDataKey
+        dataKey: graphDataKey,
+        graphPeriod
       })
     }
-  }, [currentData, graphDataKey])
+  }, [currentData, graphDataKey, graphPeriod])
 
   useEffect(() => {
     if (graphWithGtkData) {
       setLastSuccessfulGtkData({
         details: graphWithGtkData.details,
-        dataKey: graphDataKey
+        dataKey: graphDataKey,
+        graphPeriod
       })
     }
-  }, [graphWithGtkData, graphDataKey])
+  }, [graphWithGtkData, graphDataKey, graphPeriod])
 
   useEffect(() => {
     if (graphWithDetailsData) {
       setLastSuccessfulDetailsData({
         details: graphWithDetailsData.details,
-        dataKey: graphDataKey
+        dataKey: graphDataKey,
+        graphPeriod
       })
     }
-  }, [graphWithDetailsData, graphDataKey])
+  }, [graphWithDetailsData, graphDataKey, graphPeriod])
 
   const updateSeriesView = (seriesKey: GraphSeriesKey, view: GraphSeriesView) => {
     setSeriesView((currentView) => ({
@@ -389,7 +371,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
         data={data}
         dataKey={dataKey}
         emptyText="Нет данных для графика"
-        graphPeriod={graphPeriod}
+        graphPeriod={displayedGraphPeriod}
         isUpdating={shouldShowUpdatingOverlay}
         seriesView={seriesView}
       />
@@ -417,7 +399,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
             <GraphChart
               data={detail.points}
               dataKey={`${depositDetailsDataKey}:${detail.gtk}`}
-              graphPeriod={graphPeriod}
+              graphPeriod={depositGraphPeriod}
               isUpdating={shouldShowGtkUpdatingOverlay}
               seriesView={seriesView}
               size="compact"
@@ -460,13 +442,13 @@ export function GraphPanel({ query }: GraphPanelProps) {
               data={detail.points}
               dataKey={`${graphDetailsDataKey}:details:${detail.indicator}`}
               emptyText="Нет данных по детальному показателю"
-              graphPeriod={graphPeriod}
+              graphPeriod={detailsGraphPeriod}
               isUpdating={shouldShowDetailsUpdatingOverlay}
               seriesView={seriesView}
             />
             <DetailDepositGraphs
               detailIndicator={detail.indicator}
-              graphPeriod={graphPeriod}
+              graphPeriod={detailsGraphPeriod}
               parentGraphQuery={graphQuery}
               seriesView={seriesView}
             />
@@ -486,12 +468,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
               {measureUnit ? <span className={styles.graphTitleUnit}>{measureUnit}</span> : null}
             </h2>
           </div>
-          <GraphControls
-            graphPeriod={graphPeriod}
-            seriesView={seriesView}
-            onGraphPeriodChange={setGraphPeriod}
-            onSeriesViewChange={updateSeriesView}
-          />
+          <GraphControls seriesView={seriesView} onSeriesViewChange={updateSeriesView} />
         </header>
         {renderGraphContent()}
         <div className={styles.graphNestedSections}>

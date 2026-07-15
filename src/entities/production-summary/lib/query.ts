@@ -1,19 +1,12 @@
-import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-
-import { DATE_URL_FORMAT } from '@/shared/constants'
-
 import { type SummaryQuery } from '../model/types'
 
-dayjs.extend(customParseFormat)
-
-const SUMMARY_API_DATE_FORMAT = 'YYYY-MM-DD'
+const DEFAULT_SHIFT = 3
+const SUPPORTED_SHIFTS = new Set([3, 99, 100])
 
 type SearchParamValue = string | string[] | undefined
 
 export type SummarySearchParams = {
-  dateFrom?: SearchParamValue
-  dateTo?: SearchParamValue
+  shift?: SearchParamValue
   indicator?: SearchParamValue
 }
 
@@ -21,16 +14,10 @@ function getSearchParamValue(value: SearchParamValue) {
   return Array.isArray(value) ? value[0] : value
 }
 
-function formatSummaryDate(value: SearchParamValue) {
-  const date = getSearchParamValue(value)
+function getShiftParam(value: SearchParamValue) {
+  const shift = Number(getSearchParamValue(value))
 
-  if (!date) {
-    return undefined
-  }
-
-  const parsed = dayjs(date, DATE_URL_FORMAT, true)
-
-  return parsed.isValid() ? parsed.format(SUMMARY_API_DATE_FORMAT) : undefined
+  return SUPPORTED_SHIFTS.has(shift) ? shift : DEFAULT_SHIFT
 }
 
 export function getSummaryQueryFromSearchParams(
@@ -38,8 +25,7 @@ export function getSummaryQueryFromSearchParams(
   gtk?: string
 ): SummaryQuery {
   return {
-    date_from: formatSummaryDate(searchParams?.dateFrom),
-    date_to: formatSummaryDate(searchParams?.dateTo),
+    shift: getShiftParam(searchParams?.shift),
     indicator: getSearchParamValue(searchParams?.indicator),
     ...(gtk ? { gtk } : {})
   }
