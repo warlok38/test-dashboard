@@ -1,12 +1,20 @@
 'use client'
 
 import { Spin } from 'antd'
+import { useEffect, useMemo } from 'react'
 
 import {
   type GeneralSummaryCard,
   type SummaryQuery,
   useGetGeneralSummaryQuery
 } from '@/entities/production-summary'
+import {
+  applyBackendProductionDate,
+  createPeriodRequestParams,
+  getPeriodByShift,
+  normalizeProductionDate
+} from '@/features/period-filter'
+import { useAppDispatch, useAppSelector } from '@/shared/hooks'
 import { ApiErrorAlert } from '@/shared/ui'
 
 import styles from './ProductionSummaryDashboard.module.css'
@@ -15,6 +23,12 @@ import { GeneralSummary, GraphPanel } from './ui'
 type SummaryDashboardProps = {
   query: SummaryQuery
   showGraph?: boolean
+}
+
+type PeriodScopeState = {
+  shift: number | null
+  productionDate: string | null
+  committedProductionDate: string | null
 }
 
 function getSelectedGeneralSummaryIndicator(
@@ -29,12 +43,30 @@ function getSelectedGeneralSummaryIndicator(
 }
 
 export function ProductionSummaryDashboard({ query, showGraph = false }: SummaryDashboardProps) {
+  const dispatch = useAppDispatch()
+  const periodScope = useAppSelector(
+    (state: { periodFilter: PeriodScopeState }) => state.periodFilter
+  )
   const { indicator, ...summaryQuery } = query
+  const period = getPeriodByShift(summaryQuery.shift)
+  const fallbackProductionDate = useMemo(
+    () => normalizeProductionDate(period, new Date().toISOString().slice(0, 10)),
+    [period]
+  )
+  const committedProductionDate =
+    periodScope.shift === period.shift && periodScope.committedProductionDate
+      ? periodScope.committedProductionDate
+      : fallbackProductionDate
+  const periodParams = createPeriodRequestParams(period, committedProductionDate)
+  const generalSummaryQuery = {
+    ...summaryQuery,
+    ...periodParams
+  }
   const {
     data: generalSummary,
     error: generalSummaryError,
     isLoading: isGeneralSummaryLoading
-  } = useGetGeneralSummaryQuery(summaryQuery)
+  } = useGetGeneralSummaryQuery(generalSummaryQuery)
 
   const generalSummaryCards = generalSummary?.cards || []
   const selectedIndicator = getSelectedGeneralSummaryIndicator(generalSummaryCards, indicator)
@@ -44,11 +76,23 @@ export function ProductionSummaryDashboard({ query, showGraph = false }: Summary
     showGraph && selectedIndicator
       ? {
           indicator: selectedIndicator,
-          ...(query.date_from ? { date_from: query.date_from } : {}),
-          ...(query.date_to ? { date_to: query.date_to } : {}),
+          ...periodParams,
           ...(query.gtk ? { gtk: query.gtk } : {})
         }
       : undefined
+
+  useEffect(() => {
+    if (!generalSummary?.production_date) {
+      return
+    }
+
+    dispatch(
+      applyBackendProductionDate({
+        shift: period.shift,
+        productionDate: normalizeProductionDate(period, generalSummary.production_date)
+      })
+    )
+  }, [dispatch, generalSummary?.production_date, period])
 
   if (isInitialLoading) {
     return (
@@ -76,7 +120,7 @@ export function ProductionSummaryDashboard({ query, showGraph = false }: Summary
         activeIndicator={selectedIndicator}
         loading={isGeneralSummaryLoading}
       />
-      {showGraph && <GraphPanel query={graphQuery} />}
+      {showGraph && <GraphPanel graphPeriod={period.key} query={graphQuery} />}
     </section>
   )
 }

@@ -1,7 +1,5 @@
 'use client'
 
-import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { useEffect, useMemo, useState, type WheelEvent } from 'react'
 import {
   Bar,
@@ -19,11 +17,16 @@ import { type GraphPeriod, type GraphPoint } from '@/entities/production-summary
 import { ChartFrame } from '@/shared/ui'
 
 import styles from '../../ProductionSummaryDashboard.module.css'
+import {
+  formatGraphTick,
+  getGraphXAxisTicks,
+  getXAxisInterval,
+  type GraphChartSize
+} from './graph-axis'
 
-const GRAPH_DATE_FORMAT = 'YYYY-MM-DD'
-const MAX_X_AXIS_TICKS = 8
 const COMPACT_POINT_LIMIT = 10
 const COMPACT_POINT_WIDTH = 150
+const DEFAULT_BAR_SIZE = 40
 const COMPACT_BAR_SIZE = 32
 const BRUSH_VISIBLE_POINT_COUNT = 35
 const BRUSH_WHEEL_PIXELS_PER_POINT = 80
@@ -74,7 +77,7 @@ type GraphChartProps = {
   isUpdating?: boolean
   seriesView: Record<GraphSeriesKey, GraphSeriesView>
   showBrush?: boolean
-  size?: 'default' | 'compact'
+  size?: GraphChartSize
 }
 
 export const GRAPH_SERIES_CONFIGS: Array<{
@@ -85,66 +88,6 @@ export const GRAPH_SERIES_CONFIGS: Array<{
   { key: 'plan', name: 'План', color: PLAN_COLOR },
   { key: 'fact', name: 'Факт', color: FACT_COLOR }
 ]
-
-const MONTH_LABELS = [
-  'янв',
-  'фев',
-  'мар',
-  'апр',
-  'май',
-  'июн',
-  'июл',
-  'авг',
-  'сен',
-  'окт',
-  'ноя',
-  'дек'
-]
-
-const MONTH_FULL_LABELS = [
-  'январь',
-  'февраль',
-  'март',
-  'апрель',
-  'май',
-  'июнь',
-  'июль',
-  'август',
-  'сентябрь',
-  'октябрь',
-  'ноябрь',
-  'декабрь'
-]
-
-dayjs.extend(customParseFormat)
-
-function parseGraphDate(value: string | undefined) {
-  if (!value) {
-    return null
-  }
-
-  const date = dayjs(value, GRAPH_DATE_FORMAT, true)
-
-  return date.isValid() ? date : null
-}
-
-function formatGraphTick(value: string, period: GraphPeriod) {
-  const date = parseGraphDate(value)
-
-  if (!date) {
-    return value
-  }
-
-  if (period === 'year') {
-    return date.format('YYYY')
-  }
-
-  if (period === 'month') {
-    return MONTH_FULL_LABELS[date.month()]
-  }
-
-  return `${date.format('DD')} ${MONTH_LABELS[date.month()]}`
-}
 
 function formatCompactAxisNumber(value: string | number | undefined) {
   const numberValue = Number(value)
@@ -183,22 +126,6 @@ function YAxisTick({ x = 0, y = 0, payload }: AxisTickProps) {
       {formatCompactAxisNumber(payload?.value)}
     </text>
   )
-}
-
-function getXAxisTicks(data: GraphPoint[], visibleRange?: BrushRange) {
-  const tickData = visibleRange
-    ? data.slice(visibleRange.startIndex, visibleRange.endIndex + 1)
-    : data
-
-  if (tickData.length <= MAX_X_AXIS_TICKS) {
-    return tickData.map((point) => point.date)
-  }
-
-  const step = Math.ceil((tickData.length - 1) / (MAX_X_AXIS_TICKS - 1))
-  const ticks = tickData.filter((_point, index) => index % step === 0).map((point) => point.date)
-  const lastDate = tickData[tickData.length - 1].date
-
-  return ticks.includes(lastDate) ? ticks : [...ticks, lastDate]
 }
 
 function getCompactXAxisPadding(chartWidth: number, visiblePointCount: number) {
@@ -316,10 +243,6 @@ export function GraphChart({
     brushRange,
     defaultBrushRange
   )
-  const xAxisTicks = useMemo(
-    () => getXAxisTicks(data, effectiveBrushRange),
-    [data, effectiveBrushRange]
-  )
 
   useEffect(() => {
     if (!shouldUseBrush) {
@@ -413,7 +336,7 @@ export function GraphChart({
   }
 
   const isCompactRange = data.length <= COMPACT_POINT_LIMIT
-  const barSize = isCompactRange ? COMPACT_BAR_SIZE : undefined
+  const barSize = size === 'compact' && isCompactRange ? COMPACT_BAR_SIZE : DEFAULT_BAR_SIZE
   const visiblePointCount = shouldUseBrush ? BRUSH_VISIBLE_POINT_COUNT : data.length
   const chartClassName = size === 'compact' ? styles.compactChartBox : styles.chartBox
 
@@ -463,6 +386,17 @@ export function GraphChart({
       <ChartFrame className={chartClassName}>
         {({ width, height }) => {
           const compactXAxisPadding = getCompactXAxisPadding(width, visiblePointCount)
+          const visibleXAxisData = effectiveBrushRange
+            ? data.slice(effectiveBrushRange.startIndex, effectiveBrushRange.endIndex + 1)
+            : data
+          const xAxisTicks = getGraphXAxisTicks(
+            visibleXAxisData.map((point) => point.date),
+            graphPeriod,
+            size,
+            width
+          )
+          const tickFormatter = (value: string | number) =>
+            formatGraphTick(String(value), graphPeriod, size)
 
           return (
             <ComposedChart
@@ -479,7 +413,8 @@ export function GraphChart({
                 axisLine={false}
                 tick={{ fontSize: 12 }}
                 ticks={xAxisTicks}
-                tickFormatter={(value) => formatGraphTick(String(value), graphPeriod)}
+                interval={getXAxisInterval(graphPeriod, size)}
+                tickFormatter={tickFormatter}
                 padding={{ left: 0, right: compactXAxisPadding }}
               />
               <YAxis
@@ -497,7 +432,7 @@ export function GraphChart({
                   boxShadow: 'var(--color-shadow-card)'
                 }}
                 isAnimationActive={false}
-                labelFormatter={(label) => formatGraphTick(String(label), graphPeriod)}
+                labelFormatter={(label) => formatGraphTick(String(label), graphPeriod, size)}
                 labelStyle={{ color: TOOLTIP_LABEL_COLOR }}
               />
               {renderSeries('bar', barSize)}
@@ -513,7 +448,7 @@ export function GraphChart({
                   onChange={handleBrushChange}
                   startIndex={effectiveBrushRange?.startIndex}
                   stroke={BRUSH_BORDER_COLOR}
-                  tickFormatter={(value) => formatGraphTick(String(value), graphPeriod)}
+                  tickFormatter={tickFormatter}
                   travellerWidth={0}
                 />
               ) : null}
