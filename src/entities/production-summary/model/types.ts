@@ -76,6 +76,7 @@ export type GraphWithGtkMetadata = {
 export type GraphWithGtkDetail = {
   indicator: string
   gtk: string
+  display_name?: string | null
   unit: string
   points: GraphPoint[]
 }

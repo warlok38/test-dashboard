@@ -115,6 +115,20 @@ function getGraphDataKey(query: GraphQuery | undefined) {
   ].join(':')
 }
 
+function getDetailDepositGraphQuery(
+  query: GraphQuery | undefined,
+  detailIndicator: string
+): GraphQuery | undefined {
+  if (!query) {
+    return undefined
+  }
+
+  return {
+    ...query,
+    indicator: detailIndicator
+  }
+}
+
 function GraphControls({
   graphPeriod,
   seriesView,
@@ -169,6 +183,93 @@ function useDelayedFlag(isActive: boolean, delayMs: number) {
   }, [delayMs, isActive])
 
   return isDelayedActive
+}
+
+function DetailDepositGraphs({
+  detailIndicator,
+  graphPeriod,
+  parentGraphQuery,
+  seriesView
+}: {
+  detailIndicator: string
+  graphPeriod: GraphPeriod
+  parentGraphQuery: GraphQuery | undefined
+  seriesView: Record<GraphSeriesKey, GraphSeriesView>
+}) {
+  const detailGraphQuery = useMemo(
+    () => getDetailDepositGraphQuery(parentGraphQuery, detailIndicator),
+    [detailIndicator, parentGraphQuery]
+  )
+  const detailGraphDataKey = useMemo(() => getGraphDataKey(detailGraphQuery), [detailGraphQuery])
+  const {
+    currentData: detailGraphWithGtkData,
+    error: detailGraphWithGtkError,
+    isFetching: isDetailGraphWithGtkFetching,
+    isLoading: isDetailGraphWithGtkLoading
+  } = useGetGraphWithGtkQuery(detailGraphQuery as GraphQuery, {
+    skip: !detailGraphQuery
+  })
+  const [lastSuccessfulDetailGtkData, setLastSuccessfulDetailGtkData] = useState<
+    LastSuccessfulDetailsData<GraphWithGtkDetail> | undefined
+  >()
+  const detailDepositDetails =
+    detailGraphWithGtkData?.details ?? lastSuccessfulDetailGtkData?.details ?? EMPTY_GTK_DETAILS
+  const detailDepositDetailsDataKey = detailGraphWithGtkData
+    ? detailGraphDataKey
+    : lastSuccessfulDetailGtkData?.dataKey
+  const isInitialDetailGtkLoading =
+    isDetailGraphWithGtkLoading && !detailGraphWithGtkData && !lastSuccessfulDetailGtkData?.details
+  const shouldShowDetailGtkUpdatingOverlay = useDelayedFlag(
+    isDetailGraphWithGtkFetching && Boolean(lastSuccessfulDetailGtkData),
+    GRAPH_LOADING_OVERLAY_DELAY_MS
+  )
+
+  useEffect(() => {
+    if (detailGraphWithGtkData) {
+      setLastSuccessfulDetailGtkData({
+        details: detailGraphWithGtkData.details,
+        dataKey: detailGraphDataKey
+      })
+    }
+  }, [detailGraphDataKey, detailGraphWithGtkData])
+
+  if (detailGraphWithGtkError) {
+    return (
+      <ApiErrorAlert
+        error={detailGraphWithGtkError}
+        title="Не удалось загрузить месторождения для детального показателя"
+      />
+    )
+  }
+
+  if (isInitialDetailGtkLoading) {
+    return <Skeleton active paragraph={{ rows: 4 }} title={false} />
+  }
+
+  if (detailDepositDetails.length === 0) {
+    return <div className={styles.emptyState}>Нет данных по месторождениям</div>
+  }
+
+  return (
+    <div className={styles.detailDepositGraphGrid}>
+      {detailDepositDetails.map((depositDetail) => (
+        <article className={styles.depositGraphCard} key={depositDetail.gtk}>
+          <h4 className={styles.depositGraphTitle}>
+            {depositDetail.display_name ?? depositDetail.gtk}
+          </h4>
+          <GraphChart
+            data={depositDetail.points}
+            dataKey={`${detailDepositDetailsDataKey}:detail-deposits:${depositDetail.gtk}`}
+            emptyText="Нет данных по месторождению"
+            graphPeriod={graphPeriod}
+            isUpdating={shouldShowDetailGtkUpdatingOverlay}
+            seriesView={seriesView}
+            size="compact"
+          />
+        </article>
+      ))}
+    </div>
+  )
 }
 
 export function GraphPanel({ query }: GraphPanelProps) {
@@ -312,7 +413,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
       <div className={styles.depositGraphGrid}>
         {depositDetails.map((detail) => (
           <article className={styles.depositGraphCard} key={detail.gtk}>
-            <h3 className={styles.depositGraphTitle}>{detail.gtk}</h3>
+            <h3 className={styles.depositGraphTitle}>{detail.display_name ?? detail.gtk}</h3>
             <GraphChart
               data={detail.points}
               dataKey={`${depositDetailsDataKey}:${detail.gtk}`}
@@ -363,6 +464,12 @@ export function GraphPanel({ query }: GraphPanelProps) {
               isUpdating={shouldShowDetailsUpdatingOverlay}
               seriesView={seriesView}
             />
+            <DetailDepositGraphs
+              detailIndicator={detail.indicator}
+              graphPeriod={graphPeriod}
+              parentGraphQuery={graphQuery}
+              seriesView={seriesView}
+            />
           </article>
         ))}
       </div>
@@ -389,7 +496,7 @@ export function GraphPanel({ query }: GraphPanelProps) {
         {renderGraphContent()}
         <div className={styles.graphNestedSections}>
           <section className={styles.graphNestedSection}>
-            <h2 className={styles.graphSectionTitle}>Месторождения</h2>
+            {/* <h2 className={styles.graphSectionTitle}>Месторождения</h2> */}
             <div className={styles.graphSectionBody}>{renderDepositsContent()}</div>
           </section>
         </div>
