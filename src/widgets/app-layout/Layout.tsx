@@ -4,6 +4,7 @@ import { Suspense, type ReactNode } from 'react'
 import { usePathname } from 'next/navigation'
 import { isAuthStatusPath } from '@/features/auth/lib/redirect'
 import { AuthContentGate } from '@/features/auth/ui/AuthContentGate'
+import { ServiceAccessGate } from '@/features/permissions'
 import { AppFooter } from '@/widgets/app-footer'
 import { Header } from '@/widgets/header'
 import { Sidebar, SidebarProvider } from '@/widgets/sidebar'
@@ -23,17 +24,25 @@ export function Layout({ children }: LayoutProps) {
         <Header />
         <section className={styles.contentArea}>
           <AuthContentGate>
-            {!isAuthStatusPage && (
-              <Suspense fallback={null}>
-                <Sidebar />
-              </Suspense>
+            {isAuthStatusPage ? (
+              <div className={styles.contentColumn}>
+                <main className={styles.mainContent} data-main-content-scroll>
+                  {children}
+                </main>
+              </div>
+            ) : (
+              <ServiceAccessGate>
+                <Suspense fallback={null}>
+                  <Sidebar />
+                </Suspense>
+                <div className={styles.contentColumn}>
+                  <main className={styles.mainContent} data-main-content-scroll>
+                    {children}
+                  </main>
+                  <AppFooter />
+                </div>
+              </ServiceAccessGate>
             )}
-            <div className={styles.contentColumn}>
-              <main className={styles.mainContent} data-main-content-scroll>
-                {children}
-              </main>
-              {!isAuthStatusPage && <AppFooter />}
-            </div>
           </AuthContentGate>
         </section>
       </div>

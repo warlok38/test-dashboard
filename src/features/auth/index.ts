@@ -3,5 +3,11 @@ export { AuthContentGate } from './ui/AuthContentGate'
 export { AuthErrorContent } from './ui/AuthErrorContent'
 export { AuthRedirectWatcher } from './ui/AuthRedirectWatcher'
 export { ReloadPageButton } from './ui/ReloadPageButton'
-export { isAuthErrorPath, isAuthStatusPath, isForbiddenPath } from './lib/redirect'
+export {
+  getAuthErrorHref,
+  getForbiddenHref,
+  isAuthErrorPath,
+  isAuthStatusPath,
+  isForbiddenPath
+} from './lib/redirect'
 export { useAuthBootstrap } from './model/useAuthBootstrap'

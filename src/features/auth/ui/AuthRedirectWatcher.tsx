@@ -27,7 +27,7 @@ export function AuthRedirectWatcher() {
     }
 
     if (isAuthorized) {
-      if (isForbiddenPath(pathname) || isAuthErrorPath(pathname)) {
+      if (isAuthErrorPath(pathname)) {
         router.replace(getSafeForbiddenReturnPath(searchParams.get('from')))
       }
 

@@ -1,73 +1,105 @@
 'use client'
 
-import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { usePathname } from 'next/navigation'
+import { useEffect, type ReactNode } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
+import {
+  hasPermission,
+  PERMISSION_ACTIONS,
+  PERMISSION_RESOURCES,
+  useGetPermissionsQuery
+} from '@/entities/permission'
 import { selectAuth } from '@/shared/auth'
+import { HTTP_ERROR_CODES } from '@/shared/errors'
 import { useAppSelector } from '@/shared/hooks'
+import { getAuthErrorHref, getForbiddenHref } from '@/shared/routing'
 
 import { isAuthStatusPath } from '../lib/redirect'
 import { AuthLoadingIndicator } from './AuthLoadingIndicator'
-
-const LOADER_REVEAL_DELAY_MS = 200
-const LOADER_FINISH_DURATION_MS = 180
 
 type AuthContentGateProps = {
   children: ReactNode
 }
 
+function getRtkErrorStatus(error: unknown) {
+  if (error && typeof error === 'object' && 'status' in error) {
+    return (error as { status?: unknown }).status
+  }
+
+  return undefined
+}
+
+function getLoadingText(isInitialized: boolean, isInitializing: boolean) {
+  if (isInitialized) {
+    return 'Проверяем доступ...'
+  }
+
+  return isInitializing ? 'Авторизация...' : 'Загружаем интерфейс...'
+}
+
 export function AuthContentGate({ children }: AuthContentGateProps) {
+  const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const { isAuthorized, isInitialized, isInitializing } = useAppSelector(selectAuth)
-  const shouldBlockProtectedContent = isInitialized && !isAuthorized && !isAuthStatusPath(pathname)
-  const isContentBlocked = !isInitialized || shouldBlockProtectedContent
-  const isCheckingAccess = isInitializing || shouldBlockProtectedContent
-  const hasReachedRevealDelayRef = useRef(false)
-  const [isLoaderMounted, setIsLoaderMounted] = useState(true)
-  const [isFinishing, setIsFinishing] = useState(false)
+  const isAuthStatusPage = isAuthStatusPath(pathname)
+  const shouldLoadPermissions = isInitialized && isAuthorized && !isAuthStatusPage
+  const {
+    data: permissions,
+    error: permissionsError,
+    isError: isPermissionsError,
+    isFetching: isPermissionsFetching,
+    isLoading: isPermissionsLoading
+  } = useGetPermissionsQuery(undefined, {
+    skip: !shouldLoadPermissions
+  })
+  const hasServiceAccess = hasPermission(
+    permissions?.acl,
+    PERMISSION_RESOURCES.ServiceAccess,
+    PERMISSION_ACTIONS.R
+  )
+  const shouldBlockProtectedContent = isInitialized && !isAuthorized && !isAuthStatusPage
+  const shouldCheckPermissions =
+    shouldLoadPermissions &&
+    ((!permissions && (isPermissionsLoading || isPermissionsFetching)) ||
+      isPermissionsError ||
+      !hasServiceAccess)
+  const isContentBlocked = !isInitialized || shouldBlockProtectedContent || shouldCheckPermissions
+  const loadingText = getLoadingText(isInitialized, isInitializing)
 
   useEffect(() => {
-    const remainingDelay = Math.max(0, LOADER_REVEAL_DELAY_MS - performance.now())
+    if (!shouldLoadPermissions) {
+      return
+    }
 
-    if (remainingDelay === 0) {
-      hasReachedRevealDelayRef.current = true
+    if (isPermissionsError) {
+      const status = getRtkErrorStatus(permissionsError)
+      const href =
+        status === HTTP_ERROR_CODES.AccessDenied || status === HTTP_ERROR_CODES.Unauthorized
+          ? getForbiddenHref(pathname, searchParams)
+          : getAuthErrorHref(pathname, searchParams)
+
+      router.replace(href)
 
       return
     }
 
-    const timeoutId = window.setTimeout(() => {
-      hasReachedRevealDelayRef.current = true
-    }, remainingDelay)
-
-    return () => {
-      window.clearTimeout(timeoutId)
+    if (permissions && !hasServiceAccess) {
+      router.replace(getForbiddenHref(pathname, searchParams))
     }
-  }, [])
+  }, [
+    hasServiceAccess,
+    isPermissionsError,
+    pathname,
+    permissions,
+    permissionsError,
+    router,
+    searchParams,
+    shouldLoadPermissions
+  ])
 
-  useEffect(() => {
-    if (isContentBlocked) {
-      return
-    }
-
-    if (!hasReachedRevealDelayRef.current) {
-      setIsLoaderMounted(false)
-
-      return
-    }
-
-    setIsFinishing(true)
-
-    const timeoutId = window.setTimeout(() => {
-      setIsLoaderMounted(false)
-    }, LOADER_FINISH_DURATION_MS)
-
-    return () => {
-      window.clearTimeout(timeoutId)
-    }
-  }, [isContentBlocked])
-
-  if (isLoaderMounted) {
-    return <AuthLoadingIndicator isCheckingAccess={isCheckingAccess} isFinishing={isFinishing} />
+  if (isContentBlocked) {
+    return <AuthLoadingIndicator text={loadingText} />
   }
 
   return children

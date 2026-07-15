@@ -8,8 +8,6 @@
   color: var(--color-text-muted);
   background: var(--color-bg-default);
   font-size: var(--font-size-md);
-  opacity: 0;
-  animation: revealLoader 160ms ease 500ms forwards;
 }
 
 .indicator {
@@ -36,23 +34,7 @@
   background: var(--palette-accent-primary);
   transform: scaleX(0.08);
   transform-origin: left;
-  animation: advanceProgress 8s cubic-bezier(0.12, 0.7, 0.18, 1) 500ms forwards;
-  transition: transform 180ms ease-out;
-}
-
-.finishing {
-  animation: hideLoader 180ms ease forwards;
-}
-
-.finishing .progressLine {
-  animation: none;
-  transform: scaleX(1);
-}
-
-@keyframes revealLoader {
-  to {
-    opacity: 1;
-  }
+  animation: advanceProgress 8s cubic-bezier(0.12, 0.7, 0.18, 1) forwards;
 }
 
 @keyframes advanceProgress {
@@ -66,15 +48,5 @@
 
   100% {
     transform: scaleX(0.88);
-  }
-}
-
-@keyframes hideLoader {
-  65% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
   }
 }
