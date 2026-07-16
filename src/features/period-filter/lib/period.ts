@@ -4,6 +4,7 @@ export type PeriodOption = {
   key: PeriodKey
   label: string
   shift: number
+  disabled?: boolean
 }
 
 export type PeriodScopeLabel = {
@@ -18,12 +19,12 @@ export type PeriodRequestParams = {
 
 export const DEFAULT_PERIOD_KEY: PeriodKey = 'day'
 
-export const PERIOD_OPTIONS = [
+export const PERIOD_OPTIONS: PeriodOption[] = [
   { key: 'day', label: 'Сутки', shift: 3 },
   { key: 'month', label: 'Месяц', shift: 99 },
   // TODO: уточнить код смены для периода "год"
-  { key: 'year', label: 'Год', shift: 100 }
-] as const satisfies readonly PeriodOption[]
+  { key: 'year', label: 'Год', shift: 100, disabled: true }
+]
 
 const MONTH_LABELS = [
   'январь',

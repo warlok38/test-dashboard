@@ -18,14 +18,15 @@
   align-items: baseline;
   justify-content: center;
   gap: var(--space-1);
-  font-weight: 600;
+  font-size: var(--font-size-lg);
+  font-weight: 500;
   color: var(--ant-color-text);
   text-transform: lowercase;
 }
 
 .scopeLabelSecondary {
   color: var(--ant-color-text-tertiary);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   font-weight: 500;
 }
 
@@ -35,6 +36,10 @@
 
 .navButton:disabled {
   color: var(--ant-color-text-disabled);
+}
+
+.periodSegment :global(.ant-segmented-item-label) {
+  font-weight: 500;
 }
 
 @media (--screen-small) {

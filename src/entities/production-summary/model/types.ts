@@ -138,6 +138,7 @@ export type GeneralSummaryGtkBreakdown = {
   plan_value: number | null
   fact_value: number | null
   deviation_pct: number | null
+  display_name?: string | null
 }
 
 export type GeneralSummaryResponse = {

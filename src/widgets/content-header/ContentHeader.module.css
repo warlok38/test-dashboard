@@ -2,8 +2,8 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  flex: 0 0 var(--layout-header-height);
-  min-height: var(--layout-header-height);
+  flex: 0 0 var(--layout-content-header-height);
+  min-height: var(--layout-content-header-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -109,7 +109,7 @@
 
 @media (--screen-small) {
   .header {
-    min-height: var(--layout-header-height);
+    min-height: var(--layout-content-header-height);
     flex-wrap: nowrap;
     align-content: normal;
     gap: var(--space-3);

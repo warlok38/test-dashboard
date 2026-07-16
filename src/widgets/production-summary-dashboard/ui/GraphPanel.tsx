@@ -5,14 +5,14 @@ import { Segmented, Skeleton } from 'antd'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 
 import {
+  useGetGraphQuery,
+  useGetGraphWithDetailsQuery,
+  useGetGraphWithGtkQuery,
   type GraphPeriod,
   type GraphPoint,
   type GraphQuery,
   type GraphWithDetailsDetail,
-  type GraphWithGtkDetail,
-  useGetGraphQuery,
-  useGetGraphWithDetailsQuery,
-  useGetGraphWithGtkQuery
+  type GraphWithGtkDetail
 } from '@/entities/production-summary'
 import { ApiErrorAlert } from '@/shared/ui'
 
@@ -479,7 +479,7 @@ export function GraphPanel({ graphPeriod, query }: GraphPanelProps) {
         </div>
       </section>
       <section className={styles.detailGraphsSection}>
-        <h2 className={styles.detailGraphsSectionTitle}>Детальные показатели</h2>
+        {/* <h2 className={styles.detailGraphsSectionTitle}>Детальные показатели</h2> */}
         <div className={styles.detailGraphsSectionBody}>{renderDetailsContent()}</div>
       </section>
     </div>

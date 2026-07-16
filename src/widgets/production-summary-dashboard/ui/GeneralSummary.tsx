@@ -133,6 +133,12 @@ function getGtkLetter(gtk: string) {
   return gtk.trim().charAt(0).toUpperCase()
 }
 
+function getGtkBreakdownLabel(breakdown: GeneralSummaryGtkBreakdown) {
+  return breakdown.display_name
+    ? `${breakdown.display_name.trim()}:`
+    : `${getGtkLetter(breakdown.gtk_or_zif)}:`
+}
+
 function formatNullableNumber(value: number | null | undefined) {
   return value === null || value === undefined ? '-' : formatNumber(value)
 }
@@ -148,9 +154,7 @@ function GtkBreakdownPopover({ breakdowns }: { breakdowns: GeneralSummaryGtkBrea
     <div className={styles.generalSummaryGtkList}>
       {breakdowns.map((breakdown) => (
         <div key={breakdown.gtk_or_zif} className={styles.generalSummaryGtkRow}>
-          <span className={styles.generalSummaryGtkLetter}>
-            {getGtkLetter(breakdown.gtk_or_zif)}:
-          </span>
+          <span className={styles.generalSummaryGtkLetter}>{getGtkBreakdownLabel(breakdown)}</span>
           <span className={styles.generalSummaryGtkFact}>
             {formatNullableNumber(breakdown.fact_value)}
           </span>

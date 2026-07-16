@@ -1,7 +1,7 @@
 'use client'
 
 import { LeftOutlined, RightOutlined } from '@ant-design/icons'
-import { Button, Segmented } from 'antd'
+import { Button, Segmented, SegmentedProps } from 'antd'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useMemo } from 'react'
 
@@ -24,9 +24,10 @@ import styles from './PeriodFilter.module.css'
 export const SHIFT_PARAM = 'shift'
 const PERIOD_ARROW_COMMIT_DELAY_MS = 500
 
-const periodSegmentOptions = PERIOD_OPTIONS.map((period) => ({
+const periodSegmentOptions: SegmentedProps['options'] = PERIOD_OPTIONS.map((period) => ({
   label: period.label,
-  value: period.shift
+  value: period.shift,
+  disabled: period.disabled
 }))
 
 type PeriodScopeState = {
@@ -142,7 +143,6 @@ export function PeriodFilter() {
           className={styles.navButton}
           disabled={isYearPeriod}
           icon={<LeftOutlined />}
-          size="small"
           type="text"
           onClick={() => shiftScope(-1)}
         />
@@ -156,14 +156,13 @@ export function PeriodFilter() {
           className={styles.navButton}
           disabled={isYearPeriod}
           icon={<RightOutlined />}
-          size="small"
           type="text"
           onClick={() => shiftScope(1)}
         />
       </div>
       <Segmented
+        className={styles.periodSegment}
         options={periodSegmentOptions}
-        size="small"
         value={period.shift}
         onChange={(value) => updatePeriod(Number(value))}
       />
