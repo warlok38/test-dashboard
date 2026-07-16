@@ -10,11 +10,13 @@ import {
   ReferenceLine,
   Tooltip,
   XAxis,
-  YAxis
+  YAxis,
+  type TooltipContentProps
 } from 'recharts'
 
 import { type GraphPeriod, type GraphPoint } from '@/entities/production-summary'
 import { ChartFrame } from '@/shared/ui'
+import { formatNumber } from '@/shared/utils/formatNumber'
 
 import styles from '../../ProductionSummaryDashboard.module.css'
 import {
@@ -40,9 +42,7 @@ const EMPTY_AXIS_COLOR = 'var(--palette-dashboard-grid-border)'
 const EMPTY_GRID_LINES = [0.25, 0.5, 0.75]
 const BRUSH_TRACK_COLOR = 'var(--color-bg-card)'
 const BRUSH_BORDER_COLOR = 'var(--color-chart-brush-track-border)'
-const TOOLTIP_BACKGROUND_COLOR = 'var(--color-chart-tooltip-bg)'
-const TOOLTIP_BORDER_COLOR = 'var(--color-chart-tooltip-border)'
-const TOOLTIP_LABEL_COLOR = 'var(--color-chart-tooltip-label)'
+const GRAPH_DATE_REGEXP = /^(\d{4})-(\d{2})-(\d{2})$/
 
 export type GraphSeriesKey = 'plan' | 'fact'
 export type GraphSeriesView = 'bar' | 'line'
@@ -115,6 +115,57 @@ function formatFullAxisNumber(value: string | number | undefined) {
   }
 
   return numberValue.toString()
+}
+
+function formatTooltipNumber(value: unknown) {
+  const numberValue = Number(value)
+
+  if (!Number.isFinite(numberValue)) {
+    return value === null || value === undefined ? '-' : String(value)
+  }
+
+  return formatNumber(numberValue)
+}
+
+function formatTooltipDate(value: string) {
+  const match = value.match(GRAPH_DATE_REGEXP)
+
+  if (!match) {
+    return value
+  }
+
+  return `${match[3]}.${match[2]}.${match[1]}`
+}
+
+function GraphTooltip({ active, label, payload }: TooltipContentProps) {
+  if (!active || !payload?.length) {
+    return null
+  }
+
+  return (
+    <div className={styles.graphTooltip}>
+      <div className={styles.graphTooltipDate}>{formatTooltipDate(String(label))}</div>
+      <div className={styles.graphTooltipItems}>
+        {payload.map((item) => {
+          const isFact = String(item.dataKey) === 'fact'
+
+          return (
+            <div
+              key={String(item.dataKey)}
+              className={styles.graphTooltipItem}
+              style={{ color: item.color }}
+            >
+              <span>{item.name}</span>
+              <span> : </span>
+              <span className={isFact ? styles.graphTooltipFactValue : undefined}>
+                {formatTooltipNumber(item.value)}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
 }
 
 function YAxisTick({ x = 0, y = 0, payload }: AxisTickProps) {
@@ -424,17 +475,7 @@ export function GraphChart({
                 axisLine={false}
                 tick={YAxisTick}
               />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: TOOLTIP_BACKGROUND_COLOR,
-                  borderColor: TOOLTIP_BORDER_COLOR,
-                  borderRadius: 'var(--radius-5)',
-                  boxShadow: 'var(--color-shadow-card)'
-                }}
-                isAnimationActive={false}
-                labelFormatter={(label) => formatGraphTick(String(label), graphPeriod, size)}
-                labelStyle={{ color: TOOLTIP_LABEL_COLOR }}
-              />
+              <Tooltip content={(props) => <GraphTooltip {...props} />} isAnimationActive={false} />
               {renderSeries('bar', barSize)}
               {renderSeries('line', barSize)}
               {shouldUseBrush ? (
