@@ -15,7 +15,7 @@ import {
 } from 'recharts'
 
 import { type GraphPeriod, type GraphPoint } from '@/entities/production-summary'
-import { ChartFrame } from '@/shared/ui'
+import { ChartFrame, Loader } from '@/shared/ui'
 import { formatNumber } from '@/shared/utils/formatNumber'
 
 import styles from '../../ProductionSummaryDashboard.module.css'
@@ -75,6 +75,7 @@ type GraphChartProps = {
   emptyText?: string
   graphPeriod: GraphPeriod
   isUpdating?: boolean
+  updatingText?: string
   seriesView: Record<GraphSeriesKey, GraphSeriesView>
   showBrush?: boolean
   size?: GraphChartSize
@@ -273,6 +274,7 @@ export function GraphChart({
   emptyText = 'Нет данных',
   graphPeriod,
   isUpdating = false,
+  updatingText = 'Обновление...',
   seriesView,
   showBrush = true,
   size = 'default'
@@ -428,6 +430,12 @@ export function GraphChart({
           )}
         </ChartFrame>
         <div className={styles.graphEmptyChartLabel}>{emptyText}</div>
+        {isUpdating ? (
+          <div className={styles.graphUpdatingOverlay}>
+            <span>{updatingText}</span>
+            <Loader size="small" />
+          </div>
+        ) : null}
       </div>
     )
   }
@@ -497,7 +505,12 @@ export function GraphChart({
           )
         }}
       </ChartFrame>
-      {isUpdating ? <div className={styles.graphUpdatingOverlay}>Обновление...</div> : null}
+      {isUpdating ? (
+        <div className={styles.graphUpdatingOverlay}>
+          <span>{updatingText}</span>
+          <Loader size="small" />
+        </div>
+      ) : null}
     </div>
   )
 }
