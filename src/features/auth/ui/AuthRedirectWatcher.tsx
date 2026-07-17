@@ -13,7 +13,7 @@ import {
   getSafeForbiddenReturnPath,
   isAuthErrorPath,
   isForbiddenPath
-} from '../lib/redirect'
+} from '@/shared/routing'
 
 export function AuthRedirectWatcher() {
   const router = useRouter()
@@ -27,7 +27,9 @@ export function AuthRedirectWatcher() {
     }
 
     if (isAuthorized) {
-      if (isAuthErrorPath(pathname)) {
+      const shouldLeaveAuthErrorPage = isAuthErrorPath(pathname)
+
+      if (shouldLeaveAuthErrorPage) {
         router.replace(getSafeForbiddenReturnPath(searchParams.get('from')))
       }
 
@@ -39,13 +41,16 @@ export function AuthRedirectWatcher() {
     const isAccessError =
       authErrorStatus === HTTP_ERROR_CODES.Unauthorized ||
       authErrorStatus === HTTP_ERROR_CODES.AccessDenied
+    const isAuthStatusPage = isForbiddenPath(pathname) || isAuthErrorPath(pathname)
     const targetHref = isAccessError
       ? getForbiddenHref(pathname, searchParams)
       : getAuthErrorHref(pathname, searchParams)
-    const isTargetPath = isAccessError ? isForbiddenPath(pathname) : isAuthErrorPath(pathname)
+    const isAlreadyOnTargetStatusPage = isAccessError
+      ? isForbiddenPath(pathname)
+      : isAuthErrorPath(pathname)
 
-    if (isForbiddenPath(pathname) || isAuthErrorPath(pathname)) {
-      if (!isTargetPath) {
+    if (isAuthStatusPage) {
+      if (!isAlreadyOnTargetStatusPage) {
         router.replace(targetHref)
       }
 

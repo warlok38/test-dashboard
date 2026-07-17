@@ -1,15 +1,6 @@
-export const PERMISSION_ACTIONS = {
-  R: 'R',
-  C: 'C',
-  W: 'W',
-  D: 'D'
-} as const
+import type { ValueOf } from '@/shared/types'
 
-export const PERMISSION_RESOURCES = {
-  ServiceAccess: 'serviceAccess'
-} as const
-
-export type ValueOf<T> = T[keyof T]
+import type { PERMISSION_ACTIONS, PERMISSION_RESOURCES } from './permission.constants'
 
 export type PermissionAction = ValueOf<typeof PERMISSION_ACTIONS>
 export type PermissionResource = ValueOf<typeof PERMISSION_RESOURCES> | (string & {})

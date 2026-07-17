@@ -10,31 +10,21 @@ import {
   useGetPermissionsQuery
 } from '@/entities/permission'
 import { selectAuth } from '@/shared/auth'
-import { HTTP_ERROR_CODES } from '@/shared/errors'
+import { HTTP_ERROR_CODES, getHttpErrorStatus } from '@/shared/errors'
 import { useAppSelector } from '@/shared/hooks'
-import { getAuthErrorHref, getForbiddenHref } from '@/shared/routing'
+import {
+  getAuthErrorHref,
+  getForbiddenHref,
+  getSafeForbiddenReturnPath,
+  isAuthStatusPath,
+  isAuthErrorPath,
+  isForbiddenPath
+} from '@/shared/routing'
 
-import { isAuthStatusPath } from '../lib/redirect'
 import { AuthLoadingIndicator } from './AuthLoadingIndicator'
 
 type AuthContentGateProps = {
   children: ReactNode
-}
-
-function getRtkErrorStatus(error: unknown) {
-  if (error && typeof error === 'object' && 'status' in error) {
-    return (error as { status?: unknown }).status
-  }
-
-  return undefined
-}
-
-function getLoadingText(isInitialized: boolean, isInitializing: boolean) {
-  if (isInitialized) {
-    return 'Проверяем доступ...'
-  }
-
-  return isInitializing ? 'Авторизация...' : 'Загружаем интерфейс...'
 }
 
 export function AuthContentGate({ children }: AuthContentGateProps) {
@@ -43,7 +33,8 @@ export function AuthContentGate({ children }: AuthContentGateProps) {
   const searchParams = useSearchParams()
   const { isAuthorized, isInitialized, isInitializing } = useAppSelector(selectAuth)
   const isAuthStatusPage = isAuthStatusPath(pathname)
-  const shouldLoadPermissions = isInitialized && isAuthorized && !isAuthStatusPage
+  const isForbiddenPage = isForbiddenPath(pathname)
+  const shouldLoadPermissions = isInitialized && isAuthorized && !isAuthErrorPath(pathname)
   const {
     data: permissions,
     error: permissionsError,
@@ -59,12 +50,18 @@ export function AuthContentGate({ children }: AuthContentGateProps) {
     PERMISSION_ACTIONS.R
   )
   const shouldBlockProtectedContent = isInitialized && !isAuthorized && !isAuthStatusPage
-  const shouldCheckPermissions =
+  const isWaitingForPermissions = !permissions && (isPermissionsLoading || isPermissionsFetching)
+  const shouldBlockPermissionsError = isPermissionsError && !isForbiddenPage
+  const shouldRedirectFromForbidden = Boolean(permissions && hasServiceAccess && isForbiddenPage)
+  const shouldRedirectToForbidden = Boolean(permissions && !hasServiceAccess && !isForbiddenPage)
+  const shouldBlockForPermissionDecision =
     shouldLoadPermissions &&
-    ((!permissions && (isPermissionsLoading || isPermissionsFetching)) ||
-      isPermissionsError ||
-      !hasServiceAccess)
-  const isContentBlocked = !isInitialized || shouldBlockProtectedContent || shouldCheckPermissions
+    (isWaitingForPermissions ||
+      shouldBlockPermissionsError ||
+      shouldRedirectFromForbidden ||
+      shouldRedirectToForbidden)
+  const isContentBlocked =
+    !isInitialized || shouldBlockProtectedContent || shouldBlockForPermissionDecision
   const loadingText = getLoadingText(isInitialized, isInitializing)
 
   useEffect(() => {
@@ -73,28 +70,39 @@ export function AuthContentGate({ children }: AuthContentGateProps) {
     }
 
     if (isPermissionsError) {
-      const status = getRtkErrorStatus(permissionsError)
-      const href =
-        status === HTTP_ERROR_CODES.AccessDenied || status === HTTP_ERROR_CODES.Unauthorized
-          ? getForbiddenHref(pathname, searchParams)
-          : getAuthErrorHref(pathname, searchParams)
+      const status = getHttpErrorStatus(permissionsError)
+
+      if (isForbiddenPage && isAccessErrorStatus(status)) {
+        return
+      }
+
+      const href = isAccessErrorStatus(status)
+        ? getForbiddenHref(pathname, searchParams)
+        : getAuthErrorHref(pathname, searchParams)
 
       router.replace(href)
 
       return
     }
 
-    if (permissions && !hasServiceAccess) {
+    if (shouldRedirectFromForbidden) {
+      router.replace(getSafeForbiddenReturnPath(searchParams.get('from')))
+
+      return
+    }
+
+    if (shouldRedirectToForbidden) {
       router.replace(getForbiddenHref(pathname, searchParams))
     }
   }, [
-    hasServiceAccess,
+    isForbiddenPage,
     isPermissionsError,
     pathname,
-    permissions,
     permissionsError,
     router,
     searchParams,
+    shouldRedirectFromForbidden,
+    shouldRedirectToForbidden,
     shouldLoadPermissions
   ])
 
@@ -103,4 +111,16 @@ export function AuthContentGate({ children }: AuthContentGateProps) {
   }
 
   return children
+}
+
+function isAccessErrorStatus(status: number | undefined) {
+  return status === HTTP_ERROR_CODES.AccessDenied || status === HTTP_ERROR_CODES.Unauthorized
+}
+
+function getLoadingText(isInitialized: boolean, isInitializing: boolean) {
+  if (isInitialized) {
+    return 'Проверяем доступ...'
+  }
+
+  return isInitializing ? 'Авторизация...' : 'Загружаем интерфейс...'
 }

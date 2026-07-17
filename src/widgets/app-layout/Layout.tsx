@@ -2,9 +2,9 @@
 
 import { Suspense, type ReactNode } from 'react'
 import { usePathname } from 'next/navigation'
-import { isAuthStatusPath } from '@/features/auth/lib/redirect'
-import { AuthContentGate } from '@/features/auth/ui/AuthContentGate'
+import { AuthContentGate } from '@/features/auth'
 import { ServiceAccessGate } from '@/features/permissions'
+import { isAuthStatusPath } from '@/shared/routing'
 import { AppFooter } from '@/widgets/app-footer'
 import { Header } from '@/widgets/header'
 import { Sidebar, SidebarProvider } from '@/widgets/sidebar'
