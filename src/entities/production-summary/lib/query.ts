@@ -1,7 +1,7 @@
 import { type SummaryQuery } from '../model/types'
 
 const DEFAULT_SHIFT = 3
-const SUPPORTED_SHIFTS = new Set([3, 99, 100])
+const SUPPORTED_SHIFTS = new Set([3, 5, 99])
 
 type SearchParamValue = string | string[] | undefined
 
