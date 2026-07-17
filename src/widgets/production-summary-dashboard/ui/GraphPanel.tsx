@@ -309,7 +309,7 @@ function GraphTabContent({
 
   const renderDepositsContent = () => {
     if (graphWithGtkError) {
-      return <ApiErrorAlert error={graphWithGtkError} title="Не удалось загрузить месторождения" />
+      return null
     }
 
     if (depositDetails.length === 0) {
