@@ -5,7 +5,7 @@ import { Badge, Button, Drawer } from 'antd'
 import { useSearchParams } from 'next/navigation'
 import { useState, type ReactNode } from 'react'
 
-import { DATE_FROM_PARAM, DATE_TO_PARAM } from '@/features/date-range-filter'
+import { SHIFT_PARAM } from '@/features/period-filter'
 
 import styles from '../ContentHeader.module.css'
 
@@ -17,9 +17,7 @@ type MobileFilterActionsProps = {
 export function MobileFilterActions({ children, onOpenChange }: MobileFilterActionsProps) {
   const [isOpen, setIsOpen] = useState(false)
   const searchParams = useSearchParams()
-  const hasActiveFilters = Boolean(
-    searchParams.get(DATE_FROM_PARAM) || searchParams.get(DATE_TO_PARAM)
-  )
+  const hasActiveFilters = Boolean(searchParams.get(SHIFT_PARAM))
   const updateOpen = (nextIsOpen: boolean) => {
     setIsOpen(nextIsOpen)
     onOpenChange?.(nextIsOpen)

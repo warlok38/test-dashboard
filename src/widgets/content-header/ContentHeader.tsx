@@ -6,7 +6,7 @@ import { Suspense, useState, type ReactNode } from 'react'
 
 import { Breadcrumbs, type BreadcrumbItem } from '@/shared/ui'
 
-import { DateRangeFilter } from '@/features/date-range-filter'
+import { PeriodFilter } from '@/features/period-filter'
 import styles from './ContentHeader.module.css'
 import { useHeaderVisibility } from './lib'
 import { MobileFilterActions } from './ui'
@@ -23,8 +23,7 @@ export function ContentHeader({ breadcrumbs, actions, showDateFilter = true }: C
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
   const { headerRef, isHeaderHidden } = useHeaderVisibility(isMobileFilterOpen)
   const hasDefaultActions = showDateFilter
-  const renderDefaultActions = () =>
-    hasDefaultActions ? <DateRangeFilter variant="borderless" /> : null
+  const renderDefaultActions = () => (hasDefaultActions ? <PeriodFilter /> : null)
   const resolvedActions = actions ?? renderDefaultActions()
   const shouldRenderResponsiveDefaultActions = !actions && hasDefaultActions
   return (

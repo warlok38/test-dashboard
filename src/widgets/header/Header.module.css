@@ -1,6 +1,6 @@
 .header {
   flex: 0 0 2.5rem;
-  min-height: 2.5rem;
+  min-height: var(--layout-header-height);
   display: flex;
   align-items: center;
   justify-content: space-between;

@@ -21,3 +21,17 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+.ant-segmented .ant-segmented-item {
+  border-bottom: 2px solid transparent;
+}
+
+.ant-segmented .ant-segmented-item-selected {
+  border-bottom-color: var(--palette-accent-primary);
+  background: var(--ant-color-bg-container);
+}
+
+.ant-segmented .ant-segmented-thumb {
+  background: var(--ant-color-bg-container);
+  box-shadow: none;
+}

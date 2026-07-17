@@ -1,0 +1,50 @@
+.root {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.scopeControl {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.scopeLabel {
+  min-width: 4.5rem;
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-lg);
+  font-weight: 500;
+  color: var(--ant-color-text);
+  text-transform: lowercase;
+}
+
+.scopeLabelSecondary {
+  color: var(--ant-color-text-tertiary);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+}
+
+.navButton {
+  color: var(--ant-color-text);
+}
+
+.navButton:disabled {
+  color: var(--ant-color-text-disabled);
+}
+
+.periodSegment :global(.ant-segmented-item-label) {
+  font-weight: 500;
+}
+
+@media (--screen-small) {
+  .root {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

@@ -3,9 +3,11 @@ import type { ThemeConfig } from 'antd'
 type SegmentedTheme = NonNullable<NonNullable<ThemeConfig['components']>['Segmented']>
 
 export const segmentedTheme: SegmentedTheme = {
-  itemSelectedBg: 'var(--palette-status-warning-bg)'
+  fontSize: 16,
+  itemSelectedBg: '#ffffff'
 }
 
 export const darkSegmentedTheme: SegmentedTheme = {
-  itemSelectedBg: 'var(--palette-status-warning-bg)'
+  fontSize: 16,
+  itemSelectedBg: '#1f1f1d'
 }

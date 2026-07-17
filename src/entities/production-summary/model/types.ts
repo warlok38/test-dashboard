@@ -5,8 +5,8 @@ export type GtkName = string
 export type GtkSlug = 'olimpiada' | 'blagodatnoe' | 'natalka' | 'kuranah' | 'suhoy-log'
 
 export type SummaryQuery = {
-  date_from?: string
-  date_to?: string
+  shift?: number
+  production_date?: string
   indicator?: string
   gtk?: string
 }
@@ -39,6 +39,7 @@ export type StageSummary = {
 }
 
 export type AlarmSummaryResponse = {
+  production_date?: string
   production_date_from: string
   production_date_to: string
   shift: number
@@ -51,10 +52,8 @@ export type AlarmSummaryResponse = {
 
 export type GraphQuery = {
   indicator: string
-  date?: string
-  date_from?: string
-  date_to?: string
-  period?: GraphPeriod
+  shift?: number
+  production_date?: string
   gtk?: string
 }
 
@@ -69,6 +68,7 @@ export type GraphPoint = {
 
 export type GraphWithGtkMetadata = {
   period: GraphPeriod
+  production_date: string
   start_date: string
   end_date: string
 }
@@ -76,6 +76,7 @@ export type GraphWithGtkMetadata = {
 export type GraphWithGtkDetail = {
   indicator: string
   gtk: string
+  display_name?: string | null
   unit: string
   points: GraphPoint[]
 }
@@ -87,6 +88,7 @@ export type GraphWithGtkResponse = {
 
 export type GraphWithDetailsMetadata = {
   period: GraphPeriod
+  production_date: string
   start_date: string
   end_date: string
 }
@@ -136,9 +138,11 @@ export type GeneralSummaryGtkBreakdown = {
   plan_value: number | null
   fact_value: number | null
   deviation_pct: number | null
+  display_name?: string | null
 }
 
 export type GeneralSummaryResponse = {
+  production_date?: string
   production_date_from: string
   production_date_to: string
   shift: number
@@ -146,8 +150,7 @@ export type GeneralSummaryResponse = {
 }
 
 export type GeneralSummaryParams = {
-  date_from?: string
-  date_to?: string
   shift?: number
+  production_date?: string
   gtk?: string
 }
