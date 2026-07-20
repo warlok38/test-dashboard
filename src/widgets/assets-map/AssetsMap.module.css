@@ -74,6 +74,15 @@
   border-radius: var(--radius-5);
   background: var(--color-bg-card);
   box-shadow: var(--color-shadow-card);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s ease;
+}
+
+.mapFrame:hover .mapControls,
+.mapFrame:focus-within .mapControls {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .mapControlButton {

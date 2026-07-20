@@ -26,9 +26,14 @@ const DEFAULT_MAP_VIEW_SIZE = {
   height: 700
 }
 
-export const MAP_MIN_ZOOM = DEFAULT_MAP_VIEW_SIZE.width / MAP_IMAGE_VIEW_BOX.width
+const MAX_ZOOMED_OUT_VIEW_SIZE = {
+  width: 2250,
+  height: 1160
+}
 
-export const DEFAULT_MAP_ZOOM = MAP_MIN_ZOOM
+export const MAP_MIN_ZOOM = DEFAULT_MAP_VIEW_SIZE.width / MAX_ZOOMED_OUT_VIEW_SIZE.width
+
+export const DEFAULT_MAP_ZOOM = 1
 
 const DEFAULT_MAP_CENTER = {
   x: 1092.5,
@@ -43,8 +48,8 @@ export function formatViewBox(viewBox: MapViewBox) {
 
 export function getMapViewBoxForZoom(zoom: number, center = DEFAULT_MAP_CENTER): MapViewBox {
   const normalizedZoom = clamp(zoom, MAP_MIN_ZOOM, MAP_MAX_ZOOM)
-  const width = Math.min(DEFAULT_MAP_VIEW_SIZE.width / normalizedZoom, MAP_IMAGE_VIEW_BOX.width)
-  const height = Math.min(DEFAULT_MAP_VIEW_SIZE.height / normalizedZoom, MAP_IMAGE_VIEW_BOX.height)
+  const width = Math.min(DEFAULT_MAP_VIEW_SIZE.width / normalizedZoom, getMaxViewBoxWidth())
+  const height = Math.min(DEFAULT_MAP_VIEW_SIZE.height / normalizedZoom, getMaxViewBoxHeight())
 
   return constrainMapViewBox({
     x: center.x - width / 2,
@@ -81,13 +86,27 @@ export function panMapViewBox(viewBox: MapViewBox, delta: MapPoint): MapViewBox 
 }
 
 function constrainMapViewBox(viewBox: MapViewBox): MapViewBox {
-  const maxX = MAP_IMAGE_VIEW_BOX.x + MAP_IMAGE_VIEW_BOX.width - viewBox.width
-  const maxY = MAP_IMAGE_VIEW_BOX.y + MAP_IMAGE_VIEW_BOX.height - viewBox.height
+  const minX =
+    viewBox.width > MAP_IMAGE_VIEW_BOX.width
+      ? MAP_IMAGE_VIEW_BOX.x + MAP_IMAGE_VIEW_BOX.width - viewBox.width
+      : MAP_IMAGE_VIEW_BOX.x
+  const maxX =
+    viewBox.width > MAP_IMAGE_VIEW_BOX.width
+      ? MAP_IMAGE_VIEW_BOX.x
+      : MAP_IMAGE_VIEW_BOX.x + MAP_IMAGE_VIEW_BOX.width - viewBox.width
+  const minY =
+    viewBox.height > MAP_IMAGE_VIEW_BOX.height
+      ? MAP_IMAGE_VIEW_BOX.y + MAP_IMAGE_VIEW_BOX.height - viewBox.height
+      : MAP_IMAGE_VIEW_BOX.y
+  const maxY =
+    viewBox.height > MAP_IMAGE_VIEW_BOX.height
+      ? MAP_IMAGE_VIEW_BOX.y
+      : MAP_IMAGE_VIEW_BOX.y + MAP_IMAGE_VIEW_BOX.height - viewBox.height
 
   return {
     ...viewBox,
-    x: clamp(viewBox.x, MAP_IMAGE_VIEW_BOX.x, Math.max(MAP_IMAGE_VIEW_BOX.x, maxX)),
-    y: clamp(viewBox.y, MAP_IMAGE_VIEW_BOX.y, Math.max(MAP_IMAGE_VIEW_BOX.y, maxY))
+    x: clamp(viewBox.x, minX, maxX),
+    y: clamp(viewBox.y, minY, maxY)
   }
 }
 
@@ -100,11 +119,11 @@ function getMinViewBoxHeight() {
 }
 
 function getMaxViewBoxWidth() {
-  return MAP_IMAGE_VIEW_BOX.width
+  return MAX_ZOOMED_OUT_VIEW_SIZE.width
 }
 
 function getMaxViewBoxHeight() {
-  return MAP_IMAGE_VIEW_BOX.height
+  return MAX_ZOOMED_OUT_VIEW_SIZE.height
 }
 
 function clamp(value: number, min: number, max: number) {

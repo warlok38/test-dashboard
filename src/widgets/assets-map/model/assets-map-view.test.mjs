@@ -13,10 +13,10 @@ import {
 } from './assets-map-view.ts'
 
 describe('assets map view settings', () => {
-  it('uses the maximum zoomed out state as the initial map viewport', () => {
+  it('uses an eastern Russia crop as the initial map viewport', () => {
     assert.equal(formatViewBox(MAP_IMAGE_VIEW_BOX), '0 0 1650 1000')
-    assert.equal(formatViewBox(DEFAULT_MAP_VIEW_BOX), '0 0 1650 1000')
-    assert.equal(formatViewBox(getMapViewBoxForZoom(DEFAULT_MAP_ZOOM)), '0 0 1650 1000')
+    assert.equal(formatViewBox(DEFAULT_MAP_VIEW_BOX), '645 205 895 700')
+    assert.equal(formatViewBox(getMapViewBoxForZoom(DEFAULT_MAP_ZOOM)), '645 205 895 700')
   })
 
   it('zooms around an anchor point', () => {
@@ -31,7 +31,7 @@ describe('assets map view settings', () => {
     assert.equal(nextViewBox.y > DEFAULT_MAP_VIEW_BOX.y, true)
   })
 
-  it('zooms out until the full source map width is visible', () => {
+  it('zooms out until the full source map is visible with margins', () => {
     let nextViewBox = DEFAULT_MAP_VIEW_BOX
 
     for (let step = 0; step < 20; step += 1) {
@@ -41,10 +41,13 @@ describe('assets map view settings', () => {
       })
     }
 
-    assert.equal(nextViewBox.width, MAP_IMAGE_VIEW_BOX.width)
-    assert.equal(nextViewBox.height, MAP_IMAGE_VIEW_BOX.height)
-    assert.equal(nextViewBox.x, MAP_IMAGE_VIEW_BOX.x)
-    assert.equal(nextViewBox.y, MAP_IMAGE_VIEW_BOX.y)
+    assert.equal(formatViewBox(nextViewBox), '-346.4257 -83.6905 2250 1160')
+    assert.equal(nextViewBox.width > MAP_IMAGE_VIEW_BOX.width, true)
+    assert.equal(nextViewBox.height > MAP_IMAGE_VIEW_BOX.height, true)
+    assert.equal(nextViewBox.x < MAP_IMAGE_VIEW_BOX.x, true)
+    assert.equal(nextViewBox.y < MAP_IMAGE_VIEW_BOX.y, true)
+    assert.equal(nextViewBox.x + nextViewBox.width > MAP_IMAGE_VIEW_BOX.width, true)
+    assert.equal(nextViewBox.y + nextViewBox.height > MAP_IMAGE_VIEW_BOX.height, true)
   })
 
   it('keeps panning inside the source map bounds', () => {

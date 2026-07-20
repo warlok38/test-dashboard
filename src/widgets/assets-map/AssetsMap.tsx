@@ -26,6 +26,8 @@ type DragState = {
 export function AssetsMap() {
   const mapRef = useRef<SVGSVGElement>(null)
   const viewBoxRef = useRef(DEFAULT_MAP_VIEW_BOX)
+  const dragMovedRef = useRef(false)
+  const suppressNextRegionClickRef = useRef(false)
   const [viewBox, setViewBox] = useState<MapViewBox>(DEFAULT_MAP_VIEW_BOX)
   const [dragState, setDragState] = useState<DragState | null>(null)
   const [detail, setDetail] = useState('Деталка')
@@ -76,7 +78,7 @@ export function AssetsMap() {
     setDragState(null)
   }
 
-  const handlePointerDown = (event: PointerEvent<SVGSVGElement>) => {
+  const startMapDrag = (event: PointerEvent<SVGElement>) => {
     if (event.button !== 0) {
       return
     }
@@ -88,6 +90,7 @@ export function AssetsMap() {
     }
 
     event.currentTarget.setPointerCapture(event.pointerId)
+    dragMovedRef.current = false
     setDragState({
       pointerId: event.pointerId,
       startClientPoint: {
@@ -98,7 +101,11 @@ export function AssetsMap() {
     })
   }
 
-  const handlePointerMove = (event: PointerEvent<SVGSVGElement>) => {
+  const handlePointerDown = (event: PointerEvent<SVGSVGElement>) => {
+    startMapDrag(event)
+  }
+
+  const handlePointerMove = (event: PointerEvent<SVGElement>) => {
     if (!dragState || dragState.pointerId !== event.pointerId) {
       return
     }
@@ -108,6 +115,13 @@ export function AssetsMap() {
 
     if (!rect) {
       return
+    }
+
+    if (
+      Math.abs(event.clientX - dragState.startClientPoint.x) > 3 ||
+      Math.abs(event.clientY - dragState.startClientPoint.y) > 3
+    ) {
+      dragMovedRef.current = true
     }
 
     setViewBox(
@@ -122,9 +136,16 @@ export function AssetsMap() {
     )
   }
 
-  const handlePointerUp = (event: PointerEvent<SVGSVGElement>) => {
+  const handlePointerUp = (event: PointerEvent<SVGElement>) => {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+
+    if (dragMovedRef.current) {
+      suppressNextRegionClickRef.current = true
+      window.setTimeout(() => {
+        suppressNextRegionClickRef.current = false
+      }, 0)
     }
 
     setDragState(null)
@@ -200,6 +221,11 @@ export function AssetsMap() {
                     key={region.id}
                     detail={region.detail}
                     path={region.path}
+                    shouldSuppressSelect={() => suppressNextRegionClickRef.current}
+                    onDragStart={startMapDrag}
+                    onPointerCancel={handlePointerUp}
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
                     onSelect={setDetail}
                   />
                 ) : (
@@ -207,6 +233,11 @@ export function AssetsMap() {
                     key={region.id}
                     detail={region.detail}
                     sourceId={region.sourceId}
+                    shouldSuppressSelect={() => suppressNextRegionClickRef.current}
+                    onDragStart={startMapDrag}
+                    onPointerCancel={handlePointerUp}
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
                     onSelect={setDetail}
                   />
                 )
@@ -243,19 +274,42 @@ export function AssetsMap() {
 
 type RegionOverlayProps = {
   detail: string
+  onDragStart: (event: PointerEvent<SVGElement>) => void
+  onPointerCancel: (event: PointerEvent<SVGElement>) => void
+  onPointerMove: (event: PointerEvent<SVGElement>) => void
+  onPointerUp: (event: PointerEvent<SVGElement>) => void
   onSelect: (detail: string) => void
+  shouldSuppressSelect: () => boolean
   path?: string
   sourceId?: string
 }
 
-function RegionOverlay({ detail, onSelect, path, sourceId }: RegionOverlayProps) {
+function RegionOverlay({
+  detail,
+  onDragStart,
+  onPointerCancel,
+  onPointerMove,
+  onPointerUp,
+  onSelect,
+  path,
+  shouldSuppressSelect,
+  sourceId
+}: RegionOverlayProps) {
   const commonProps = {
     className: styles.regionOverlay,
     onClick: (event: MouseEvent<SVGElement>) => {
       event.stopPropagation()
+
+      if (shouldSuppressSelect()) {
+        return
+      }
+
       onSelect(detail)
     },
-    onPointerDown: (event: PointerEvent<SVGElement>) => event.stopPropagation()
+    onPointerCancel,
+    onPointerDown: onDragStart,
+    onPointerMove,
+    onPointerUp
   }
 
   if (path) {
