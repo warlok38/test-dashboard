@@ -1,11 +1,13 @@
 export type SummarySeverity = 'critical' | 'warning' | 'info' | string
 
+export type SummaryPeriod = 'day' | 'month' | 'year'
+
 export type GtkName = string
 
 export type GtkSlug = 'olimpiada' | 'blagodatnoe' | 'natalka' | 'kuranah' | 'suhoy-log'
 
 export type SummaryQuery = {
-  shift?: number
+  period?: SummaryPeriod
   production_date?: string
   indicator?: string
   gtk?: string
@@ -57,7 +59,7 @@ export type GraphQuery = {
   gtk?: string
 }
 
-export type GraphPeriod = 'day' | 'month' | 'year'
+export type GraphPeriod = SummaryPeriod
 
 export type GraphPoint = {
   date: string

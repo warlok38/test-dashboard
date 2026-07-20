@@ -1,4 +1,4 @@
-export { PeriodFilter, SHIFT_PARAM } from './PeriodFilter'
+export { PERIOD_PARAM, PeriodFilter } from './PeriodFilter'
 export {
   applyBackendProductionDate,
   commitPeriodProductionDate,
@@ -7,7 +7,8 @@ export {
 } from './model/period-filter-slice'
 export {
   createPeriodRequestParams,
-  getPeriodByShift,
+  getCurrentProductionDate,
+  getPeriodByKey,
   normalizeProductionDate,
   type PeriodKey,
   type PeriodOption

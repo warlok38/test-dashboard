@@ -1,27 +1,27 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
-import { getPeriodByShift, shiftProductionDate } from '../lib'
+import { getPeriodByKey, type PeriodKey, shiftProductionDate } from '../lib'
 
 type PeriodScopePayload = {
-  shift: number
+  periodKey: PeriodKey
   productionDate: string
 }
 
 type ShiftPeriodScopePayload = {
   direction: -1 | 1
   productionDate: string
-  shift: number
+  periodKey: PeriodKey
 }
 
 type PeriodFilterState = {
-  shift: number | null
+  periodKey: PeriodKey | null
   productionDate: string | null
   committedProductionDate: string | null
   isDirty: boolean
 }
 
 const initialState: PeriodFilterState = {
-  shift: null,
+  periodKey: null,
   productionDate: null,
   committedProductionDate: null,
   isDirty: false
@@ -32,39 +32,39 @@ const periodFilterSlice = createSlice({
   initialState,
   reducers: {
     resetPeriodScope: (state, action: PayloadAction<PeriodScopePayload>) => {
-      state.shift = action.payload.shift
+      state.periodKey = action.payload.periodKey
       state.productionDate = action.payload.productionDate
       state.committedProductionDate = action.payload.productionDate
       state.isDirty = false
     },
     setPeriodProductionDate: (state, action: PayloadAction<PeriodScopePayload>) => {
-      state.shift = action.payload.shift
+      state.periodKey = action.payload.periodKey
       state.productionDate = action.payload.productionDate
       state.isDirty = true
     },
     shiftPeriodProductionDate: (state, action: PayloadAction<ShiftPeriodScopePayload>) => {
-      if (state.shift !== action.payload.shift && state.shift !== null) {
+      if (state.periodKey !== action.payload.periodKey && state.periodKey !== null) {
         return
       }
 
       const productionDate = state.productionDate ?? action.payload.productionDate
-      state.shift = action.payload.shift
+      state.periodKey = action.payload.periodKey
       state.productionDate = shiftProductionDate(
-        getPeriodByShift(action.payload.shift),
+        getPeriodByKey(action.payload.periodKey),
         productionDate,
         action.payload.direction
       )
       state.isDirty = true
     },
     commitPeriodProductionDate: (state, action: PayloadAction<PeriodScopePayload>) => {
-      if (state.shift !== action.payload.shift) {
+      if (state.periodKey !== action.payload.periodKey) {
         return
       }
 
       state.committedProductionDate = action.payload.productionDate
     },
     applyBackendProductionDate: (state, action: PayloadAction<PeriodScopePayload>) => {
-      if (state.shift !== action.payload.shift || state.isDirty) {
+      if (state.periodKey !== action.payload.periodKey || state.isDirty) {
         return
       }
 

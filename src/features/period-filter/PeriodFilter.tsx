@@ -10,7 +10,7 @@ import { useAppDispatch, useAppSelector } from '@/shared/hooks'
 import {
   formatPeriodScopeLabel,
   getCurrentProductionDate,
-  getPeriodByShift,
+  getPeriodByKey,
   normalizeProductionDate,
   PERIOD_OPTIONS
 } from './lib'
@@ -21,17 +21,17 @@ import {
 } from './model/period-filter-slice'
 import styles from './PeriodFilter.module.css'
 
-export const SHIFT_PARAM = 'shift'
+export const PERIOD_PARAM = 'period'
 const PERIOD_ARROW_COMMIT_DELAY_MS = 500
 
 const periodSegmentOptions: SegmentedProps['options'] = PERIOD_OPTIONS.map((period) => ({
   label: period.label,
-  value: period.shift,
+  value: period.key,
   disabled: period.disabled
 }))
 
 type PeriodScopeState = {
-  shift: number | null
+  periodKey: string | null
   productionDate: string | null
   committedProductionDate: string | null
 }
@@ -44,32 +44,32 @@ export function PeriodFilter() {
   const periodScope = useAppSelector(
     (state: { periodFilter: PeriodScopeState }) => state.periodFilter
   )
-  const period = getPeriodByShift(searchParams.get(SHIFT_PARAM) ?? undefined)
+  const period = getPeriodByKey(searchParams.get(PERIOD_PARAM) ?? undefined)
   const fallbackProductionDate = useMemo(() => getCurrentProductionDate(), [])
   const activeProductionDate =
-    periodScope.shift === period.shift && periodScope.productionDate
+    periodScope.periodKey === period.key && periodScope.productionDate
       ? periodScope.productionDate
       : normalizeProductionDate(period, fallbackProductionDate)
   const scopeLabel = formatPeriodScopeLabel(period, activeProductionDate)
   const isYearPeriod = period.key === 'year'
 
   useEffect(() => {
-    if (periodScope.shift === period.shift && periodScope.productionDate) {
+    if (periodScope.periodKey === period.key && periodScope.productionDate) {
       return
     }
 
     dispatch(
       resetPeriodScope({
-        shift: period.shift,
+        periodKey: period.key,
         productionDate: normalizeProductionDate(period, fallbackProductionDate)
       })
     )
-  }, [dispatch, fallbackProductionDate, period, periodScope.productionDate, periodScope.shift])
+  }, [dispatch, fallbackProductionDate, period, periodScope.periodKey, periodScope.productionDate])
 
   useEffect(() => {
     if (
       isYearPeriod ||
-      periodScope.shift !== period.shift ||
+      periodScope.periodKey !== period.key ||
       !periodScope.productionDate ||
       periodScope.productionDate === periodScope.committedProductionDate
     ) {
@@ -80,7 +80,7 @@ export function PeriodFilter() {
     const timeoutId = window.setTimeout(() => {
       dispatch(
         commitPeriodProductionDate({
-          shift: period.shift,
+          periodKey: period.key,
           productionDate: nextProductionDate
         })
       )
@@ -92,16 +92,17 @@ export function PeriodFilter() {
   }, [
     dispatch,
     isYearPeriod,
-    period.shift,
+    period.key,
     periodScope.committedProductionDate,
-    periodScope.productionDate,
-    periodScope.shift
+    periodScope.periodKey,
+    periodScope.productionDate
   ])
 
-  const updateUrlShift = (shift: number) => {
+  const updateUrlPeriod = (periodKey: string) => {
     const params = new URLSearchParams(searchParams.toString())
 
-    params.set(SHIFT_PARAM, String(shift))
+    params.set(PERIOD_PARAM, periodKey)
+    params.delete('shift')
     params.delete('dateFrom')
     params.delete('dateTo')
 
@@ -109,17 +110,17 @@ export function PeriodFilter() {
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
   }
 
-  const updatePeriod = (nextShift: number) => {
-    const nextPeriod = getPeriodByShift(nextShift)
+  const updatePeriod = (nextPeriodKey: string) => {
+    const nextPeriod = getPeriodByKey(nextPeriodKey)
     const nextProductionDate = normalizeProductionDate(nextPeriod, fallbackProductionDate)
 
     dispatch(
       resetPeriodScope({
-        shift: nextPeriod.shift,
+        periodKey: nextPeriod.key,
         productionDate: nextProductionDate
       })
     )
-    updateUrlShift(nextPeriod.shift)
+    updateUrlPeriod(nextPeriod.key)
   }
 
   const shiftScope = (direction: -1 | 1) => {
@@ -131,7 +132,7 @@ export function PeriodFilter() {
       shiftPeriodProductionDate({
         direction,
         productionDate: activeProductionDate,
-        shift: period.shift
+        periodKey: period.key
       })
     )
   }
@@ -163,8 +164,8 @@ export function PeriodFilter() {
       <Segmented
         className={styles.periodSegment}
         options={periodSegmentOptions}
-        value={period.shift}
-        onChange={(value) => updatePeriod(Number(value))}
+        value={period.key}
+        onChange={(value) => updatePeriod(String(value))}
       />
     </div>
   )
