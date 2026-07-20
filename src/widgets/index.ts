@@ -1,5 +1,6 @@
 export * from './app-footer'
 export * from './app-layout'
+export * from './assets-map'
 export * from './content-header'
 export * from './header'
 export * from './production-summary-dashboard'

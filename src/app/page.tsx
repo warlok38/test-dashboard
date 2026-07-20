@@ -3,7 +3,7 @@ import {
   type SummarySearchParams
 } from '@/entities/production-summary'
 import { PageShell, PageSurface } from '@/shared/ui'
-import { ContentHeader, ProductionSummaryDashboard } from '@/widgets'
+import { AssetsMap, ContentHeader, ProductionSummaryDashboard } from '@/widgets'
 
 type HomePageProps = {
   searchParams?: SummarySearchParams
@@ -18,6 +18,7 @@ export default function Home({ searchParams }: HomePageProps) {
           query={getSummaryQueryFromSearchParams(searchParams)}
           showGraph
         />
+        <AssetsMap />
       </PageSurface>
     </PageShell>
   )

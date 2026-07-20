@@ -1,0 +1,138 @@
+.mapWidget {
+  min-width: 0;
+  padding: var(--space-4);
+  background: var(--color-bg-default);
+}
+
+.mapContent {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(18rem, 1fr);
+  gap: var(--space-4);
+}
+
+.mapFrame {
+  position: relative;
+  width: 100%;
+  height: clamp(22rem, 42vw, 34rem);
+  overflow: hidden;
+  border: var(--border-width-hairline) solid var(--palette-border-soft);
+  background: var(--color-bg-card);
+}
+
+.map {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.mapDragging {
+  cursor: grabbing;
+}
+
+.mapBase {
+  filter: brightness(0.95);
+}
+
+.regionOverlay {
+  fill: #cfcfcf;
+  stroke: var(--color-bg-card);
+  stroke-width: 2;
+  cursor: pointer;
+  pointer-events: all;
+}
+
+.regionOverlay:hover {
+  fill: rgb(246 191 38 / 28%);
+  stroke: var(--palette-status-warning);
+}
+
+.markerGroup {
+  cursor: pointer;
+}
+
+.marker {
+  fill: var(--palette-status-danger);
+  stroke: var(--color-bg-card);
+  stroke-width: 4;
+}
+
+.markerGroup:hover .marker {
+  fill: var(--palette-status-warning);
+}
+
+.mapControls {
+  position: absolute;
+  z-index: 1;
+  top: var(--space-3);
+  left: var(--space-3);
+  display: inline-flex;
+  overflow: hidden;
+  border: var(--border-width-hairline) solid var(--palette-border-soft);
+  border-radius: var(--radius-5);
+  background: var(--color-bg-card);
+  box-shadow: var(--color-shadow-card);
+}
+
+.mapControlButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-8);
+  height: var(--space-8);
+  padding: 0;
+  border: 0;
+  border-right: var(--border-width-hairline) solid var(--palette-border-soft);
+  color: var(--color-text-strong);
+  background: transparent;
+  cursor: pointer;
+}
+
+.mapControlButton:last-child {
+  border-right: 0;
+}
+
+.mapControlButton:hover {
+  background: var(--color-bg-default);
+}
+
+.detailPanel {
+  display: flex;
+  align-items: flex-start;
+  min-width: 0;
+  min-height: clamp(22rem, 42vw, 34rem);
+  padding: var(--space-4);
+  border: var(--border-width-hairline) solid var(--palette-border-soft);
+  background: var(--color-bg-card);
+  color: var(--color-text-strong);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+@media (--screen-medium) {
+  .mapWidget {
+    padding: var(--space-3);
+  }
+}
+
+@media (--screen-mobile) {
+  .mapWidget {
+    padding: var(--space-4);
+  }
+
+  .mapContent {
+    grid-template-columns: 1fr;
+  }
+
+  .mapFrame {
+    height: 20rem;
+  }
+
+  .detailPanel {
+    min-height: 8rem;
+    padding: var(--space-3);
+  }
+}
