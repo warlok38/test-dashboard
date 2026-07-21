@@ -381,7 +381,7 @@ function GraphTabContent({
   }
 
   const renderDepositsContent = () => {
-    if (!graphWithGtkError) {
+    if (graphWithGtkError) {
       if (error) {
         return null
       }
