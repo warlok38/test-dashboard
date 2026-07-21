@@ -5,15 +5,13 @@
 }
 
 .mapContent {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(18rem, 1fr);
-  gap: var(--space-4);
+  min-width: 0;
 }
 
 .mapFrame {
   position: relative;
   width: 100%;
-  height: clamp(22rem, 42vw, 34rem);
+  height: clamp(22rem, 80dvh, 50rem);
   overflow: hidden;
   border: var(--border-width-hairline) solid var(--palette-border-soft);
   background: var(--color-bg-card);
@@ -65,9 +63,9 @@
 
 .mapControls {
   position: absolute;
-  z-index: 1;
+  z-index: 3;
   top: var(--space-3);
-  left: var(--space-3);
+  right: var(--space-3);
   display: inline-flex;
   overflow: hidden;
   border: var(--border-width-hairline) solid var(--palette-border-soft);
@@ -108,17 +106,46 @@
 }
 
 .detailPanel {
-  display: flex;
+  position: absolute;
+  z-index: 4;
+  top: var(--space-3);
+  bottom: var(--space-3);
+  left: var(--space-3);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: flex-start;
+  width: min(20rem, calc(100% - var(--space-6)));
   min-width: 0;
-  min-height: clamp(22rem, 42vw, 34rem);
   padding: var(--space-4);
   border: var(--border-width-hairline) solid var(--palette-border-soft);
   background: var(--color-bg-card);
+  box-shadow: var(--color-shadow-card);
   color: var(--color-text-strong);
   font-size: var(--font-size-lg);
   font-weight: 600;
   line-height: 1.2;
+}
+
+.detailContent {
+  min-width: 0;
+  padding-top: var(--space-1);
+}
+
+.detailCloseButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-8);
+  height: var(--space-8);
+  padding: 0;
+  border: 0;
+  color: var(--color-text-strong);
+  background: transparent;
+  cursor: pointer;
+}
+
+.detailCloseButton:hover {
+  background: var(--color-bg-default);
 }
 
 @media (--screen-medium) {
@@ -132,16 +159,17 @@
     padding: var(--space-4);
   }
 
-  .mapContent {
-    grid-template-columns: 1fr;
-  }
-
-  .mapFrame {
-    height: 20rem;
+  .mapControls {
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .detailPanel {
-    min-height: 8rem;
+    right: var(--space-3);
+    bottom: auto;
+    width: auto;
+    max-height: calc(100% - var(--space-6));
     padding: var(--space-3);
+    overflow: auto;
   }
 }

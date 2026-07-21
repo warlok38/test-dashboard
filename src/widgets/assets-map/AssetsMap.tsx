@@ -1,12 +1,15 @@
 'use client'
 
-import { MinusOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons'
+import { CloseOutlined, MinusOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons'
 import { Popover } from 'antd'
 import { type MouseEvent, type PointerEvent, useEffect, useRef, useState } from 'react'
 
+import { useScreen } from '@/shared/hooks/useScreen'
+
 import { ASSET_MAP_MARKERS, ASSET_MAP_REGIONS } from './model/assets-map-layers'
 import {
-  DEFAULT_MAP_VIEW_BOX,
+  DEFAULT_DESKTOP_MAP_VIEW_BOX,
+  DEFAULT_MOBILE_MAP_VIEW_BOX,
   MAP_IMAGE_VIEW_BOX,
   MAP_ZOOM_STEP,
   formatViewBox,
@@ -24,13 +27,23 @@ type DragState = {
 }
 
 export function AssetsMap() {
+  const { isSmallScreen } = useScreen()
+  const defaultMapViewBox = isSmallScreen
+    ? DEFAULT_MOBILE_MAP_VIEW_BOX
+    : DEFAULT_DESKTOP_MAP_VIEW_BOX
   const mapRef = useRef<SVGSVGElement>(null)
-  const viewBoxRef = useRef(DEFAULT_MAP_VIEW_BOX)
+  const viewBoxRef = useRef(DEFAULT_DESKTOP_MAP_VIEW_BOX)
   const dragMovedRef = useRef(false)
+  const pendingRegionDetailRef = useRef<string | null>(null)
   const suppressNextRegionClickRef = useRef(false)
-  const [viewBox, setViewBox] = useState<MapViewBox>(DEFAULT_MAP_VIEW_BOX)
+  const [viewBox, setViewBox] = useState<MapViewBox>(DEFAULT_DESKTOP_MAP_VIEW_BOX)
   const [dragState, setDragState] = useState<DragState | null>(null)
-  const [detail, setDetail] = useState('Деталка')
+  const [detail, setDetail] = useState<string | null>(null)
+
+  useEffect(() => {
+    setViewBox(defaultMapViewBox)
+    setDragState(null)
+  }, [defaultMapViewBox])
 
   useEffect(() => {
     viewBoxRef.current = viewBox
@@ -74,7 +87,7 @@ export function AssetsMap() {
   }
 
   const resetMap = () => {
-    setViewBox(DEFAULT_MAP_VIEW_BOX)
+    setViewBox(defaultMapViewBox)
     setDragState(null)
   }
 
@@ -91,6 +104,7 @@ export function AssetsMap() {
 
     event.currentTarget.setPointerCapture(event.pointerId)
     dragMovedRef.current = false
+    pendingRegionDetailRef.current = getRegionDetailFromEventTarget(event.target)
     setDragState({
       pointerId: event.pointerId,
       startClientPoint: {
@@ -146,8 +160,11 @@ export function AssetsMap() {
       window.setTimeout(() => {
         suppressNextRegionClickRef.current = false
       }, 0)
+    } else if (pendingRegionDetailRef.current) {
+      setDetail(pendingRegionDetailRef.current)
     }
 
+    pendingRegionDetailRef.current = null
     setDragState(null)
   }
 
@@ -196,6 +213,19 @@ export function AssetsMap() {
               <ReloadOutlined />
             </button>
           </div>
+          {detail ? (
+            <aside className={styles.detailPanel}>
+              <div className={styles.detailContent}>{detail}</div>
+              <button
+                className={styles.detailCloseButton}
+                title="Закрыть деталку"
+                type="button"
+                onClick={() => setDetail(null)}
+              >
+                <CloseOutlined />
+              </button>
+            </aside>
+          ) : null}
           <svg
             ref={mapRef}
             className={`${styles.map} ${dragState ? styles.mapDragging : ''}`}
@@ -222,10 +252,6 @@ export function AssetsMap() {
                     detail={region.detail}
                     path={region.path}
                     shouldSuppressSelect={() => suppressNextRegionClickRef.current}
-                    onDragStart={startMapDrag}
-                    onPointerCancel={handlePointerUp}
-                    onPointerMove={handlePointerMove}
-                    onPointerUp={handlePointerUp}
                     onSelect={setDetail}
                   />
                 ) : (
@@ -234,10 +260,6 @@ export function AssetsMap() {
                     detail={region.detail}
                     sourceId={region.sourceId}
                     shouldSuppressSelect={() => suppressNextRegionClickRef.current}
-                    onDragStart={startMapDrag}
-                    onPointerCancel={handlePointerUp}
-                    onPointerMove={handlePointerMove}
-                    onPointerUp={handlePointerUp}
                     onSelect={setDetail}
                   />
                 )
@@ -266,7 +288,6 @@ export function AssetsMap() {
             </g>
           </svg>
         </div>
-        <aside className={styles.detailPanel}>{detail}</aside>
       </div>
     </section>
   )
@@ -274,10 +295,6 @@ export function AssetsMap() {
 
 type RegionOverlayProps = {
   detail: string
-  onDragStart: (event: PointerEvent<SVGElement>) => void
-  onPointerCancel: (event: PointerEvent<SVGElement>) => void
-  onPointerMove: (event: PointerEvent<SVGElement>) => void
-  onPointerUp: (event: PointerEvent<SVGElement>) => void
   onSelect: (detail: string) => void
   shouldSuppressSelect: () => boolean
   path?: string
@@ -286,10 +303,6 @@ type RegionOverlayProps = {
 
 function RegionOverlay({
   detail,
-  onDragStart,
-  onPointerCancel,
-  onPointerMove,
-  onPointerUp,
   onSelect,
   path,
   shouldSuppressSelect,
@@ -297,6 +310,7 @@ function RegionOverlay({
 }: RegionOverlayProps) {
   const commonProps = {
     className: styles.regionOverlay,
+    'data-region-detail': detail,
     onClick: (event: MouseEvent<SVGElement>) => {
       event.stopPropagation()
 
@@ -305,11 +319,7 @@ function RegionOverlay({
       }
 
       onSelect(detail)
-    },
-    onPointerCancel,
-    onPointerDown: onDragStart,
-    onPointerMove,
-    onPointerUp
+    }
   }
 
   if (path) {
@@ -319,6 +329,10 @@ function RegionOverlay({
   return sourceId ? (
     <use {...commonProps} href={`/assets-map/russia-map-gray.svg#${sourceId}`} />
   ) : null
+}
+
+function getRegionDetailFromEventTarget(target: EventTarget) {
+  return target instanceof SVGElement ? (target.dataset.regionDetail ?? null) : null
 }
 
 function getRenderedMapScale(rect: DOMRect, viewBox: MapViewBox) {

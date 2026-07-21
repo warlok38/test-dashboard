@@ -27,9 +27,12 @@ const DEFAULT_MAP_VIEW_SIZE = {
 }
 
 const MAX_ZOOMED_OUT_VIEW_SIZE = {
-  width: 2250,
-  height: 1160
+  width: 4500,
+  height: 2320
 }
+
+const VERTICAL_PAN_PADDING_RATIO = 0.45
+const HORIZONTAL_PAN_PADDING_RATIO = 0.45
 
 export const MAP_MIN_ZOOM = DEFAULT_MAP_VIEW_SIZE.width / MAX_ZOOMED_OUT_VIEW_SIZE.width
 
@@ -40,7 +43,21 @@ const DEFAULT_MAP_CENTER = {
   y: 555
 } satisfies MapPoint
 
-export const DEFAULT_MAP_VIEW_BOX = getMapViewBoxForZoom(DEFAULT_MAP_ZOOM)
+export const DEFAULT_DESKTOP_MAP_VIEW_BOX = {
+  x: 80,
+  y: 110,
+  width: 1700,
+  height: 820
+} satisfies MapViewBox
+
+export const DEFAULT_MOBILE_MAP_VIEW_BOX = {
+  x: 640,
+  y: 0,
+  width: 920,
+  height: 1000
+} satisfies MapViewBox
+
+export const DEFAULT_MAP_VIEW_BOX = DEFAULT_DESKTOP_MAP_VIEW_BOX
 
 export function formatViewBox(viewBox: MapViewBox) {
   return `${formatViewBoxNumber(viewBox.x)} ${formatViewBoxNumber(viewBox.y)} ${formatViewBoxNumber(viewBox.width)} ${formatViewBoxNumber(viewBox.height)}`
@@ -86,22 +103,24 @@ export function panMapViewBox(viewBox: MapViewBox, delta: MapPoint): MapViewBox 
 }
 
 function constrainMapViewBox(viewBox: MapViewBox): MapViewBox {
+  const horizontalPanPadding = viewBox.width * HORIZONTAL_PAN_PADDING_RATIO
+  const verticalPanPadding = viewBox.height * VERTICAL_PAN_PADDING_RATIO
   const minX =
     viewBox.width > MAP_IMAGE_VIEW_BOX.width
-      ? MAP_IMAGE_VIEW_BOX.x + MAP_IMAGE_VIEW_BOX.width - viewBox.width
-      : MAP_IMAGE_VIEW_BOX.x
+      ? MAP_IMAGE_VIEW_BOX.x + MAP_IMAGE_VIEW_BOX.width - viewBox.width - horizontalPanPadding
+      : MAP_IMAGE_VIEW_BOX.x - horizontalPanPadding
   const maxX =
     viewBox.width > MAP_IMAGE_VIEW_BOX.width
-      ? MAP_IMAGE_VIEW_BOX.x
-      : MAP_IMAGE_VIEW_BOX.x + MAP_IMAGE_VIEW_BOX.width - viewBox.width
+      ? MAP_IMAGE_VIEW_BOX.x + horizontalPanPadding
+      : MAP_IMAGE_VIEW_BOX.x + MAP_IMAGE_VIEW_BOX.width - viewBox.width + horizontalPanPadding
   const minY =
     viewBox.height > MAP_IMAGE_VIEW_BOX.height
-      ? MAP_IMAGE_VIEW_BOX.y + MAP_IMAGE_VIEW_BOX.height - viewBox.height
-      : MAP_IMAGE_VIEW_BOX.y
+      ? MAP_IMAGE_VIEW_BOX.y + MAP_IMAGE_VIEW_BOX.height - viewBox.height - verticalPanPadding
+      : MAP_IMAGE_VIEW_BOX.y - verticalPanPadding
   const maxY =
     viewBox.height > MAP_IMAGE_VIEW_BOX.height
-      ? MAP_IMAGE_VIEW_BOX.y
-      : MAP_IMAGE_VIEW_BOX.y + MAP_IMAGE_VIEW_BOX.height - viewBox.height
+      ? MAP_IMAGE_VIEW_BOX.y + verticalPanPadding
+      : MAP_IMAGE_VIEW_BOX.y + MAP_IMAGE_VIEW_BOX.height - viewBox.height + verticalPanPadding
 
   return {
     ...viewBox,
