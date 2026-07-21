@@ -26,7 +26,7 @@ export default function GtkPage({ params, searchParams }: GtkPageProps) {
     <PageShell>
       <ContentHeader
         breadcrumbs={[
-          { label: 'Группа', href: '/', icon: homeBreadcrumbIcon },
+          { label: 'ГРУППА', href: '/', icon: homeBreadcrumbIcon },
           { label: gtkName.toUpperCase() }
         ]}
       />

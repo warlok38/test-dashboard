@@ -309,7 +309,10 @@ function GraphTabContent({
 
   const renderDepositsContent = () => {
     if (graphWithGtkError) {
-      return null
+      if (error) {
+        return null
+      }
+      return <ApiErrorAlert error={graphWithGtkError} title="Не удалось загрузить детали" />
     }
 
     if (depositDetails.length === 0) {

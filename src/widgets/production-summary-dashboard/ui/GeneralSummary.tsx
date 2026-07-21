@@ -2,7 +2,7 @@ import { DownOutlined, UpOutlined } from '@ant-design/icons'
 import classNames from 'classnames'
 import { Empty, Popover } from 'antd'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useState } from 'react'
+import { CSSProperties, useState } from 'react'
 
 import {
   type GeneralSummaryCard,
@@ -54,7 +54,17 @@ export function GeneralSummary({
       <div className={styles.generalSummaryWrapper}>
         <div className={styles.generalSummary}>
           <div className={styles.generalSummaryTopIndicator}>
-            <Card card={cards[0]} selectable={false} size="lg" />
+            <Card
+              card={cards[0]}
+              size="lg"
+              style={{ border: 'none' }}
+              active={cards[0].indicator_name === activeIndicator}
+            />
+            {cards?.[1] && (
+              <div>
+                <Card card={cards[1]} selectable={false} size="sm" style={{ border: 'none' }} />
+              </div>
+            )}
           </div>
           <div className={styles.generalSummaryIndicatorsWrapper}>
             <div className={styles.generalSummaryIndicators}>
@@ -124,6 +134,7 @@ type CardProps = {
   active?: boolean
   selectable?: boolean
   size?: 'lg' | 'md' | 'sm'
+  style?: CSSProperties
 }
 
 const INDICATOR_PARAM = 'indicator'
@@ -173,7 +184,7 @@ function GtkBreakdownPopover({ breakdowns }: { breakdowns: GeneralSummaryGtkBrea
   )
 }
 
-export function Card({ active = false, card, selectable = true, size = 'md' }: CardProps) {
+export function Card({ active = false, card, selectable = true, size = 'md', style }: CardProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -210,6 +221,7 @@ export function Card({ active = false, card, selectable = true, size = 'md' }: C
         }
       )}
       onClick={selectIndicator}
+      style={style}
     >
       <div className={styles.generalSummaryCardTitleWrapper}>
         <span

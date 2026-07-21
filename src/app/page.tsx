@@ -12,7 +12,7 @@ type HomePageProps = {
 export default function Home({ searchParams }: HomePageProps) {
   return (
     <PageShell>
-      <ContentHeader breadcrumbs={[{ label: 'Группа' }]} />
+      <ContentHeader breadcrumbs={[{ label: 'ГРУППА' }]} />
       <PageSurface variant="constrained">
         <ProductionSummaryDashboard
           query={getSummaryQueryFromSearchParams(searchParams)}
