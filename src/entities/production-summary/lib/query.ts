@@ -1,7 +1,7 @@
 import { type SummaryPeriod, type SummaryQuery } from '../model/types'
 
 const DEFAULT_PERIOD: SummaryPeriod = 'day'
-const SUPPORTED_PERIODS = new Set<SummaryPeriod>(['day', 'month', 'year'])
+const SUPPORTED_PERIODS = new Set<SummaryPeriod>(['day', 'week', 'month', 'quarter', 'year'])
 
 type SearchParamValue = string | string[] | undefined
 

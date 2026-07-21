@@ -1,6 +1,6 @@
 export type SummarySeverity = 'critical' | 'warning' | 'info' | string
 
-export type SummaryPeriod = 'day' | 'month' | 'year'
+export type SummaryPeriod = 'day' | 'week' | 'month' | 'quarter' | 'year'
 
 export type GtkName = string
 

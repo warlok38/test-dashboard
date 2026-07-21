@@ -145,6 +145,7 @@ export function PeriodFilter() {
           disabled={isYearPeriod}
           icon={<LeftOutlined />}
           type="text"
+          size="large"
           onClick={() => shiftScope(-1)}
         />
         <span className={styles.scopeLabel}>
@@ -158,6 +159,7 @@ export function PeriodFilter() {
           disabled={isYearPeriod}
           icon={<RightOutlined />}
           type="text"
+          size="large"
           onClick={() => shiftScope(1)}
         />
       </div>
@@ -165,6 +167,7 @@ export function PeriodFilter() {
         className={styles.periodSegment}
         options={periodSegmentOptions}
         value={period.key}
+        size="large"
         onChange={(value) => updatePeriod(String(value))}
       />
     </div>

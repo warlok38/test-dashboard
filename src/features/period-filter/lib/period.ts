@@ -1,4 +1,4 @@
-export type PeriodKey = 'day' | 'month' | 'year'
+export type PeriodKey = 'day' | 'week' | 'month' | 'quarter' | 'year'
 
 export type PeriodOption = {
   key: PeriodKey
@@ -20,8 +20,9 @@ export const DEFAULT_PERIOD_KEY: PeriodKey = 'day'
 
 export const PERIOD_OPTIONS: PeriodOption[] = [
   { key: 'day', label: 'Сутки' },
+  { key: 'week', label: 'Неделя', disabled: true },
   { key: 'month', label: 'Месяц' },
-  // TODO: уточнить код смены для периода "год"
+  { key: 'quarter', label: 'Квартал', disabled: true },
   { key: 'year', label: 'Год', disabled: true }
 ]
 

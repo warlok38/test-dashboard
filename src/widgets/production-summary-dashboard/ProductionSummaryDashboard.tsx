@@ -36,7 +36,12 @@ function getSelectedGeneralSummaryIndicator(
   cards: GeneralSummaryCard[],
   indicator: string | undefined
 ) {
-  const indicators = cards[0]?.cards ?? []
+  let topIndicators: GeneralSummaryCard[] = []
+  if (indicator) {
+    topIndicators = cards?.[0] ? [cards[0]] : []
+  }
+  const detailIndicators = cards[0]?.cards ?? []
+  const indicators = [...topIndicators, ...detailIndicators]
 
   return indicators.some((card) => card.indicator_name === indicator)
     ? indicator

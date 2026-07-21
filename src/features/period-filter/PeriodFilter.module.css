@@ -13,12 +13,12 @@
 }
 
 .scopeLabel {
-  min-width: 4.5rem;
+  min-width: 7.5rem;
   display: inline-flex;
   align-items: baseline;
   justify-content: center;
   gap: var(--space-1);
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl);
   font-weight: 500;
   color: var(--ant-color-text);
   text-transform: lowercase;
@@ -26,7 +26,7 @@
 
 .scopeLabelSecondary {
   color: var(--ant-color-text-tertiary);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   font-weight: 500;
 }
 
@@ -39,6 +39,7 @@
 }
 
 .periodSegment :global(.ant-segmented-item-label) {
+  font-size: var(--font-size-lg) !important;
   font-weight: 500;
 }
 
