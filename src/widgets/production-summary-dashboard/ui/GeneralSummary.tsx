@@ -12,6 +12,7 @@ import { Loader } from '@/shared/ui'
 import { formatNumber } from '@/shared/utils/formatNumber'
 
 import styles from '../ProductionSummaryDashboard.module.css'
+import { SideActions } from './SideActions'
 
 type GeneralSummaryProps = {
   cards: GeneralSummaryCard[]
@@ -116,14 +117,16 @@ export function GeneralSummary({
             )}
           </div>
         </div>
-        <div
-          className={styles.generalSummaryShowAll}
-          title={showAllLabel}
-          onClick={() => setIsShowAll(!isShowAll)}
-        >
-          <span>{showAllLabel}</span>
-          {isShowAll ? <UpOutlined /> : <DownOutlined />}
-        </div>
+        <SideActions
+          actions={[
+            {
+              icon: isShowAll ? <UpOutlined /> : <DownOutlined />,
+              key: 'show-all',
+              label: showAllLabel,
+              onClick: () => setIsShowAll(!isShowAll)
+            }
+          ]}
+        />
       </div>
     </Loader>
   )

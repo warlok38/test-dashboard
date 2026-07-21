@@ -1,7 +1,16 @@
 'use client'
 
-import { BarChartOutlined, LineChartOutlined, SettingOutlined } from '@ant-design/icons'
-import { Button, Popover, Segmented, Tabs } from 'antd'
+import {
+  AppstoreOutlined,
+  BarChartOutlined,
+  CarOutlined,
+  LineChartOutlined,
+  PartitionOutlined,
+  PercentageOutlined,
+  SettingOutlined,
+  TruckOutlined
+} from '@ant-design/icons'
+import { Popover, Segmented, Tabs, Tooltip } from 'antd'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 
 import {
@@ -13,7 +22,7 @@ import {
   type GraphQuery,
   type GraphWithGtkDetail
 } from '@/entities/production-summary'
-import { ApiErrorAlert, Loader } from '@/shared/ui'
+import { ApiErrorAlert, Empty, Loader } from '@/shared/ui'
 
 import styles from '../ProductionSummaryDashboard.module.css'
 import {
@@ -22,6 +31,7 @@ import {
   type GraphSeriesKey,
   type GraphSeriesView
 } from './graph-chart'
+import { SideActions } from './SideActions'
 
 const GRAPH_LOADING_OVERLAY_DELAY_MS = 400
 const MAIN_TAB_KEY = 'main'
@@ -49,6 +59,40 @@ const SERIES_VIEW_OPTIONS: Array<{ label: ReactNode; value: GraphSeriesView }> =
   }
 ]
 
+type GraphDetailMode = 'quarry' | 'stage' | 'park' | 'parkPercent' | 'block'
+
+const GRAPH_DETAIL_MODE_OPTIONS: Array<{
+  icon: ReactNode
+  label: string
+  value: GraphDetailMode
+}> = [
+  {
+    icon: <TruckOutlined />,
+    label: 'Карьер',
+    value: 'quarry'
+  },
+  {
+    icon: <PartitionOutlined />,
+    label: 'Этап',
+    value: 'stage'
+  },
+  {
+    icon: <CarOutlined />,
+    label: 'Парк',
+    value: 'park'
+  },
+  {
+    icon: <PercentageOutlined />,
+    label: 'Парк %',
+    value: 'parkPercent'
+  },
+  {
+    icon: <AppstoreOutlined />,
+    label: 'Блок',
+    value: 'block'
+  }
+]
+
 type GraphPanelQuery = Pick<GraphQuery, 'indicator' | 'gtk' | 'shift' | 'production_date'>
 
 type GraphPanelProps = {
@@ -57,6 +101,8 @@ type GraphPanelProps = {
 }
 
 type GraphControlsProps = {
+  activeDetailMode: GraphDetailMode
+  onDetailModeChange: (detailMode: GraphDetailMode) => void
   seriesView: Record<GraphSeriesKey, GraphSeriesView>
   onSeriesViewChange: (seriesKey: GraphSeriesKey, view: GraphSeriesView) => void
 }
@@ -121,7 +167,12 @@ function getDetailTabKey(indicator: string) {
   return `detail:${indicator}`
 }
 
-function GraphControls({ seriesView, onSeriesViewChange }: GraphControlsProps) {
+function GraphControls({
+  activeDetailMode,
+  onDetailModeChange,
+  seriesView,
+  onSeriesViewChange
+}: GraphControlsProps) {
   const content = (
     <div className={styles.graphSettingsMenu}>
       <div className={styles.graphViewControls}>
@@ -141,22 +192,44 @@ function GraphControls({ seriesView, onSeriesViewChange }: GraphControlsProps) {
   )
 
   return (
-    <Popover
-      classNames={{
-        content: styles.graphSettingsPopoverContent,
-        root: styles.graphSettingsPopoverRoot
-      }}
-      content={content}
-      placement="bottomRight"
-      trigger={['hover', 'click']}
+    <SideActions
+      actions={[
+        {
+          icon: <SettingOutlined />,
+          key: 'settings',
+          label: 'Настройки отображения',
+          render: (button) => (
+            <Popover
+              classNames={{
+                content: styles.graphSettingsPopoverContent,
+                root: styles.graphSettingsPopoverRoot
+              }}
+              content={content}
+              placement="leftTop"
+              trigger={['click']}
+            >
+              {button}
+            </Popover>
+          )
+        }
+      ]}
     >
-      <Button
-        className={styles.graphSettingsButton}
-        icon={<SettingOutlined />}
-        title="Настройки отображения"
-        type="text"
+      <Segmented<GraphDetailMode>
+        className={styles.graphDetailModeSelector}
+        options={GRAPH_DETAIL_MODE_OPTIONS.map((option) => ({
+          label: (
+            <Tooltip placement="left" title={option.label}>
+              <span className={styles.graphDetailModeIcon}>{option.icon}</span>
+            </Tooltip>
+          ),
+          value: option.value
+        }))}
+        size="small"
+        value={activeDetailMode}
+        vertical
+        onChange={onDetailModeChange}
       />
-    </Popover>
+    </SideActions>
   )
 }
 
@@ -308,7 +381,7 @@ function GraphTabContent({
   }
 
   const renderDepositsContent = () => {
-    if (graphWithGtkError) {
+    if (!graphWithGtkError) {
       if (error) {
         return null
       }
@@ -340,7 +413,7 @@ function GraphTabContent({
         )
       }
 
-      return <div className={styles.emptyState}>Нет данных по месторождениям</div>
+      return <Empty />
     }
 
     return (
@@ -378,6 +451,9 @@ function GraphTabContent({
 function GraphTabsPanel({ graphPeriod, query }: GraphPanelProps) {
   const [activeTabKey, setActiveTabKey] = useState(MAIN_TAB_KEY)
   const [visitedTabKeys, setVisitedTabKeys] = useState<Set<string>>(() => new Set([MAIN_TAB_KEY]))
+  const [activeDetailMode, setActiveDetailMode] = useState<GraphDetailMode>(
+    GRAPH_DETAIL_MODE_OPTIONS[0].value
+  )
   const [mainMeasureUnit, setMainMeasureUnit] = useState<string | undefined>()
   const [seriesView, setSeriesView] = useState<Record<GraphSeriesKey, GraphSeriesView>>({
     plan: 'bar',
@@ -488,12 +564,9 @@ function GraphTabsPanel({ graphPeriod, query }: GraphPanelProps) {
   }
 
   const detailsStatus = renderDetailsStatus()
-  const tabBarExtraContent = (
-    <div className={styles.graphTabsExtra}>
-      {detailsStatus}
-      <GraphControls seriesView={seriesView} onSeriesViewChange={updateSeriesView} />
-    </div>
-  )
+  const tabBarExtraContent = detailsStatus ? (
+    <div className={styles.graphTabsExtra}>{detailsStatus}</div>
+  ) : undefined
 
   if (!query?.indicator) {
     return <div className={styles.emptyState}>Нет показателя для графика</div>
@@ -502,13 +575,21 @@ function GraphTabsPanel({ graphPeriod, query }: GraphPanelProps) {
   return (
     <div className={styles.graphPanelStack}>
       <section className={styles.graphPanel}>
-        <Tabs
-          activeKey={activeTab?.key}
-          className={styles.graphTabs}
-          destroyOnHidden={false}
-          items={tabItems}
-          tabBarExtraContent={tabBarExtraContent}
-          onChange={setActiveTabKey}
+        <div className={styles.graphPanelContent}>
+          <Tabs
+            activeKey={activeTab?.key}
+            className={styles.graphTabs}
+            destroyOnHidden={false}
+            items={tabItems}
+            tabBarExtraContent={tabBarExtraContent}
+            onChange={setActiveTabKey}
+          />
+        </div>
+        <GraphControls
+          activeDetailMode={activeDetailMode}
+          seriesView={seriesView}
+          onDetailModeChange={setActiveDetailMode}
+          onSeriesViewChange={updateSeriesView}
         />
       </section>
     </div>

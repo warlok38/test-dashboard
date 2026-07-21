@@ -169,20 +169,109 @@
   min-width: 0;
 }
 
-.generalSummaryShowAll {
+.sideActions {
   display: flex;
-  flex: 0 0 var(--space-8);
+  flex: 0 0 var(--space-12);
+  flex-direction: column;
   gap: var(--space-2);
+  align-items: center;
+  width: var(--space-12);
+  padding: var(--space-3) var(--space-2);
+  border-left: var(--border-width-hairline) solid var(--palette-dashboard-card-border);
+  background: var(--color-bg-card);
+}
+
+.sideActionTarget {
+  display: inline-flex;
+}
+
+.sideActionsChildren {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: var(--space-1);
+  padding-top: var(--space-2);
+  border-top: var(--border-width-hairline) solid var(--palette-dashboard-card-border);
+}
+
+.sideActionButton.sideActionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--space-8);
+  width: var(--space-8);
+  height: var(--space-8);
+  padding: 0;
+  border-radius: 50%;
+  color: var(--color-text-muted);
+  background: var(--palette-bg-muted);
+}
+
+.sideActionButton.sideActionButton:hover,
+.sideActionButton.sideActionButton:focus-visible {
+  color: var(--color-text-strong);
+  background: var(--color-bg-interactive-hover);
+}
+
+.graphDetailModeSelector.graphDetailModeSelector {
+  padding: 0;
+  background: transparent;
+}
+
+.graphDetailModeSelector.graphDetailModeSelector :global(.ant-segmented-group) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.graphDetailModeSelector.graphDetailModeSelector :global(.ant-segmented-thumb) {
+  border-radius: var(--radius-5);
+  background: var(--color-kpi-fact);
+  box-shadow: none;
+}
+
+.graphDetailModeSelector.graphDetailModeSelector :global(.ant-segmented-item) {
+  display: flex;
   align-items: center;
   justify-content: center;
   width: var(--space-8);
-  padding: var(--space-2) var(--space-1);
-  border-left: var(--border-width-hairline) solid var(--palette-dashboard-card-border);
+  height: var(--space-8);
+  min-height: var(--space-8);
+  border-radius: 50%;
   color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  white-space: nowrap;
-  writing-mode: vertical-rl;
-  cursor: pointer;
+  background: transparent;
+}
+
+.graphDetailModeSelector.graphDetailModeSelector :global(.ant-segmented-item-label) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--space-8);
+  padding: 0;
+  line-height: 1;
+}
+
+.graphDetailModeSelector.graphDetailModeSelector
+  :global(.ant-segmented-item:not(.ant-segmented-item-selected):hover) {
+  color: var(--color-text-strong);
+  background: var(--color-bg-interactive-hover);
+}
+
+.graphDetailModeSelector.graphDetailModeSelector
+  :global(.ant-segmented-item-selected.ant-segmented-item-selected) {
+  color: var(--palette-accent-on-solid);
+  background: var(--color-kpi-fact);
+  box-shadow: none;
+}
+
+.graphDetailModeIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-8);
+  height: var(--space-8);
+  font-size: var(--font-size-base);
 }
 
 .generalSummaryTopIndicator {
@@ -708,11 +797,19 @@
 }
 
 .graphPanel {
-  padding: var(--space-3) var(--space-4);
+  display: flex;
+  overflow: hidden;
+  padding: 0;
   border: var(--border-width-hairline) solid var(--palette-border-soft);
   border-radius: var(--radius-5);
   background: var(--color-bg-card);
   box-shadow: var(--color-shadow-card);
+}
+
+.graphPanelContent {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
 }
 
 .graphHeader {
@@ -1040,12 +1137,33 @@
     min-width: 0;
   }
 
-  .generalSummaryShowAll {
+  .generalSummaryWrapper .sideActions,
+  .graphPanel .sideActions {
     flex: initial;
     width: 100%;
-    padding: 0;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding: var(--space-2);
     border-left: none;
-    writing-mode: initial;
+    border-top: var(--border-width-hairline) solid var(--palette-dashboard-card-border);
+  }
+
+  .graphPanel .sideActionsChildren {
+    width: auto;
+    margin-top: 0;
+    margin-left: var(--space-1);
+    padding-top: 0;
+    padding-left: var(--space-2);
+    border-top: none;
+    border-left: var(--border-width-hairline) solid var(--palette-dashboard-card-border);
+  }
+
+  .graphDetailModeSelector.graphDetailModeSelector :global(.ant-segmented-group) {
+    flex-direction: row;
+  }
+
+  .graphPanel {
+    flex-direction: column;
   }
 
   .kpiGrid,
