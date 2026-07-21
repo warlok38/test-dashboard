@@ -101,7 +101,7 @@ function formatCompactAxisNumber(value: string | number | undefined) {
     return `${Number((numberValue / 1_000_000).toFixed(1)).toString()}m`
   }
 
-  if (Math.abs(numberValue) >= 10_000) {
+  if (Math.abs(numberValue) >= 1_000) {
     return `${Number((numberValue / 1_000).toFixed(1)).toString()}k`
   }
 
