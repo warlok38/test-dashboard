@@ -38,6 +38,34 @@
   color: var(--ant-color-text-disabled);
 }
 
+.periodSegment:global(.ant-segmented) {
+  background: transparent;
+}
+
+.periodSegment :global(.ant-segmented-group) {
+  align-items: center;
+}
+
+.periodSegment :global(.ant-segmented-item) {
+  position: relative;
+}
+
+.periodSegment :global(.ant-segmented-item:not(:last-child)) {
+  margin-inline-end: var(--space-2);
+}
+
+.periodSegment :global(.ant-segmented-item:not(:last-child)::before) {
+  content: '|';
+  position: absolute;
+  inset-inline-end: calc(var(--space-2) / -2);
+  top: 50%;
+  z-index: 2;
+  color: var(--ant-color-border);
+  font-weight: 400;
+  transform: translate(50%, -50%);
+  pointer-events: none;
+}
+
 .periodSegment :global(.ant-segmented-item-label) {
   font-size: var(--font-size-lg) !important;
   font-weight: 500;
