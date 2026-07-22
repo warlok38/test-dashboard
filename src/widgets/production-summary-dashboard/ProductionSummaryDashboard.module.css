@@ -214,6 +214,43 @@
   background: var(--color-bg-interactive-hover);
 }
 
+.cameraToggle {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.0625rem;
+  width: var(--space-8);
+  padding: 0;
+  border: 0;
+  color: var(--color-text-muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.cameraToggleIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-8);
+  height: 1.125rem;
+  font-size: var(--font-size-base);
+  line-height: 1;
+}
+
+.cameraSwitch.cameraSwitch {
+  min-width: var(--space-8);
+  height: var(--space-5);
+  pointer-events: none;
+}
+
+.cameraSwitch.cameraSwitch:global(.ant-switch-checked) {
+  background: var(--color-kpi-fact);
+}
+
+.cameraSwitch.cameraSwitch:global(.ant-switch-checked):hover {
+  background: var(--color-kpi-fact);
+}
+
 .graphDetailModeSelector.graphDetailModeSelector {
   padding: 0;
   background: transparent;
@@ -906,6 +943,25 @@
   min-width: 0;
 }
 
+.graphMainChartArea {
+  position: relative;
+  min-width: 0;
+}
+
+.graphVideoOverlay {
+  position: absolute;
+  z-index: 3;
+  top: var(--space-2);
+  right: var(--space-2);
+  width: min(20rem, 28%);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: var(--border-width-hairline) solid color-mix(in srgb, var(--color-bg-card) 30%, #000);
+  border-radius: var(--radius-5);
+  background: #000;
+  box-shadow: var(--color-shadow-card);
+}
+
 .graphEmptyChartLabel {
   position: absolute;
   inset: 0;
@@ -1190,5 +1246,9 @@
 
   .graphTabs :global(.ant-tabs-tab + .ant-tabs-tab) {
     margin-left: var(--space-3);
+  }
+
+  .graphVideoOverlay {
+    width: min(12rem, 45%);
   }
 }

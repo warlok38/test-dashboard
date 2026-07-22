@@ -8,9 +8,11 @@ import {
   PartitionOutlined,
   PercentageOutlined,
   SettingOutlined,
+  VideoCameraFilled,
+  VideoCameraOutlined,
   TruckOutlined
 } from '@ant-design/icons'
-import { Popover, Segmented, Tabs, Tooltip } from 'antd'
+import { Popover, Segmented, Switch, Tabs, Tooltip } from 'antd'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 
 import {
@@ -22,7 +24,7 @@ import {
   type GraphQuery,
   type GraphWithGtkDetail
 } from '@/entities/production-summary'
-import { ApiErrorAlert, Empty, Loader } from '@/shared/ui'
+import { ApiErrorAlert, Empty, Loader, VideoStream } from '@/shared/ui'
 
 import styles from '../ProductionSummaryDashboard.module.css'
 import {
@@ -102,7 +104,9 @@ type GraphPanelProps = {
 
 type GraphControlsProps = {
   activeDetailMode: GraphDetailMode
+  isCameraVisible: boolean
   onDetailModeChange: (detailMode: GraphDetailMode) => void
+  onCameraVisibleChange: (isVisible: boolean) => void
   seriesView: Record<GraphSeriesKey, GraphSeriesView>
   onSeriesViewChange: (seriesKey: GraphSeriesKey, view: GraphSeriesView) => void
 }
@@ -169,7 +173,9 @@ function getDetailTabKey(indicator: string) {
 
 function GraphControls({
   activeDetailMode,
+  isCameraVisible,
   onDetailModeChange,
+  onCameraVisibleChange,
   seriesView,
   onSeriesViewChange
 }: GraphControlsProps) {
@@ -190,6 +196,7 @@ function GraphControls({
       </div>
     </div>
   )
+  const cameraToggleIcon = isCameraVisible ? <VideoCameraFilled /> : <VideoCameraOutlined />
 
   return (
     <SideActions
@@ -210,6 +217,21 @@ function GraphControls({
             >
               {button}
             </Popover>
+          )
+        },
+        {
+          icon: <VideoCameraOutlined />,
+          key: 'cameras',
+          label: isCameraVisible ? 'Выключить камеры' : 'Включить камеры',
+          render: () => (
+            <button
+              className={styles.cameraToggle}
+              type="button"
+              onClick={() => onCameraVisibleChange(!isCameraVisible)}
+            >
+              <span className={styles.cameraToggleIcon}>{cameraToggleIcon}</span>
+              <Switch checked={isCameraVisible} className={styles.cameraSwitch} size="small" />
+            </button>
           )
         }
       ]}
@@ -280,10 +302,12 @@ function GraphTabContent({
   indicator,
   onMeasureUnitChange,
   parentGraphQuery,
+  isCameraVisible,
   seriesView
 }: {
   graphPeriod: GraphPeriod
   indicator: string
+  isCameraVisible: boolean
   onMeasureUnitChange?: (measureUnit: string | undefined) => void
   parentGraphQuery: GraphQuery | undefined
   seriesView: Record<GraphSeriesKey, GraphSeriesView>
@@ -368,15 +392,22 @@ function GraphTabContent({
     }
 
     return (
-      <GraphChart
-        data={data}
-        dataKey={dataKey}
-        emptyText="Нет данных для графика"
-        graphPeriod={displayedGraphPeriod}
-        isUpdating={isInitialLoading || shouldShowUpdatingOverlay}
-        seriesView={seriesView}
-        updatingText={isInitialLoading ? 'Загрузка...' : 'Обновление...'}
-      />
+      <div className={styles.graphMainChartArea}>
+        <GraphChart
+          data={data}
+          dataKey={dataKey}
+          emptyText="Нет данных для графика"
+          graphPeriod={displayedGraphPeriod}
+          isUpdating={isInitialLoading || shouldShowUpdatingOverlay}
+          seriesView={seriesView}
+          updatingText={isInitialLoading ? 'Загрузка...' : 'Обновление...'}
+        />
+        {isCameraVisible ? (
+          <div className={styles.graphVideoOverlay}>
+            <VideoStream />
+          </div>
+        ) : null}
+      </div>
     )
   }
 
@@ -455,6 +486,7 @@ function GraphTabsPanel({ graphPeriod, query }: GraphPanelProps) {
     GRAPH_DETAIL_MODE_OPTIONS[0].value
   )
   const [mainMeasureUnit, setMainMeasureUnit] = useState<string | undefined>()
+  const [isCameraVisible, setIsCameraVisible] = useState(false)
   const [seriesView, setSeriesView] = useState<Record<GraphSeriesKey, GraphSeriesView>>({
     plan: 'bar',
     fact: 'bar'
@@ -544,6 +576,7 @@ function GraphTabsPanel({ graphPeriod, query }: GraphPanelProps) {
       <GraphTabContent
         graphPeriod={graphPeriod}
         indicator={tab.indicator}
+        isCameraVisible={isCameraVisible}
         onMeasureUnitChange={tab.key === MAIN_TAB_KEY ? setMainMeasureUnit : undefined}
         parentGraphQuery={graphQuery}
         seriesView={seriesView}
@@ -587,7 +620,9 @@ function GraphTabsPanel({ graphPeriod, query }: GraphPanelProps) {
         </div>
         <GraphControls
           activeDetailMode={activeDetailMode}
+          isCameraVisible={isCameraVisible}
           seriesView={seriesView}
+          onCameraVisibleChange={setIsCameraVisible}
           onDetailModeChange={setActiveDetailMode}
           onSeriesViewChange={updateSeriesView}
         />
