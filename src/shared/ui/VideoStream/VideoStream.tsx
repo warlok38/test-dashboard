@@ -4,15 +4,20 @@ import { useEffect, useRef } from 'react'
 
 import Hls from 'hls.js'
 
+import { DEFAULT_CAMERA_STREAM } from './settings'
 import styles from './VideoStream.module.css'
 
-const STREAM_URL = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8'
-
 type VideoStreamProps = {
+  controls?: boolean
+  isPlaying?: boolean
   src?: string
 }
 
-export function VideoStream({ src = STREAM_URL }: VideoStreamProps) {
+export function VideoStream({
+  controls = true,
+  isPlaying = true,
+  src = DEFAULT_CAMERA_STREAM.previewSrc
+}: VideoStreamProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const hlsRef = useRef<Hls | null>(null)
 
@@ -69,9 +74,27 @@ export function VideoStream({ src = STREAM_URL }: VideoStreamProps) {
     }
   }, [src])
 
+  useEffect(() => {
+    const video = videoRef.current
+
+    if (!video) {
+      return
+    }
+
+    if (isPlaying) {
+      void video.play().catch(() => {
+        // Autoplay blocked - user interaction required.
+      })
+
+      return
+    }
+
+    video.pause()
+  }, [isPlaying])
+
   return (
     <div className={styles.streamContainer}>
-      <video ref={videoRef} className={styles.streamVideo} controls muted playsInline />
+      <video ref={videoRef} className={styles.streamVideo} controls={controls} muted playsInline />
     </div>
   )
 }

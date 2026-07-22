@@ -214,40 +214,25 @@
   background: var(--color-bg-interactive-hover);
 }
 
-.cameraToggle {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.0625rem;
-  width: var(--space-8);
-  padding: 0;
-  border: 0;
-  color: var(--color-text-muted);
-  background: transparent;
-  cursor: pointer;
-}
-
-.cameraToggleIcon {
+.cameraToggleButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-width: var(--space-8);
   width: var(--space-8);
-  height: 1.125rem;
+  height: var(--space-8);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-5);
+  color: var(--color-text-muted);
+  background: transparent;
+  cursor: pointer;
   font-size: var(--font-size-base);
   line-height: 1;
 }
 
-.cameraSwitch.cameraSwitch {
-  min-width: var(--space-8);
-  height: var(--space-5);
-  pointer-events: none;
-}
-
-.cameraSwitch.cameraSwitch:global(.ant-switch-checked) {
-  background: var(--color-kpi-fact);
-}
-
-.cameraSwitch.cameraSwitch:global(.ant-switch-checked):hover {
+.cameraToggleButtonActive {
+  color: #000;
   background: var(--color-kpi-fact);
 }
 
@@ -844,6 +829,7 @@
 }
 
 .graphPanelContent {
+  position: relative;
   flex: 1 1 auto;
   min-width: 0;
   padding: var(--space-3) var(--space-4);
@@ -951,15 +937,82 @@
 .graphVideoOverlay {
   position: absolute;
   z-index: 3;
-  top: var(--space-2);
-  right: var(--space-2);
-  width: min(20rem, 28%);
+  top: var(--space-4);
+  right: var(--space-4);
+  width: min(20rem, 17%);
   aspect-ratio: 16 / 9;
   overflow: hidden;
   border: var(--border-width-hairline) solid color-mix(in srgb, var(--color-bg-card) 30%, #000);
   border-radius: var(--radius-5);
   background: #000;
   box-shadow: var(--color-shadow-card);
+}
+
+.graphVideoPreviewButton {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: block;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.graphVideoPreviewHover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: rgb(0 0 0 / 36%);
+  font-size: var(--font-size-2xl);
+  opacity: 0;
+  transition: opacity 0.16s ease;
+  pointer-events: none;
+}
+
+.graphVideoPreviewButton:hover .graphVideoPreviewHover,
+.graphVideoPreviewButton:focus-visible .graphVideoPreviewHover {
+  opacity: 1;
+}
+
+.graphCameraModal.graphCameraModal :global(.ant-modal-content) {
+  padding: var(--space-5);
+}
+
+.graphCameraModal.graphCameraModal :global(.ant-modal-header) {
+  margin-bottom: var(--space-4);
+}
+
+.graphCameraModal.graphCameraModal :global(.ant-modal-title) {
+  color: var(--color-text-strong);
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.graphCameraModalContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.graphCameraModalVideo {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-5);
+  background: #000;
+}
+
+.graphCameraModalDescription {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-base);
+  line-height: 1.4;
 }
 
 .graphEmptyChartLabel {
