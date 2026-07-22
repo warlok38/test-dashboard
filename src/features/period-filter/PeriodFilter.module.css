@@ -60,10 +60,15 @@
   inset-inline-end: calc(var(--space-2) / -2);
   top: 50%;
   z-index: 2;
-  color: var(--ant-color-border);
+  color: var(--color-text-muted);
   font-weight: 400;
   transform: translate(50%, -50%);
   pointer-events: none;
+}
+
+.periodSegment :global(.ant-segmented-item) {
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
 
 .periodSegment :global(.ant-segmented-item-label) {

@@ -63,7 +63,13 @@ export function GeneralSummary({
             />
             {cards?.[1] && (
               <div>
-                <Card card={cards[1]} selectable={false} size="sm" style={{ border: 'none' }} />
+                <Card
+                  card={cards[1]}
+                  selectable={false}
+                  size="sm"
+                  style={{ border: 'none' }}
+                  active={cards[0].indicator_name === activeIndicator}
+                />
               </div>
             )}
           </div>
