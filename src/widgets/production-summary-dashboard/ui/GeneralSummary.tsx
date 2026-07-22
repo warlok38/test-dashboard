@@ -83,44 +83,45 @@ export function GeneralSummary({
                 />
               ))}
             </div>
-            {isShowAll ? (
-              cards[0].cards?.map((card) => (
-                <div
-                  key={card.indicator_name + '-3'}
-                  className={classNames(
-                    styles.generalSummaryIndicators,
-                    styles.generalSummaryDetailIndicators
-                  )}
-                >
-                  {card.cards?.map((cardDetail) => (
-                    <Card
-                      key={cardDetail.indicator_name + '-3-1'}
-                      card={cardDetail}
-                      size="sm"
-                      active={card.indicator_name === activeIndicator}
-                      selectable={false}
-                    />
-                  ))}
-                </div>
-              ))
-            ) : (
-              <div
-                className={classNames(
-                  styles.generalSummaryIndicators,
-                  styles.generalSummaryDetailIndicators
+            {isShowAll
+              ? cards[0].cards?.map((card) => (
+                  <div
+                    key={card.indicator_name + '-3'}
+                    className={classNames(
+                      styles.generalSummaryIndicators,
+                      styles.generalSummaryDetailIndicators
+                    )}
+                  >
+                    {card.cards?.map((cardDetail) => (
+                      <Card
+                        key={cardDetail.indicator_name + '-3-1'}
+                        card={cardDetail}
+                        size="sm"
+                        active={card.indicator_name === activeIndicator}
+                        selectable={false}
+                      />
+                    ))}
+                  </div>
+                ))
+              : detailCards &&
+                detailCards.length > 0 && (
+                  <div
+                    className={classNames(
+                      styles.generalSummaryIndicators,
+                      styles.generalSummaryDetailIndicators
+                    )}
+                  >
+                    {detailCards?.map((card) => (
+                      <Card
+                        key={card.indicator_name + '-2'}
+                        card={card}
+                        size="sm"
+                        selectable={false}
+                        active={true}
+                      />
+                    ))}
+                  </div>
                 )}
-              >
-                {detailCards?.map((card) => (
-                  <Card
-                    key={card.indicator_name + '-2'}
-                    card={card}
-                    size="sm"
-                    selectable={false}
-                    active={true}
-                  />
-                ))}
-              </div>
-            )}
           </div>
         </div>
         <SideActions
