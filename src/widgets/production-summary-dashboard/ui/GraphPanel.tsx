@@ -16,13 +16,15 @@ import { Popover, Segmented, Tabs, Tooltip } from 'antd'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 
 import {
-  useGetGraphQuery,
-  useGetGraphWithDetailsQuery,
-  useGetGraphWithGtkQuery,
+  useGetGraphByModeQuery,
+  useGetGraphMappingQuery,
+  type GraphByModeDetail,
+  type GraphByModeQuery,
+  type GraphMappingItem,
+  type GraphMappingResponse,
+  type GraphMode,
   type GraphPeriod,
-  type GraphPoint,
-  type GraphQuery,
-  type GraphWithGtkDetail
+  type GraphPoint
 } from '@/entities/production-summary'
 import { ApiErrorAlert, DEFAULT_CAMERA_STREAM, Empty, Loader } from '@/shared/ui'
 
@@ -41,8 +43,8 @@ const GRAPH_LOADING_OVERLAY_DELAY_MS = 400
 const MAIN_TAB_KEY = 'main'
 
 const EMPTY_GRAPH_DATA: GraphPoint[] = []
-const EMPTY_GTK_DETAILS: GraphWithGtkDetail[] = []
-const DEPOSIT_LOADING_CARD_COUNT = 6
+const EMPTY_MODE_DETAILS: GraphByModeDetail[] = []
+const DETAIL_LOADING_CARD_COUNT = 6
 
 const SERIES_VIEW_OPTIONS: Array<{ label: ReactNode; value: GraphSeriesView }> = [
   {
@@ -63,7 +65,6 @@ const SERIES_VIEW_OPTIONS: Array<{ label: ReactNode; value: GraphSeriesView }> =
   }
 ]
 
-type GraphDetailMode = 'quarry' | 'stage' | 'park' | 'parkPercent' | 'block'
 type DetailScaleMode = 'comparison' | 'dynamics'
 
 const DETAIL_SCALE_MODE_OPTIONS: Array<{ label: ReactNode; value: DetailScaleMode }> = [
@@ -91,39 +92,50 @@ const DETAIL_SCALE_MODE_OPTIONS: Array<{ label: ReactNode; value: DetailScaleMod
   }
 ]
 
-const GRAPH_DETAIL_MODE_OPTIONS: Array<{
-  icon: ReactNode
-  label: string
-  value: GraphDetailMode
-}> = [
+const GRAPH_DETAIL_MODE_OPTIONS: Record<
+  GraphMode,
   {
+    icon: ReactNode
+    label: string
+    value: GraphMode
+  }
+> = {
+  gtk: {
     icon: <TruckOutlined />,
+    label: 'Месторождения',
+    value: 'gtk'
+  },
+  quarry: {
+    icon: <AppstoreOutlined />,
     label: 'Карьер',
     value: 'quarry'
   },
-  {
+  stage: {
     icon: <PartitionOutlined />,
     label: 'Этап',
     value: 'stage'
   },
-  {
+  park: {
     icon: <CarOutlined />,
     label: 'Парк',
     value: 'park'
   },
-  {
+  parkPercent: {
     icon: <PercentageOutlined />,
     label: 'Парк %',
     value: 'parkPercent'
   },
-  {
+  block: {
     icon: <AppstoreOutlined />,
     label: 'Блок',
     value: 'block'
   }
-]
+}
 
-type GraphPanelQuery = Pick<GraphQuery, 'indicator' | 'gtk' | 'shift' | 'production_date'>
+type GraphPanelQuery = Pick<
+  GraphByModeQuery,
+  'date_from' | 'date_to' | 'gtk_name' | 'indicator' | 'period' | 'production_date' | 'shift'
+>
 
 type GraphPanelProps = {
   graphPeriod: GraphPeriod
@@ -132,71 +144,133 @@ type GraphPanelProps = {
 }
 
 type GraphControlsProps = {
-  activeDetailMode: GraphDetailMode
+  activeDetailMode: GraphMode | undefined
+  detailModeOptions: GraphMode[]
   detailScaleMode: DetailScaleMode
   isCameraVisible: boolean
-  onDetailModeChange: (detailMode: GraphDetailMode) => void
+  onDetailModeChange: (detailMode: GraphMode) => void
   onDetailScaleModeChange: (detailScaleMode: DetailScaleMode) => void
   onCameraVisibleChange: (isVisible: boolean) => void
   seriesView: Record<GraphSeriesKey, GraphSeriesView>
   onSeriesViewChange: (seriesKey: GraphSeriesKey, view: GraphSeriesView) => void
   showCameraButton: boolean
+  showDetailModeSelector: boolean
 }
 
 type GraphTab = {
   indicator: string
   isDetail: boolean
   key: string
+  modes: GraphMode[]
   unit?: string
 }
 
 type LastSuccessfulGraphData = {
-  data: GraphPoint[]
+  detail: GraphByModeDetail | undefined
   dataKey: string | undefined
   graphPeriod: GraphPeriod
 }
 
-type LastSuccessfulDetailsData<T> = {
-  details: T[]
+type LastSuccessfulDetailsData = {
+  details: GraphByModeDetail[]
   dataKey: string | undefined
   graphPeriod: GraphPeriod
 }
 
-function getGraphQuery(query: GraphPanelQuery | undefined) {
-  if (!query) {
-    return undefined
-  }
+function getGraphTabs(mapping: GraphMappingResponse | undefined, indicator: string): GraphTab[] {
+  const mappingItems =
+    mapping?.[indicator] ??
+    Object.values(mapping ?? {}).find((items) => items.some((item) => item.indicator === indicator))
 
-  return {
-    indicator: query.indicator,
-    ...(query.gtk ? { gtk: query.gtk } : {}),
-    ...(query.shift ? { shift: query.shift } : {}),
-    ...(query.production_date ? { production_date: query.production_date } : {})
-  } satisfies GraphQuery
-}
-
-function getGraphDataKey(query: GraphQuery | undefined) {
-  if (!query) {
-    return undefined
-  }
-
-  return [query.gtk ?? '', query.indicator, query.shift ?? '', query.production_date ?? ''].join(
-    ':'
+  return (
+    mappingItems?.map((item, index) => ({
+      indicator: item.indicator,
+      isDetail: index > 0,
+      key: index === 0 ? MAIN_TAB_KEY : getDetailTabKey(item.indicator),
+      modes: item.modes,
+      unit: item.unit
+    })) ?? [
+      {
+        indicator,
+        isDetail: false,
+        key: MAIN_TAB_KEY,
+        modes: ['gtk'],
+        unit: undefined
+      }
+    ]
   )
 }
 
-function getIndicatorQuery(
-  query: GraphQuery | undefined,
-  indicator: string
-): GraphQuery | undefined {
-  if (!query) {
+function getStableDetailModes(
+  activeTab: GraphTab | undefined,
+  tabs: GraphTab[],
+  isGeneralPage: boolean
+) {
+  if (!activeTab || isGeneralPage) {
+    return []
+  }
+
+  const availableModes = new Set(activeTab.modes.filter((mode) => mode !== 'gtk'))
+  const groupModes = tabs[0]?.modes.filter((mode) => mode !== 'gtk') ?? []
+  const orderedModes = groupModes.filter((mode) => availableModes.has(mode))
+  const modesMissingFromMainTab = activeTab.modes.filter(
+    (mode) => mode !== 'gtk' && !orderedModes.includes(mode)
+  )
+
+  return [...orderedModes, ...modesMissingFromMainTab]
+}
+
+function getBaseGraphQuery(
+  query: GraphPanelQuery | undefined,
+  tab: GraphMappingItem | GraphTab | undefined
+): GraphByModeQuery | undefined {
+  if (!query || !tab) {
     return undefined
   }
 
   return {
-    ...query,
-    indicator
+    indicator: tab.indicator,
+    ...(query.gtk_name ? { gtk_name: query.gtk_name } : {}),
+    ...(query.shift ? { shift: query.shift } : {}),
+    ...(query.production_date ? { production_date: query.production_date } : {}),
+    ...(query.period ? { period: query.period } : {}),
+    ...(query.date_from ? { date_from: query.date_from } : {}),
+    ...(query.date_to ? { date_to: query.date_to } : {})
   }
+}
+
+function getDetailGraphQuery(
+  query: GraphPanelQuery | undefined,
+  tab: GraphTab | undefined,
+  mode: GraphMode | undefined
+): GraphByModeQuery | undefined {
+  const baseQuery = getBaseGraphQuery(query, tab)
+
+  if (!baseQuery || !mode) {
+    return undefined
+  }
+
+  return {
+    ...baseQuery,
+    mode
+  }
+}
+
+function getGraphDataKey(query: GraphByModeQuery | undefined) {
+  if (!query) {
+    return undefined
+  }
+
+  return [
+    query.gtk_name ?? '',
+    query.indicator,
+    query.mode ?? '',
+    query.shift ?? '',
+    query.production_date ?? '',
+    query.period ?? '',
+    query.date_from ?? '',
+    query.date_to ?? ''
+  ].join(':')
 }
 
 function getDetailTabKey(indicator: string) {
@@ -207,7 +281,7 @@ function isFiniteNumber(value: number | null | undefined): value is number {
   return typeof value === 'number' && Number.isFinite(value)
 }
 
-function getSharedGraphValueRange(details: GraphWithGtkDetail[]): GraphYAxisValueRange | undefined {
+function getSharedGraphValueRange(details: GraphByModeDetail[]): GraphYAxisValueRange | undefined {
   const values = details.flatMap((detail) =>
     detail.points.flatMap((point) => [point.fact, point.plan]).filter(isFiniteNumber)
   )
@@ -226,6 +300,7 @@ function getSharedGraphValueRange(details: GraphWithGtkDetail[]): GraphYAxisValu
 
 function GraphControls({
   activeDetailMode,
+  detailModeOptions,
   detailScaleMode,
   isCameraVisible,
   onDetailModeChange,
@@ -233,7 +308,8 @@ function GraphControls({
   onCameraVisibleChange,
   seriesView,
   onSeriesViewChange,
-  showCameraButton
+  showCameraButton,
+  showDetailModeSelector
 }: GraphControlsProps) {
   const content = (
     <div className={styles.graphSettingsMenu}>
@@ -309,41 +385,47 @@ function GraphControls({
 
   return (
     <SideActions actions={actions}>
-      <Segmented<GraphDetailMode>
-        className={styles.graphDetailModeSelector}
-        options={GRAPH_DETAIL_MODE_OPTIONS.map((option) => ({
-          label: (
-            <Tooltip placement="left" title={option.label}>
-              <span className={styles.graphDetailModeIcon}>{option.icon}</span>
-            </Tooltip>
-          ),
-          value: option.value
-        }))}
-        size="small"
-        value={activeDetailMode}
-        vertical
-        onChange={onDetailModeChange}
-      />
+      {showDetailModeSelector && activeDetailMode ? (
+        <Segmented<GraphMode>
+          className={styles.graphDetailModeSelector}
+          options={detailModeOptions.map((mode) => {
+            const option = GRAPH_DETAIL_MODE_OPTIONS[mode]
+
+            return {
+              label: (
+                <Tooltip placement="left" title={option.label}>
+                  <span className={styles.graphDetailModeIcon}>{option.icon}</span>
+                </Tooltip>
+              ),
+              value: option.value
+            }
+          })}
+          size="small"
+          value={activeDetailMode}
+          vertical
+          onChange={onDetailModeChange}
+        />
+      ) : null}
     </SideActions>
   )
 }
 
 function GraphTabLabel({
-  isDetailsLoading,
   indicator,
   isDetail,
+  isMappingLoading,
   unit
 }: {
-  isDetailsLoading?: boolean
   indicator: string
   isDetail: boolean
+  isMappingLoading?: boolean
   unit?: string
 }) {
   return (
     <span className={isDetail ? styles.graphTabLabelDetail : styles.graphTabLabel}>
       <span>{indicator}</span>
       {unit ? <span className={styles.graphTabUnit}>{unit}</span> : null}
-      {isDetailsLoading ? <Loader size="small" /> : null}
+      {isMappingLoading ? <Loader size="small" /> : null}
     </span>
   )
 }
@@ -371,102 +453,114 @@ function useDelayedFlag(isActive: boolean, delayMs: number) {
 }
 
 function GraphTabContent({
+  detailMode,
   detailScaleMode,
   graphPeriod,
-  indicator,
   onMeasureUnitChange,
   parentGraphQuery,
-  seriesView
+  seriesView,
+  tab
 }: {
+  detailMode: GraphMode | undefined
   detailScaleMode: DetailScaleMode
   graphPeriod: GraphPeriod
-  indicator: string
   onMeasureUnitChange?: (measureUnit: string | undefined) => void
-  parentGraphQuery: GraphQuery | undefined
+  parentGraphQuery: GraphPanelQuery | undefined
   seriesView: Record<GraphSeriesKey, GraphSeriesView>
+  tab: GraphTab
 }) {
-  const graphQuery = useMemo(
-    () => getIndicatorQuery(parentGraphQuery, indicator),
-    [indicator, parentGraphQuery]
+  const mainGraphQuery = useMemo(
+    () => getBaseGraphQuery(parentGraphQuery, tab),
+    [parentGraphQuery, tab]
   )
-  const graphDataKey = useMemo(() => getGraphDataKey(graphQuery), [graphQuery])
-  const { currentData, error, isFetching, isLoading } = useGetGraphQuery(graphQuery as GraphQuery, {
-    skip: !graphQuery
+  const detailGraphQuery = useMemo(
+    () => getDetailGraphQuery(parentGraphQuery, tab, detailMode),
+    [detailMode, parentGraphQuery, tab]
+  )
+  const mainGraphDataKey = useMemo(() => getGraphDataKey(mainGraphQuery), [mainGraphQuery])
+  const detailGraphDataKey = useMemo(() => getGraphDataKey(detailGraphQuery), [detailGraphQuery])
+  const {
+    currentData: mainGraphData,
+    error: mainGraphError,
+    isFetching: isMainGraphFetching,
+    isLoading: isMainGraphLoading
+  } = useGetGraphByModeQuery(mainGraphQuery as GraphByModeQuery, {
+    skip: !mainGraphQuery
   })
   const {
-    currentData: graphWithGtkData,
-    error: graphWithGtkError,
-    isFetching: isGraphWithGtkFetching,
-    isLoading: isGraphWithGtkLoading
-  } = useGetGraphWithGtkQuery(graphQuery as GraphQuery, {
-    skip: !graphQuery
+    currentData: detailGraphData,
+    error: detailGraphError,
+    isFetching: isDetailGraphFetching,
+    isLoading: isDetailGraphLoading
+  } = useGetGraphByModeQuery(detailGraphQuery as GraphByModeQuery, {
+    skip: !detailGraphQuery
   })
-  const [lastSuccessfulData, setLastSuccessfulData] = useState<
+  const [lastSuccessfulMainData, setLastSuccessfulMainData] = useState<
     LastSuccessfulGraphData | undefined
   >()
-  const [lastSuccessfulGtkData, setLastSuccessfulGtkData] = useState<
-    LastSuccessfulDetailsData<GraphWithGtkDetail> | undefined
+  const [lastSuccessfulDetailData, setLastSuccessfulDetailData] = useState<
+    LastSuccessfulDetailsData | undefined
   >()
-  const data = currentData ?? lastSuccessfulData?.data ?? EMPTY_GRAPH_DATA
-  const dataKey = currentData ? graphDataKey : lastSuccessfulData?.dataKey
-  const displayedGraphPeriod = currentData
+  const mainDetail = mainGraphData?.details[0] ?? lastSuccessfulMainData?.detail
+  const data = mainDetail?.points ?? EMPTY_GRAPH_DATA
+  const dataKey = mainGraphData ? mainGraphDataKey : lastSuccessfulMainData?.dataKey
+  const displayedGraphPeriod = mainGraphData
     ? graphPeriod
-    : (lastSuccessfulData?.graphPeriod ?? graphPeriod)
-  const measureUnit = data[0]?.measure_unit
-  const isInitialLoading = isLoading && !currentData && !lastSuccessfulData?.data
+    : (lastSuccessfulMainData?.graphPeriod ?? graphPeriod)
+  const measureUnit = mainDetail?.unit ?? tab.unit
+  const isInitialLoading = isMainGraphLoading && !mainGraphData && !lastSuccessfulMainData?.detail
   const shouldShowUpdatingOverlay = useDelayedFlag(
-    isFetching && Boolean(lastSuccessfulData),
+    isMainGraphFetching && Boolean(lastSuccessfulMainData),
     GRAPH_LOADING_OVERLAY_DELAY_MS
   )
-  const depositDetails =
-    graphWithGtkData?.details ?? lastSuccessfulGtkData?.details ?? EMPTY_GTK_DETAILS
-  const depositDetailsDataKey = graphWithGtkData ? graphDataKey : lastSuccessfulGtkData?.dataKey
-  const depositGraphPeriod = graphWithGtkData
+  const detailGraphs =
+    detailGraphData?.details ?? lastSuccessfulDetailData?.details ?? EMPTY_MODE_DETAILS
+  const displayedDetailDataKey = detailGraphData
+    ? detailGraphDataKey
+    : lastSuccessfulDetailData?.dataKey
+  const displayedDetailGraphPeriod = detailGraphData
     ? graphPeriod
-    : (lastSuccessfulGtkData?.graphPeriod ?? graphPeriod)
-  const depositValueRange = useMemo(
-    () => getSharedGraphValueRange(depositDetails),
-    [depositDetails]
-  )
-  const sharedDepositValueRange = detailScaleMode === 'comparison' ? depositValueRange : undefined
-  const isInitialGtkLoading =
-    isGraphWithGtkLoading && !graphWithGtkData && !lastSuccessfulGtkData?.details
-  const shouldShowGtkUpdatingOverlay = useDelayedFlag(
-    isGraphWithGtkFetching && Boolean(lastSuccessfulGtkData),
+    : (lastSuccessfulDetailData?.graphPeriod ?? graphPeriod)
+  const detailValueRange = useMemo(() => getSharedGraphValueRange(detailGraphs), [detailGraphs])
+  const sharedDetailValueRange = detailScaleMode === 'comparison' ? detailValueRange : undefined
+  const isInitialDetailsLoading =
+    isDetailGraphLoading && !detailGraphData && !lastSuccessfulDetailData?.details
+  const shouldShowDetailsUpdatingOverlay = useDelayedFlag(
+    isDetailGraphFetching && Boolean(lastSuccessfulDetailData),
     GRAPH_LOADING_OVERLAY_DELAY_MS
   )
 
   useEffect(() => {
-    if (currentData) {
-      setLastSuccessfulData({
-        data: currentData,
-        dataKey: graphDataKey,
+    if (mainGraphData) {
+      setLastSuccessfulMainData({
+        detail: mainGraphData.details[0],
+        dataKey: mainGraphDataKey,
         graphPeriod
       })
     }
-  }, [currentData, graphDataKey, graphPeriod])
+  }, [mainGraphData, mainGraphDataKey, graphPeriod])
 
   useEffect(() => {
-    if (graphWithGtkData) {
-      setLastSuccessfulGtkData({
-        details: graphWithGtkData.details,
-        dataKey: graphDataKey,
+    if (detailGraphData) {
+      setLastSuccessfulDetailData({
+        details: detailGraphData.details,
+        dataKey: detailGraphDataKey,
         graphPeriod
       })
     }
-  }, [graphWithGtkData, graphDataKey, graphPeriod])
+  }, [detailGraphData, detailGraphDataKey, graphPeriod])
 
   useEffect(() => {
     onMeasureUnitChange?.(measureUnit)
   }, [measureUnit, onMeasureUnitChange])
 
   const renderGraphContent = () => {
-    if (!graphQuery) {
+    if (!mainGraphQuery) {
       return <div className={styles.emptyState}>Нет показателя для графика</div>
     }
 
-    if (error) {
-      return <ApiErrorAlert error={error} title="Не удалось загрузить график" />
+    if (mainGraphError) {
+      return <ApiErrorAlert error={mainGraphError} title="Не удалось загрузить график" />
     }
 
     return (
@@ -485,26 +579,31 @@ function GraphTabContent({
     )
   }
 
-  const renderDepositsContent = () => {
-    if (graphWithGtkError) {
-      if (error) {
-        return null
-      }
-      return <ApiErrorAlert error={graphWithGtkError} title="Не удалось загрузить детали" />
+  const renderDetailsContent = () => {
+    if (!detailGraphQuery) {
+      return <Empty />
     }
 
-    if (depositDetails.length === 0) {
-      if (isInitialGtkLoading) {
+    if (detailGraphError) {
+      if (mainGraphError) {
+        return null
+      }
+
+      return <ApiErrorAlert error={detailGraphError} title="Не удалось загрузить детали" />
+    }
+
+    if (detailGraphs.length === 0) {
+      if (isInitialDetailsLoading) {
         return (
           <div className={styles.depositGraphGrid}>
-            {Array.from({ length: DEPOSIT_LOADING_CARD_COUNT }, (_, index) => (
+            {Array.from({ length: DETAIL_LOADING_CARD_COUNT }, (_, index) => (
               <article className={styles.depositGraphCard} key={index}>
                 <h3 className={styles.depositGraphTitle}>
                   <span className={styles.depositGraphTitlePlaceholder}>Загрузка...</span>
                 </h3>
                 <GraphChart
                   data={EMPTY_GRAPH_DATA}
-                  dataKey={`${graphDataKey}:deposit-loading:${index}`}
+                  dataKey={`${detailGraphDataKey}:detail-loading:${index}`}
                   emptyText="Нет данных"
                   graphPeriod={graphPeriod}
                   isUpdating
@@ -523,16 +622,16 @@ function GraphTabContent({
 
     return (
       <div className={styles.depositGraphGrid}>
-        {depositDetails.map((detail) => (
+        {detailGraphs.map((detail) => (
           <article className={styles.depositGraphCard} key={detail.gtk}>
             <h3 className={styles.depositGraphTitle}>{detail.display_name ?? detail.gtk}</h3>
             <GraphChart
               data={detail.points}
-              dataKey={`${depositDetailsDataKey}:${detail.gtk}`}
-              graphPeriod={depositGraphPeriod}
-              isUpdating={shouldShowGtkUpdatingOverlay}
+              dataKey={`${displayedDetailDataKey}:${detail.gtk}`}
+              graphPeriod={displayedDetailGraphPeriod}
+              isUpdating={shouldShowDetailsUpdatingOverlay}
               normalizeValueRange
-              normalizedValueRange={sharedDepositValueRange}
+              normalizedValueRange={sharedDetailValueRange}
               seriesView={seriesView}
               size="compact"
               updatingText="Обновление..."
@@ -548,7 +647,7 @@ function GraphTabContent({
       {renderGraphContent()}
       <div className={styles.graphNestedSections}>
         <section className={styles.graphNestedSection}>
-          <div className={styles.graphSectionBody}>{renderDepositsContent()}</div>
+          <div className={styles.graphSectionBody}>{renderDetailsContent()}</div>
         </section>
       </div>
     </>
@@ -558,9 +657,7 @@ function GraphTabContent({
 function GraphTabsPanel({ graphPeriod, query, showCameraButton = false }: GraphPanelProps) {
   const [activeTabKey, setActiveTabKey] = useState(MAIN_TAB_KEY)
   const [visitedTabKeys, setVisitedTabKeys] = useState<Set<string>>(() => new Set([MAIN_TAB_KEY]))
-  const [activeDetailMode, setActiveDetailMode] = useState<GraphDetailMode>(
-    GRAPH_DETAIL_MODE_OPTIONS[0].value
-  )
+  const [activeDetailMode, setActiveDetailMode] = useState<GraphMode | undefined>()
   const [detailScaleMode, setDetailScaleMode] = useState<DetailScaleMode>('dynamics')
   const [mainMeasureUnit, setMainMeasureUnit] = useState<string | undefined>()
   const [isCameraVisible, setIsCameraVisible] = useState(false)
@@ -568,22 +665,13 @@ function GraphTabsPanel({ graphPeriod, query, showCameraButton = false }: GraphP
     plan: 'bar',
     fact: 'bar'
   })
-  const graphQuery = useMemo(() => getGraphQuery(query), [query])
-  const graphDataKey = useMemo(() => getGraphDataKey(graphQuery), [graphQuery])
+  const isGeneralPage = !query?.gtk_name
   const {
-    currentData: graphWithDetailsData,
-    error: graphWithDetailsError,
-    isFetching: isGraphWithDetailsFetching,
-    isLoading: isGraphWithDetailsLoading
-  } = useGetGraphWithDetailsQuery(graphQuery as GraphQuery, {
-    skip: !graphQuery
-  })
-
-  useEffect(() => {
-    setActiveTabKey(MAIN_TAB_KEY)
-    setVisitedTabKeys(new Set([MAIN_TAB_KEY]))
-    setMainMeasureUnit(undefined)
-  }, [graphDataKey])
+    currentData: graphMapping,
+    error: graphMappingError,
+    isFetching: isGraphMappingFetching,
+    isLoading: isGraphMappingLoading
+  } = useGetGraphMappingQuery()
 
   useEffect(() => {
     setVisitedTabKeys((currentKeys) => {
@@ -613,65 +701,79 @@ function GraphTabsPanel({ graphPeriod, query, showCameraButton = false }: GraphP
       return []
     }
 
-    const usedIndicators = new Set([query.indicator])
-    const detailTabs =
-      graphWithDetailsData?.details
-        .filter((detail) => {
-          if (usedIndicators.has(detail.indicator)) {
-            return false
-          }
+    return getGraphTabs(graphMapping, query.indicator)
+  }, [graphMapping, query?.indicator])
 
-          usedIndicators.add(detail.indicator)
+  const selectedTab = tabs.find((tab) => tab.key === activeTabKey)
+  const activeTab = selectedTab ?? tabs[0]
+  const activeGroupIndicator = tabs[0]?.indicator
+  const selectableDetailModes = useMemo(
+    () => getStableDetailModes(activeTab, tabs, isGeneralPage),
+    [activeTab, isGeneralPage, tabs]
+  )
+  const selectedDetailMode = isGeneralPage ? 'gtk' : activeDetailMode
 
-          return true
-        })
-        .map((detail) => ({
-          indicator: detail.indicator,
-          isDetail: true,
-          key: getDetailTabKey(detail.indicator),
-          unit: detail.unit
-        })) ?? []
+  useEffect(() => {
+    if (!activeTab) {
+      return
+    }
 
-    return [
-      {
-        indicator: query.indicator,
-        isDetail: false,
-        key: MAIN_TAB_KEY,
-        unit: mainMeasureUnit
-      },
-      ...detailTabs
-    ]
-  }, [graphWithDetailsData?.details, mainMeasureUnit, query?.indicator])
+    const nextModes = isGeneralPage
+      ? activeTab.modes
+      : activeTab.modes.filter((mode) => mode !== 'gtk')
 
-  const activeTab = tabs.find((tab) => tab.key === activeTabKey) ?? tabs[0]
-  const isDetailsLoading = isGraphWithDetailsLoading || isGraphWithDetailsFetching
+    if (isGeneralPage) {
+      setActiveDetailMode('gtk')
+
+      return
+    }
+
+    setActiveDetailMode((currentMode) =>
+      currentMode && nextModes.includes(currentMode) ? currentMode : nextModes[0]
+    )
+  }, [activeTab, isGeneralPage])
+
+  useEffect(() => {
+    if (selectedTab || tabs.length === 0) {
+      return
+    }
+
+    setActiveTabKey(tabs[0].key)
+  }, [selectedTab, tabs])
+
+  useEffect(() => {
+    setMainMeasureUnit(undefined)
+  }, [activeGroupIndicator])
+
+  const isMappingLoading = isGraphMappingLoading || isGraphMappingFetching
   const tabItems = tabs.map((tab) => ({
     key: tab.key,
     label: (
       <GraphTabLabel
         indicator={tab.indicator}
         isDetail={tab.isDetail}
-        isDetailsLoading={tab.key === MAIN_TAB_KEY && isDetailsLoading}
-        unit={tab.unit}
+        isMappingLoading={tab.key === MAIN_TAB_KEY && isMappingLoading}
+        unit={tab.key === MAIN_TAB_KEY ? (mainMeasureUnit ?? tab.unit) : tab.unit}
       />
     ),
     children: visitedTabKeys.has(tab.key) ? (
       <GraphTabContent
+        detailMode={selectedDetailMode}
         detailScaleMode={detailScaleMode}
         graphPeriod={graphPeriod}
-        indicator={tab.indicator}
         onMeasureUnitChange={tab.key === MAIN_TAB_KEY ? setMainMeasureUnit : undefined}
-        parentGraphQuery={graphQuery}
+        parentGraphQuery={query}
         seriesView={seriesView}
+        tab={tab}
       />
     ) : null
   }))
 
-  const renderDetailsStatus = () => {
-    if (graphWithDetailsError) {
+  const renderMappingStatus = () => {
+    if (graphMappingError) {
       return (
         <div className={styles.graphDetailsStatus}>
-          <span>Не удалось загрузить список детальных показателей</span>
+          <span>Не удалось загрузить список показателей</span>
         </div>
       )
     }
@@ -679,9 +781,9 @@ function GraphTabsPanel({ graphPeriod, query, showCameraButton = false }: GraphP
     return null
   }
 
-  const detailsStatus = renderDetailsStatus()
-  const tabBarExtraContent = detailsStatus ? (
-    <div className={styles.graphTabsExtra}>{detailsStatus}</div>
+  const mappingStatus = renderMappingStatus()
+  const tabBarExtraContent = mappingStatus ? (
+    <div className={styles.graphTabsExtra}>{mappingStatus}</div>
   ) : undefined
 
   if (!query?.indicator) {
@@ -711,14 +813,16 @@ function GraphTabsPanel({ graphPeriod, query, showCameraButton = false }: GraphP
         </div>
         <GraphControls
           activeDetailMode={activeDetailMode}
+          detailModeOptions={selectableDetailModes}
           detailScaleMode={detailScaleMode}
           isCameraVisible={isCameraVisible}
           seriesView={seriesView}
+          showCameraButton={showCameraButton}
+          showDetailModeSelector={!isGeneralPage && selectableDetailModes.length > 0}
           onCameraVisibleChange={setIsCameraVisible}
           onDetailModeChange={setActiveDetailMode}
           onDetailScaleModeChange={setDetailScaleMode}
           onSeriesViewChange={updateSeriesView}
-          showCameraButton={showCameraButton}
         />
       </section>
     </div>
