@@ -89,7 +89,7 @@ export function ProductionSummaryDashboard({
       ? {
           indicator: selectedIndicator,
           ...graphPeriodParams,
-          ...(query.gtk ? { gtk: query.gtk } : {})
+          ...(query.gtk ? { gtk_name: query.gtk } : {})
         }
       : undefined
 

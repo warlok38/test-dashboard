@@ -4,6 +4,9 @@ import {
   GeneralSummaryParams,
   GeneralSummaryResponse,
   type AlarmSummaryResponse,
+  type GraphByModeQuery,
+  type GraphByModeResponse,
+  type GraphMappingResponse,
   type GraphPoint,
   type GraphQuery,
   type GraphWithDetailsResponse,
@@ -31,6 +34,17 @@ export const productionSummaryApi = mainApi.injectEndpoints({
         params
       }),
       providesTags: [API_TAGS.graph]
+    }),
+    getGraphMapping: build.query<GraphMappingResponse, void>({
+      query: () => API_ROUTES.graphMapping,
+      providesTags: [API_TAGS.graphMapping]
+    }),
+    getGraphByMode: build.query<GraphByModeResponse, GraphByModeQuery>({
+      query: (params) => ({
+        url: API_ROUTES.graphByMode,
+        params
+      }),
+      providesTags: [API_TAGS.graphByMode]
     }),
     getGraphWithGtk: build.query<GraphWithGtkResponse, GraphQuery>({
       query: (params) => ({
@@ -60,6 +74,8 @@ export const {
   useGetGtkQuery,
   useGetSummaryQuery,
   useGetGraphQuery,
+  useGetGraphByModeQuery,
+  useGetGraphMappingQuery,
   useGetGraphWithDetailsQuery,
   useGetGraphWithGtkQuery,
   useGetGeneralSummaryQuery

@@ -61,11 +61,53 @@ export type GraphQuery = {
 
 export type GraphPeriod = SummaryPeriod
 
+export type GraphMode = 'gtk' | 'park' | 'stage' | 'quarry' | 'parkPercent' | 'block'
+
 export type GraphPoint = {
   date: string
   fact: number | null
-  measure_unit: string
+  measure_unit?: string
   plan: number | null
+}
+
+export type GraphMappingItem = {
+  indicator: string
+  unit: string
+  modes: GraphMode[]
+}
+
+export type GraphMappingResponse = Record<string, GraphMappingItem[]>
+
+export type GraphByModeQuery = {
+  indicator: string
+  shift?: number
+  production_date?: string
+  period?: GraphPeriod
+  date_from?: string
+  date_to?: string
+  mode?: GraphMode
+  gtk_name?: string
+}
+
+export type GraphByModeMetadata = {
+  period: GraphPeriod
+  start_date: string
+  end_date: string
+  shift: number
+  gtk: string
+}
+
+export type GraphByModeDetail = {
+  indicator: string
+  gtk: string
+  display_name?: string | null
+  unit: string
+  points: GraphPoint[]
+}
+
+export type GraphByModeResponse = {
+  metadata: GraphByModeMetadata
+  details: GraphByModeDetail[]
 }
 
 export type GraphWithGtkMetadata = {
