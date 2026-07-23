@@ -7,6 +7,7 @@ import {
   CartesianGrid,
   ComposedChart,
   Line,
+  ReferenceDot,
   ReferenceLine,
   Tooltip,
   XAxis,
@@ -25,6 +26,12 @@ import {
   getXAxisInterval,
   type GraphChartSize
 } from './graph-axis'
+import {
+  createGraphYAxisScale,
+  type GraphYAxisDataPoint,
+  type GraphYAxisValueRange,
+  type GraphYAxisZeroLabel
+} from './graph-y-axis'
 
 const COMPACT_POINT_LIMIT = 10
 const COMPACT_POINT_WIDTH = 150
@@ -35,6 +42,7 @@ const BRUSH_WHEEL_PIXELS_PER_POINT = 80
 const BRUSH_WHEEL_MAX_STEP = 8
 const CHART_HORIZONTAL_MARGIN = 32
 const Y_AXIS_TICK_COUNT = 5
+const COMPACT_Y_AXIS_TICK_COUNT = 3
 const FACT_COLOR = 'var(--color-kpi-fact)'
 const PLAN_COLOR = 'var(--color-chart-plan)'
 const GRID_COLOR = 'var(--palette-dashboard-grid-border)'
@@ -64,6 +72,7 @@ type AxisTickPayload = {
 }
 
 type AxisTickProps = {
+  tickFormatter?: (value: string | number | undefined) => string
   x?: number | string
   y?: number | string
   payload?: AxisTickPayload
@@ -75,6 +84,8 @@ type GraphChartProps = {
   emptyText?: string
   graphPeriod: GraphPeriod
   isUpdating?: boolean
+  normalizeValueRange?: boolean
+  normalizedValueRange?: GraphYAxisValueRange
   updatingText?: string
   seriesView: Record<GraphSeriesKey, GraphSeriesView>
   showBrush?: boolean
@@ -143,19 +154,21 @@ function GraphTooltip({ active, label, payload }: TooltipContentProps) {
     return null
   }
 
+  const point = payload[0]?.payload as Partial<Record<GraphSeriesKey, unknown>> | undefined
+  const items = GRAPH_SERIES_CONFIGS.map((series) => ({
+    ...series,
+    value: point?.[series.key]
+  })).filter((item) => item.value !== null && item.value !== undefined)
+
   return (
     <div className={styles.graphTooltip}>
       <div className={styles.graphTooltipDate}>{formatTooltipDate(String(label))}</div>
       <div className={styles.graphTooltipItems}>
-        {payload.map((item) => {
-          const isFact = String(item.dataKey) === 'fact'
+        {items.map((item) => {
+          const isFact = item.key === 'fact'
 
           return (
-            <div
-              key={String(item.dataKey)}
-              className={styles.graphTooltipItem}
-              style={{ color: item.color }}
-            >
+            <div key={item.key} className={styles.graphTooltipItem} style={{ color: item.color }}>
               <span>{item.name}</span>
               <span> : </span>
               <span className={isFact ? styles.graphTooltipFactValue : undefined}>
@@ -169,13 +182,14 @@ function GraphTooltip({ active, label, payload }: TooltipContentProps) {
   )
 }
 
-function YAxisTick({ x = 0, y = 0, payload }: AxisTickProps) {
-  const fullValue = formatFullAxisNumber(payload?.value)
+function YAxisTick({ tickFormatter, x = 0, y = 0, payload }: AxisTickProps) {
+  const formattedValue = tickFormatter ? tickFormatter(payload?.value) : payload?.value
+  const fullValue = formatFullAxisNumber(formattedValue)
 
   return (
     <text className={styles.graphYAxisTick} dy={4} fill="currentColor" textAnchor="end" x={x} y={y}>
       <title>{fullValue}</title>
-      {formatCompactAxisNumber(payload?.value)}
+      {formatCompactAxisNumber(formattedValue)}
     </text>
   )
 }
@@ -191,22 +205,65 @@ function getCompactXAxisPadding(chartWidth: number, visiblePointCount: number) {
   return Math.max(availableWidth - compactWidth, 0)
 }
 
-function getYAxisMax(data: GraphPoint[]) {
-  const maxValue = Math.max(...data.flatMap((point) => [point.fact ?? 0, point.plan ?? 0]), 0)
-
-  if (maxValue <= 0) {
-    return 1
+function getCompactYAxisTicks(ticks: number[] | undefined) {
+  if (!ticks || ticks.length <= COMPACT_Y_AXIS_TICK_COUNT) {
+    return ticks
   }
 
-  const magnitude = 10 ** Math.max(Math.floor(Math.log10(maxValue)) - 1, 0)
-
-  return Math.ceil((maxValue * 1.05) / magnitude) * magnitude
+  return [ticks[0], ticks[Math.floor(ticks.length / 2)], ticks[ticks.length - 1]]
 }
 
 function getDefaultBrushRange(dataLength: number): BrushRange | undefined {
   return normalizeBrushRange(
     { startIndex: dataLength - BRUSH_VISIBLE_POINT_COUNT, endIndex: dataLength - 1 },
     dataLength
+  )
+}
+
+type ZeroValueLabelProps = {
+  x?: number | string
+  y?: number | string
+}
+
+function ZeroValueLabel({
+  label,
+  x = 0,
+  y = 0
+}: ZeroValueLabelProps & { label: GraphYAxisZeroLabel }) {
+  const numericX = Number(x)
+  const numericY = Number(y)
+  const isBar = label.view === 'bar'
+  const xOffset = label.key === 'fact' ? -8 : 8
+
+  if (!Number.isFinite(numericX) || !Number.isFinite(numericY)) {
+    return null
+  }
+
+  if (isBar) {
+    return (
+      <g
+        className={styles.graphZeroValueLabel}
+        transform={`translate(${numericX + xOffset} ${numericY})`}
+      >
+        <text className={styles.graphZeroValueDash} textAnchor="middle" y={-8}>
+          -
+        </text>
+        <text textAnchor="middle" y={12}>
+          0
+        </text>
+      </g>
+    )
+  }
+
+  return (
+    <text
+      className={styles.graphZeroValueLabel}
+      textAnchor="middle"
+      x={numericX + xOffset}
+      y={numericY - 8}
+    >
+      0
+    </text>
   )
 }
 
@@ -274,6 +331,8 @@ export function GraphChart({
   emptyText = 'Нет данных',
   graphPeriod,
   isUpdating = false,
+  normalizeValueRange = false,
+  normalizedValueRange,
   updatingText = 'Обновление...',
   seriesView,
   showBrush = true,
@@ -282,7 +341,16 @@ export function GraphChart({
   const [brushRange, setBrushRange] = useState<BrushState | undefined>()
   const shouldUseBrush =
     showBrush && graphPeriod === 'day' && data.length > BRUSH_VISIBLE_POINT_COUNT
-  const yAxisMax = useMemo(() => getYAxisMax(data), [data])
+  const yAxisScale = useMemo(
+    () =>
+      createGraphYAxisScale({
+        data,
+        normalizeValueRange,
+        seriesView,
+        valueRange: normalizedValueRange
+      }),
+    [data, normalizeValueRange, normalizedValueRange, seriesView]
+  )
   const lastDataDate = data[data.length - 1]?.date
   const defaultBrushRange = useMemo(() => getDefaultBrushRange(data.length), [data.length])
   const isBrushRangeActual =
@@ -323,11 +391,13 @@ export function GraphChart({
 
   const renderSeries = (view: GraphSeriesView, barSize: number | undefined) =>
     GRAPH_SERIES_CONFIGS.filter((series) => seriesView[series.key] === view).map((series) => {
+      const chartDataKey = `${series.key}ChartValue` satisfies keyof GraphYAxisDataPoint
+
       if (view === 'line') {
         return (
           <Line
             key={series.key}
-            dataKey={series.key}
+            dataKey={chartDataKey}
             name={series.name}
             stroke={series.color}
             strokeWidth={2}
@@ -343,7 +413,7 @@ export function GraphChart({
       return (
         <Bar
           key={series.key}
-          dataKey={series.key}
+          dataKey={chartDataKey}
           name={series.name}
           fill={series.color}
           radius={[3, 3, 0, 0]}
@@ -352,6 +422,18 @@ export function GraphChart({
         />
       )
     })
+
+  const renderZeroLabels = () =>
+    yAxisScale.zeroLabels.map((label) => (
+      <ReferenceDot
+        key={`${label.date}-${label.key}`}
+        x={label.date}
+        y={0}
+        r={0}
+        ifOverflow="visible"
+        label={(props) => <ZeroValueLabel {...props} label={label} />}
+      />
+    ))
 
   const handleBrushChange = (range: { startIndex?: number; endIndex?: number }) => {
     if (typeof range.startIndex !== 'number' || typeof range.endIndex !== 'number') {
@@ -456,11 +538,14 @@ export function GraphChart({
           )
           const tickFormatter = (value: string | number) =>
             formatGraphTick(String(value), graphPeriod, size)
+          const yAxisTicks =
+            size === 'compact' ? getCompactYAxisTicks(yAxisScale.ticks) : yAxisScale.ticks
+          const yAxisTickCount = size === 'compact' ? COMPACT_Y_AXIS_TICK_COUNT : Y_AXIS_TICK_COUNT
 
           return (
             <ComposedChart
               barGap={0}
-              data={data}
+              data={yAxisScale.data}
               height={height}
               margin={{ top: 8, right: 16, bottom: shouldUseBrush ? 8 : 0, left: -16 }}
               width={width}
@@ -477,15 +562,19 @@ export function GraphChart({
                 padding={{ left: 0, right: compactXAxisPadding }}
               />
               <YAxis
-                domain={[0, yAxisMax]}
-                tickCount={Y_AXIS_TICK_COUNT}
+                domain={yAxisScale.domain}
+                tickCount={yAxisTickCount}
                 tickLine={false}
                 axisLine={false}
-                tick={YAxisTick}
+                tickFormatter={yAxisScale.formatTick}
+                ticks={yAxisTicks}
+                interval={yAxisTicks ? 0 : undefined}
+                tick={(props) => <YAxisTick {...props} tickFormatter={yAxisScale.formatTick} />}
               />
               <Tooltip content={(props) => <GraphTooltip {...props} />} isAnimationActive={false} />
               {renderSeries('bar', barSize)}
               {renderSeries('line', barSize)}
+              {renderZeroLabels()}
               {shouldUseBrush ? (
                 <Brush
                   key={dataKey}

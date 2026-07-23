@@ -34,6 +34,7 @@ import {
   type GraphSeriesKey,
   type GraphSeriesView
 } from './graph-chart'
+import { type GraphYAxisValueRange } from './graph-chart/graph-y-axis'
 import { SideActions } from './SideActions'
 
 const GRAPH_LOADING_OVERLAY_DELAY_MS = 400
@@ -63,6 +64,32 @@ const SERIES_VIEW_OPTIONS: Array<{ label: ReactNode; value: GraphSeriesView }> =
 ]
 
 type GraphDetailMode = 'quarry' | 'stage' | 'park' | 'parkPercent' | 'block'
+type DetailScaleMode = 'comparison' | 'dynamics'
+
+const DETAIL_SCALE_MODE_OPTIONS: Array<{ label: ReactNode; value: DetailScaleMode }> = [
+  {
+    label: (
+      <Tooltip
+        title="Каждый график использует свою шкалу, чтобы лучше видеть колебания."
+        mouseEnterDelay={0.5}
+      >
+        <span className={styles.detailScaleModeLabel}>Динамика</span>
+      </Tooltip>
+    ),
+    value: 'dynamics'
+  },
+  {
+    label: (
+      <Tooltip
+        title="Все графики используют общую шкалу, чтобы сравнивать значения."
+        mouseEnterDelay={0.5}
+      >
+        <span className={styles.detailScaleModeLabel}>Сравнение</span>
+      </Tooltip>
+    ),
+    value: 'comparison'
+  }
+]
 
 const GRAPH_DETAIL_MODE_OPTIONS: Array<{
   icon: ReactNode
@@ -105,8 +132,10 @@ type GraphPanelProps = {
 
 type GraphControlsProps = {
   activeDetailMode: GraphDetailMode
+  detailScaleMode: DetailScaleMode
   isCameraVisible: boolean
   onDetailModeChange: (detailMode: GraphDetailMode) => void
+  onDetailScaleModeChange: (detailScaleMode: DetailScaleMode) => void
   onCameraVisibleChange: (isVisible: boolean) => void
   seriesView: Record<GraphSeriesKey, GraphSeriesView>
   onSeriesViewChange: (seriesKey: GraphSeriesKey, view: GraphSeriesView) => void
@@ -172,10 +201,33 @@ function getDetailTabKey(indicator: string) {
   return `detail:${indicator}`
 }
 
+function isFiniteNumber(value: number | null | undefined): value is number {
+  return typeof value === 'number' && Number.isFinite(value)
+}
+
+function getSharedGraphValueRange(details: GraphWithGtkDetail[]): GraphYAxisValueRange | undefined {
+  const values = details.flatMap((detail) =>
+    detail.points.flatMap((point) => [point.fact, point.plan]).filter(isFiniteNumber)
+  )
+  const nonZeroValues = values.filter((value) => value !== 0)
+
+  if (nonZeroValues.length === 0) {
+    return undefined
+  }
+
+  return {
+    hasZero: values.some((value) => value === 0),
+    max: Math.max(...nonZeroValues),
+    min: Math.min(...nonZeroValues)
+  }
+}
+
 function GraphControls({
   activeDetailMode,
+  detailScaleMode,
   isCameraVisible,
   onDetailModeChange,
+  onDetailScaleModeChange,
   onCameraVisibleChange,
   seriesView,
   onSeriesViewChange
@@ -185,7 +237,7 @@ function GraphControls({
       <div className={styles.graphViewControls}>
         {GRAPH_SERIES_CONFIGS.map((series) => (
           <div className={styles.seriesViewControl} key={series.key}>
-            <span className={styles.seriesViewLabel}>{series.name}</span>
+            <span className={styles.seriesViewLabel}>Вид: {series.name.toLowerCase()}</span>
             <Segmented
               options={SERIES_VIEW_OPTIONS}
               size="small"
@@ -194,6 +246,15 @@ function GraphControls({
             />
           </div>
         ))}
+        <div className={styles.seriesViewControl}>
+          <span className={styles.seriesViewLabel}>Детали</span>
+          <Segmented<DetailScaleMode>
+            options={DETAIL_SCALE_MODE_OPTIONS}
+            size="small"
+            value={detailScaleMode}
+            onChange={onDetailScaleModeChange}
+          />
+        </div>
       </div>
     </div>
   )
@@ -300,12 +361,14 @@ function useDelayedFlag(isActive: boolean, delayMs: number) {
 }
 
 function GraphTabContent({
+  detailScaleMode,
   graphPeriod,
   indicator,
   onMeasureUnitChange,
   parentGraphQuery,
   seriesView
 }: {
+  detailScaleMode: DetailScaleMode
   graphPeriod: GraphPeriod
   indicator: string
   onMeasureUnitChange?: (measureUnit: string | undefined) => void
@@ -351,6 +414,11 @@ function GraphTabContent({
   const depositGraphPeriod = graphWithGtkData
     ? graphPeriod
     : (lastSuccessfulGtkData?.graphPeriod ?? graphPeriod)
+  const depositValueRange = useMemo(
+    () => getSharedGraphValueRange(depositDetails),
+    [depositDetails]
+  )
+  const sharedDepositValueRange = detailScaleMode === 'comparison' ? depositValueRange : undefined
   const isInitialGtkLoading =
     isGraphWithGtkLoading && !graphWithGtkData && !lastSuccessfulGtkData?.details
   const shouldShowGtkUpdatingOverlay = useDelayedFlag(
@@ -399,6 +467,7 @@ function GraphTabContent({
           emptyText="Нет данных для графика"
           graphPeriod={displayedGraphPeriod}
           isUpdating={isInitialLoading || shouldShowUpdatingOverlay}
+          normalizeValueRange
           seriesView={seriesView}
           updatingText={isInitialLoading ? 'Загрузка...' : 'Обновление...'}
         />
@@ -452,6 +521,8 @@ function GraphTabContent({
               dataKey={`${depositDetailsDataKey}:${detail.gtk}`}
               graphPeriod={depositGraphPeriod}
               isUpdating={shouldShowGtkUpdatingOverlay}
+              normalizeValueRange
+              normalizedValueRange={sharedDepositValueRange}
               seriesView={seriesView}
               size="compact"
               updatingText="Обновление..."
@@ -480,6 +551,7 @@ function GraphTabsPanel({ graphPeriod, query }: GraphPanelProps) {
   const [activeDetailMode, setActiveDetailMode] = useState<GraphDetailMode>(
     GRAPH_DETAIL_MODE_OPTIONS[0].value
   )
+  const [detailScaleMode, setDetailScaleMode] = useState<DetailScaleMode>('dynamics')
   const [mainMeasureUnit, setMainMeasureUnit] = useState<string | undefined>()
   const [isCameraVisible, setIsCameraVisible] = useState(false)
   const [seriesView, setSeriesView] = useState<Record<GraphSeriesKey, GraphSeriesView>>({
@@ -569,6 +641,7 @@ function GraphTabsPanel({ graphPeriod, query }: GraphPanelProps) {
     ),
     children: visitedTabKeys.has(tab.key) ? (
       <GraphTabContent
+        detailScaleMode={detailScaleMode}
         graphPeriod={graphPeriod}
         indicator={tab.indicator}
         onMeasureUnitChange={tab.key === MAIN_TAB_KEY ? setMainMeasureUnit : undefined}
@@ -622,10 +695,12 @@ function GraphTabsPanel({ graphPeriod, query }: GraphPanelProps) {
         </div>
         <GraphControls
           activeDetailMode={activeDetailMode}
+          detailScaleMode={detailScaleMode}
           isCameraVisible={isCameraVisible}
           seriesView={seriesView}
           onCameraVisibleChange={setIsCameraVisible}
           onDetailModeChange={setActiveDetailMode}
+          onDetailScaleModeChange={setDetailScaleMode}
           onSeriesViewChange={updateSeriesView}
         />
       </section>
