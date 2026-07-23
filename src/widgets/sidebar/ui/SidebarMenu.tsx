@@ -1,7 +1,9 @@
 import { Menu, type MenuProps } from 'antd'
+import classNames from 'classnames'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
-import { type SidebarMenuItem } from '../sidebarConfig'
+import { GTK_MENU_KEY, type SidebarMenuItem } from '../sidebarConfig'
 import styles from '../Sidebar.module.css'
 
 type SidebarMenuProps = {
@@ -21,7 +23,7 @@ function getMenuLabel(item: SidebarMenuItem, onRouteClick?: () => void) {
     return <span className={styles.menuStatusText}>{item.label}</span>
   }
 
-  if (item.href) {
+  if (item.href && !item.children) {
     if (item.isExternal) {
       return (
         <a href={item.href} target="_blank" rel="noreferrer" onClick={onRouteClick}>
@@ -40,15 +42,23 @@ function getMenuLabel(item: SidebarMenuItem, onRouteClick?: () => void) {
   return item.label
 }
 
-function getMenuItems(items: SidebarMenuItem[], onRouteClick?: () => void): MenuProps['items'] {
+function getMenuItems(
+  items: SidebarMenuItem[],
+  onRouteClick: (() => void) | undefined,
+  onTitleRouteClick: (item: SidebarMenuItem) => void
+): MenuProps['items'] {
   return items.map((item) => {
     const Icon = item.icon
+    const hasChildren = Boolean(item.children)
 
     return {
       key: item.key,
       icon: Icon ? <Icon /> : undefined,
       label: getMenuLabel(item, onRouteClick),
-      children: item.children ? getMenuItems(item.children, onRouteClick) : undefined,
+      children: item.children
+        ? getMenuItems(item.children, onRouteClick, onTitleRouteClick)
+        : undefined,
+      onTitleClick: hasChildren && item.href ? () => onTitleRouteClick(item) : undefined,
       disabled: item.disabled
     }
   })
@@ -61,10 +71,22 @@ export function SidebarMenu({
   openKeys,
   selectedKey
 }: SidebarMenuProps) {
+  const router = useRouter()
+  const onTitleRouteClick = (item: SidebarMenuItem) => {
+    if (!item.href || item.isExternal) {
+      return
+    }
+
+    router.push(item.href)
+    onRouteClick?.()
+  }
+
   return (
     <Menu
-      className={styles.menu}
-      items={getMenuItems(items, onRouteClick)}
+      className={classNames(styles.menu, {
+        [styles.menuGtkOverviewSelected]: selectedKey === GTK_MENU_KEY
+      })}
+      items={getMenuItems(items, onRouteClick, onTitleRouteClick)}
       mode="inline"
       openKeys={openKeys}
       selectedKeys={selectedKey ? [selectedKey] : []}

@@ -7,6 +7,7 @@ import {
 import type { ComponentType } from 'react'
 
 export const GTK_MENU_KEY = 'gtk-root'
+export const GTK_OVERVIEW_HREF = '/deposits'
 
 export type SidebarMenuItem = {
   key: string
@@ -29,6 +30,7 @@ export const BASE_SIDEBAR_ITEMS: SidebarMenuItem[] = [
   },
   {
     key: GTK_MENU_KEY,
+    href: GTK_OVERVIEW_HREF,
     label: 'Месторождения',
     icon: EnvironmentOutlined,
     children: []
@@ -51,6 +53,10 @@ export const BASE_SIDEBAR_ITEMS: SidebarMenuItem[] = [
 export function getSelectedSidebarKey(pathname: string) {
   if (pathname === '/') {
     return '/'
+  }
+
+  if (pathname === GTK_OVERVIEW_HREF) {
+    return GTK_MENU_KEY
   }
 
   if (pathname === '/settings') {

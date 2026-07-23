@@ -244,6 +244,23 @@
   font-weight: 600;
 }
 
+.menuGtkOverviewSelected :global(.ant-menu-submenu-selected > .ant-menu-submenu-title) {
+  color: var(--palette-accent-on-solid) !important;
+  font-weight: 700;
+  background: var(--palette-accent-primary) !important;
+}
+
+.menuGtkOverviewSelected
+  :global(.ant-menu-submenu-selected > .ant-menu-submenu-title .ant-menu-title-content),
+.menuGtkOverviewSelected
+  :global(.ant-menu-submenu-selected > .ant-menu-submenu-title .ant-menu-submenu-arrow),
+.menuGtkOverviewSelected :global(.ant-menu-submenu-selected > .ant-menu-submenu-title .anticon),
+.menuGtkOverviewSelected
+  :global(.ant-menu-submenu-selected > .ant-menu-submenu-title .anticon svg) {
+  color: var(--palette-accent-on-solid) !important;
+  fill: currentColor;
+}
+
 .menu :global(.ant-menu-sub .ant-menu-item) {
   padding-left: 2.25rem !important;
 }
