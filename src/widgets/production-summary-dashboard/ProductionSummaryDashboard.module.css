@@ -924,7 +924,12 @@
 
 .chartBox {
   width: 100%;
-  height: 14rem;
+  height: 16rem;
+  overflow: visible;
+}
+
+.chartBox :global(.recharts-wrapper),
+.chartBox :global(.recharts-surface) {
   overflow: visible;
 }
 
@@ -1061,6 +1066,27 @@
   font-size: var(--font-size-xs);
 }
 
+.graphTopAnnotation {
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.graphTopAnnotationLabel {
+  fill: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+.graphTopAnnotationFact {
+  fill: var(--color-kpi-fact);
+  font-size: var(--font-size-sm);
+}
+
+.graphTopAnnotationDelta {
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
 .graphTooltip {
   padding: var(--space-2);
   border: var(--border-width-hairline) solid var(--color-chart-tooltip-border);
@@ -1085,12 +1111,30 @@
 
 .graphTooltipItem {
   font-size: var(--font-size-base);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.25;
+}
+
+.graphTooltipItemLabel {
+  color: var(--color-text-default);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.graphTooltipItemValue {
+  margin-left: var(--space-1);
+  font-weight: 600;
 }
 
 .graphTooltipFactValue {
   font-weight: 600;
+}
+
+.graphTooltipDelta {
+  margin-top: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: 1.25;
 }
 
 .graphBrush :global(.recharts-brush-slide) {
@@ -1233,7 +1277,7 @@
   }
 
   .chartBox {
-    height: 15rem;
+    height: 17rem;
   }
 
   .compactChartBox {

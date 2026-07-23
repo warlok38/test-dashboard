@@ -7,6 +7,7 @@ import {
   CartesianGrid,
   ComposedChart,
   Line,
+  ReferenceDot,
   ReferenceLine,
   Tooltip,
   XAxis,
@@ -14,7 +15,12 @@ import {
   type TooltipContentProps
 } from 'recharts'
 
-import { type GraphPeriod, type GraphPoint } from '@/entities/production-summary'
+import {
+  formatDeviation,
+  getDeviationClassName,
+  type GraphPeriod,
+  type GraphPoint
+} from '@/entities/production-summary'
 import { ChartFrame, Loader } from '@/shared/ui'
 import { formatNumber } from '@/shared/utils/formatNumber'
 
@@ -30,6 +36,7 @@ import {
   type GraphYAxisDataPoint,
   type GraphYAxisValueRange
 } from './graph-y-axis'
+import { getGraphTopAnnotations, type GraphTopAnnotation } from './graph-top-annotations'
 
 const COMPACT_POINT_LIMIT = 10
 const COMPACT_POINT_WIDTH = 150
@@ -74,6 +81,16 @@ type AxisTickProps = {
   x?: number | string
   y?: number | string
   payload?: AxisTickPayload
+}
+
+type GraphTopAnnotationLabelProps = {
+  annotation: GraphTopAnnotation
+  viewBox?: {
+    x?: number | string
+    y?: number | string
+  }
+  x?: number | string
+  y?: number | string
 }
 
 type GraphChartProps = {
@@ -137,6 +154,17 @@ function formatTooltipNumber(value: unknown) {
   return formatNumber(numberValue)
 }
 
+function getTooltipDelta(point: Partial<Record<GraphSeriesKey, unknown>> | undefined) {
+  const fact = Number(point?.fact)
+  const plan = Number(point?.plan)
+
+  if (!Number.isFinite(fact) || !Number.isFinite(plan) || plan === 0) {
+    return null
+  }
+
+  return ((fact - plan) / plan) * 100
+}
+
 function formatTooltipDate(value: string) {
   const match = value.match(GRAPH_DATE_REGEXP)
 
@@ -153,6 +181,7 @@ function GraphTooltip({ active, label, payload }: TooltipContentProps) {
   }
 
   const point = payload[0]?.payload as Partial<Record<GraphSeriesKey, unknown>> | undefined
+  const delta = getTooltipDelta(point)
   const items = GRAPH_SERIES_CONFIGS.map((series) => ({
     ...series,
     value: point?.[series.key]
@@ -166,17 +195,72 @@ function GraphTooltip({ active, label, payload }: TooltipContentProps) {
           const isFact = item.key === 'fact'
 
           return (
-            <div key={item.key} className={styles.graphTooltipItem} style={{ color: item.color }}>
-              <span>{item.name}</span>
-              <span> : </span>
-              <span className={isFact ? styles.graphTooltipFactValue : undefined}>
+            <div key={item.key} className={styles.graphTooltipItem}>
+              <span className={styles.graphTooltipItemLabel}>{item.name}:</span>
+              <span
+                className={`${styles.graphTooltipItemValue} ${
+                  isFact ? styles.graphTooltipFactValue : ''
+                }`}
+                style={{ color: item.color }}
+              >
                 {formatTooltipNumber(item.value)}
               </span>
             </div>
           )
         })}
       </div>
+      {delta === null ? null : (
+        <div className={`${styles.graphTooltipDelta} ${styles[getDeviationClassName(delta)]}`}>
+          {formatDeviation(delta)}
+        </div>
+      )}
     </div>
+  )
+}
+
+function getCoordinate(value: string | number | undefined) {
+  const coordinate = Number(value)
+
+  return Number.isFinite(coordinate) ? coordinate : undefined
+}
+
+function GraphTopAnnotationLabel({ annotation, viewBox, x, y }: GraphTopAnnotationLabelProps) {
+  const labelX = getCoordinate(x ?? viewBox?.x)
+  const labelY = getCoordinate(y ?? viewBox?.y)
+
+  if (labelX === undefined || labelY === undefined) {
+    return null
+  }
+
+  const deltaClassName =
+    annotation.delta === null ? '' : styles[getDeviationClassName(annotation.delta)]
+
+  return (
+    <text
+      className={styles.graphTopAnnotation}
+      fill="currentColor"
+      textAnchor="middle"
+      x={labelX}
+      y={labelY - (annotation.label ? 34 : 22)}
+    >
+      {annotation.label ? (
+        <tspan className={styles.graphTopAnnotationLabel} x={labelX}>
+          {annotation.label}
+        </tspan>
+      ) : null}
+      <tspan
+        className={styles.graphTopAnnotationFact}
+        dy={annotation.label ? 12 : undefined}
+        x={annotation.label ? labelX : undefined}
+      >
+        {formatCompactAxisNumber(annotation.fact)}
+      </tspan>
+      {annotation.delta === null ? null : (
+        <tspan className={`${styles.graphTopAnnotationDelta} ${deltaClassName}`} dy="12" x={labelX}>
+          {formatDeviation(annotation.delta)}
+        </tspan>
+      )}
+    </text>
   )
 }
 
@@ -480,13 +564,19 @@ export function GraphChart({
           const yAxisTicks =
             size === 'compact' ? getCompactYAxisTicks(yAxisScale.ticks) : yAxisScale.ticks
           const yAxisTickCount = size === 'compact' ? COMPACT_Y_AXIS_TICK_COUNT : Y_AXIS_TICK_COUNT
+          const topAnnotations = size === 'compact' ? [] : getGraphTopAnnotations(visibleXAxisData)
 
           return (
             <ComposedChart
               barGap={0}
               data={yAxisScale.data}
               height={height}
-              margin={{ top: 8, right: 16, bottom: shouldUseBrush ? 8 : 0, left: -16 }}
+              margin={{
+                top: size === 'compact' ? 8 : 40,
+                right: 16,
+                bottom: shouldUseBrush ? 8 : 0,
+                left: -16
+              }}
               width={width}
             >
               <CartesianGrid stroke={GRID_COLOR} vertical={false} />
@@ -511,6 +601,17 @@ export function GraphChart({
                 tick={(props) => <YAxisTick {...props} tickFormatter={yAxisScale.formatTick} />}
               />
               <Tooltip content={(props) => <GraphTooltip {...props} />} isAnimationActive={false} />
+              {topAnnotations.map((annotation) => (
+                <ReferenceDot
+                  key={`${annotation.date}-${annotation.index}`}
+                  x={annotation.date}
+                  y={yAxisScale.domain[1]}
+                  r={0}
+                  fill="none"
+                  stroke="none"
+                  label={(props) => <GraphTopAnnotationLabel {...props} annotation={annotation} />}
+                />
+              ))}
               {renderSeries('bar', barSize)}
               {renderSeries('line', barSize)}
               {shouldUseBrush ? (
