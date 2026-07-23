@@ -424,16 +424,18 @@ export function GraphChart({
     })
 
   const renderZeroLabels = () =>
-    yAxisScale.zeroLabels.map((label) => (
-      <ReferenceDot
-        key={`${label.date}-${label.key}`}
-        x={label.date}
-        y={0}
-        r={0}
-        ifOverflow="visible"
-        label={(props) => <ZeroValueLabel {...props} label={label} />}
-      />
-    ))
+    size === 'compact'
+      ? null
+      : yAxisScale.zeroLabels.map((label) => (
+          <ReferenceDot
+            key={`${label.date}-${label.key}`}
+            x={label.date}
+            y={0}
+            r={0}
+            ifOverflow="visible"
+            label={(props) => <ZeroValueLabel {...props} label={label} />}
+          />
+        ))
 
   const handleBrushChange = (range: { startIndex?: number; endIndex?: number }) => {
     if (typeof range.startIndex !== 'number' || typeof range.endIndex !== 'number') {

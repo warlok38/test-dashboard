@@ -925,11 +925,13 @@
 .chartBox {
   width: 100%;
   height: 14rem;
+  overflow: visible;
 }
 
 .compactChartBox {
   width: 100%;
   height: 6.5rem;
+  overflow: visible;
 }
 
 .graphWheelArea {
