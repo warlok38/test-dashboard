@@ -900,6 +900,14 @@
   font-weight: 500;
 }
 
+.detailScaleModeLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  font-size: var(--font-size-xs);
+}
+
 .seriesViewIconLabel {
   display: inline-flex;
   align-items: center;
@@ -1049,6 +1057,18 @@
 .graphYAxisTick {
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
+}
+
+.graphZeroValueLabel {
+  fill: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.graphZeroValueDash {
+  fill: var(--color-text-muted);
+  font-size: var(--font-size-base);
 }
 
 .graphTooltip {
