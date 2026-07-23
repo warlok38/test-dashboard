@@ -617,7 +617,7 @@ function GraphTabContent({
         )
       }
 
-      return <Empty />
+      return <Empty description="Нет детальных данных" />
     }
 
     return (
