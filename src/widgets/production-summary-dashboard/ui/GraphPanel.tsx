@@ -128,6 +128,7 @@ type GraphPanelQuery = Pick<GraphQuery, 'indicator' | 'gtk' | 'shift' | 'product
 type GraphPanelProps = {
   graphPeriod: GraphPeriod
   query: GraphPanelQuery | undefined
+  showCameraButton?: boolean
 }
 
 type GraphControlsProps = {
@@ -139,6 +140,7 @@ type GraphControlsProps = {
   onCameraVisibleChange: (isVisible: boolean) => void
   seriesView: Record<GraphSeriesKey, GraphSeriesView>
   onSeriesViewChange: (seriesKey: GraphSeriesKey, view: GraphSeriesView) => void
+  showCameraButton: boolean
 }
 
 type GraphTab = {
@@ -230,7 +232,8 @@ function GraphControls({
   onDetailScaleModeChange,
   onCameraVisibleChange,
   seriesView,
-  onSeriesViewChange
+  onSeriesViewChange,
+  showCameraButton
 }: GraphControlsProps) {
   const content = (
     <div className={styles.graphSettingsMenu}>
@@ -259,46 +262,53 @@ function GraphControls({
     </div>
   )
   const cameraToggleIcon = isCameraVisible ? <VideoCameraFilled /> : <VideoCameraOutlined />
+  const actions: Array<{
+    icon: ReactNode
+    key: string
+    label: string
+    render?: (button: ReactNode) => ReactNode
+  }> = [
+    {
+      icon: <SettingOutlined />,
+      key: 'settings',
+      label: 'Настройки отображения',
+      render: (button) => (
+        <Popover
+          classNames={{
+            content: styles.graphSettingsPopoverContent,
+            root: styles.graphSettingsPopoverRoot
+          }}
+          content={content}
+          placement="leftTop"
+          trigger={['click']}
+        >
+          {button}
+        </Popover>
+      )
+    }
+  ]
+
+  if (showCameraButton) {
+    actions.push({
+      icon: <VideoCameraOutlined />,
+      key: 'cameras',
+      label: isCameraVisible ? 'Выключить камеры' : 'Включить камеры',
+      render: () => (
+        <button
+          className={`${styles.cameraToggleButton} ${
+            isCameraVisible ? styles.cameraToggleButtonActive : ''
+          }`}
+          type="button"
+          onClick={() => onCameraVisibleChange(!isCameraVisible)}
+        >
+          {cameraToggleIcon}
+        </button>
+      )
+    })
+  }
 
   return (
-    <SideActions
-      actions={[
-        {
-          icon: <SettingOutlined />,
-          key: 'settings',
-          label: 'Настройки отображения',
-          render: (button) => (
-            <Popover
-              classNames={{
-                content: styles.graphSettingsPopoverContent,
-                root: styles.graphSettingsPopoverRoot
-              }}
-              content={content}
-              placement="leftTop"
-              trigger={['click']}
-            >
-              {button}
-            </Popover>
-          )
-        },
-        {
-          icon: <VideoCameraOutlined />,
-          key: 'cameras',
-          label: isCameraVisible ? 'Выключить камеры' : 'Включить камеры',
-          render: () => (
-            <button
-              className={`${styles.cameraToggleButton} ${
-                isCameraVisible ? styles.cameraToggleButtonActive : ''
-              }`}
-              type="button"
-              onClick={() => onCameraVisibleChange(!isCameraVisible)}
-            >
-              {cameraToggleIcon}
-            </button>
-          )
-        }
-      ]}
-    >
+    <SideActions actions={actions}>
       <Segmented<GraphDetailMode>
         className={styles.graphDetailModeSelector}
         options={GRAPH_DETAIL_MODE_OPTIONS.map((option) => ({
@@ -545,7 +555,7 @@ function GraphTabContent({
   )
 }
 
-function GraphTabsPanel({ graphPeriod, query }: GraphPanelProps) {
+function GraphTabsPanel({ graphPeriod, query, showCameraButton = false }: GraphPanelProps) {
   const [activeTabKey, setActiveTabKey] = useState(MAIN_TAB_KEY)
   const [visitedTabKeys, setVisitedTabKeys] = useState<Set<string>>(() => new Set([MAIN_TAB_KEY]))
   const [activeDetailMode, setActiveDetailMode] = useState<GraphDetailMode>(
@@ -584,6 +594,12 @@ function GraphTabsPanel({ graphPeriod, query }: GraphPanelProps) {
       return new Set([...Array.from(currentKeys), activeTabKey])
     })
   }, [activeTabKey])
+
+  useEffect(() => {
+    if (!showCameraButton) {
+      setIsCameraVisible(false)
+    }
+  }, [showCameraButton])
 
   const updateSeriesView = (seriesKey: GraphSeriesKey, view: GraphSeriesView) => {
     setSeriesView((currentView) => ({
@@ -684,7 +700,7 @@ function GraphTabsPanel({ graphPeriod, query }: GraphPanelProps) {
             tabBarExtraContent={tabBarExtraContent}
             onChange={setActiveTabKey}
           />
-          {isCameraVisible ? (
+          {showCameraButton && isCameraVisible ? (
             <GraphCameraOverlay
               description={DEFAULT_CAMERA_STREAM.description}
               detailSrc={DEFAULT_CAMERA_STREAM.detailSrc}
@@ -702,6 +718,7 @@ function GraphTabsPanel({ graphPeriod, query }: GraphPanelProps) {
           onDetailModeChange={setActiveDetailMode}
           onDetailScaleModeChange={setDetailScaleMode}
           onSeriesViewChange={updateSeriesView}
+          showCameraButton={showCameraButton}
         />
       </section>
     </div>

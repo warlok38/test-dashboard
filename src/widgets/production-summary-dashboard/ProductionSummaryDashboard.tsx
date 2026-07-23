@@ -23,6 +23,7 @@ import { GeneralSummary, GraphPanel } from './ui'
 
 type SummaryDashboardProps = {
   query: SummaryQuery
+  showCameraButton?: boolean
   showGraph?: boolean
 }
 
@@ -48,7 +49,11 @@ function getSelectedGeneralSummaryIndicator(
     : indicators[0]?.indicator_name
 }
 
-export function ProductionSummaryDashboard({ query, showGraph = false }: SummaryDashboardProps) {
+export function ProductionSummaryDashboard({
+  query,
+  showCameraButton = false,
+  showGraph = false
+}: SummaryDashboardProps) {
   const dispatch = useAppDispatch()
   const periodScope = useAppSelector(
     (state: { periodFilter: PeriodScopeState }) => state.periodFilter
@@ -127,7 +132,13 @@ export function ProductionSummaryDashboard({ query, showGraph = false }: Summary
         activeIndicator={selectedIndicator}
         loading={isGeneralSummaryLoading}
       />
-      {showGraph && <GraphPanel graphPeriod={period.key} query={graphQuery} />}
+      {showGraph && (
+        <GraphPanel
+          graphPeriod={period.key}
+          query={graphQuery}
+          showCameraButton={showCameraButton}
+        />
+      )}
     </section>
   )
 }
