@@ -7,7 +7,6 @@ import {
   CartesianGrid,
   ComposedChart,
   Line,
-  ReferenceDot,
   ReferenceLine,
   Tooltip,
   XAxis,
@@ -29,8 +28,7 @@ import {
 import {
   createGraphYAxisScale,
   type GraphYAxisDataPoint,
-  type GraphYAxisValueRange,
-  type GraphYAxisZeroLabel
+  type GraphYAxisValueRange
 } from './graph-y-axis'
 
 const COMPACT_POINT_LIMIT = 10
@@ -220,53 +218,6 @@ function getDefaultBrushRange(dataLength: number): BrushRange | undefined {
   )
 }
 
-type ZeroValueLabelProps = {
-  x?: number | string
-  y?: number | string
-}
-
-function ZeroValueLabel({
-  label,
-  x = 0,
-  y = 0
-}: ZeroValueLabelProps & { label: GraphYAxisZeroLabel }) {
-  const numericX = Number(x)
-  const numericY = Number(y)
-  const isBar = label.view === 'bar'
-  const xOffset = label.key === 'fact' ? -8 : 8
-
-  if (!Number.isFinite(numericX) || !Number.isFinite(numericY)) {
-    return null
-  }
-
-  if (isBar) {
-    return (
-      <g
-        className={styles.graphZeroValueLabel}
-        transform={`translate(${numericX + xOffset} ${numericY})`}
-      >
-        <text className={styles.graphZeroValueDash} textAnchor="middle" y={-8}>
-          -
-        </text>
-        <text textAnchor="middle" y={12}>
-          0
-        </text>
-      </g>
-    )
-  }
-
-  return (
-    <text
-      className={styles.graphZeroValueLabel}
-      textAnchor="middle"
-      x={numericX + xOffset}
-      y={numericY - 8}
-    >
-      0
-    </text>
-  )
-}
-
 function normalizeBrushRange(
   range: BrushRange | undefined,
   dataLength: number
@@ -423,20 +374,6 @@ export function GraphChart({
       )
     })
 
-  const renderZeroLabels = () =>
-    size === 'compact'
-      ? null
-      : yAxisScale.zeroLabels.map((label) => (
-          <ReferenceDot
-            key={`${label.date}-${label.key}`}
-            x={label.date}
-            y={0}
-            r={0}
-            ifOverflow="visible"
-            label={(props) => <ZeroValueLabel {...props} label={label} />}
-          />
-        ))
-
   const handleBrushChange = (range: { startIndex?: number; endIndex?: number }) => {
     if (typeof range.startIndex !== 'number' || typeof range.endIndex !== 'number') {
       return
@@ -576,7 +513,6 @@ export function GraphChart({
               <Tooltip content={(props) => <GraphTooltip {...props} />} isAnimationActive={false} />
               {renderSeries('bar', barSize)}
               {renderSeries('line', barSize)}
-              {renderZeroLabels()}
               {shouldUseBrush ? (
                 <Brush
                   key={dataKey}

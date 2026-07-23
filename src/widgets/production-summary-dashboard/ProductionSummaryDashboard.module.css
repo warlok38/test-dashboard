@@ -1061,18 +1061,6 @@
   font-size: var(--font-size-xs);
 }
 
-.graphZeroValueLabel {
-  fill: var(--color-text-muted);
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-  pointer-events: none;
-}
-
-.graphZeroValueDash {
-  fill: var(--color-text-muted);
-  font-size: var(--font-size-base);
-}
-
 .graphTooltip {
   padding: var(--space-2);
   border: var(--border-width-hairline) solid var(--color-chart-tooltip-border);

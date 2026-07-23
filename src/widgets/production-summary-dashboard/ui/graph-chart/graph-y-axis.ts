@@ -12,19 +12,12 @@ export type GraphYAxisDataPoint = GraphYAxisPoint & {
   planChartValue: number | null
 }
 
-export type GraphYAxisZeroLabel = {
-  date: string
-  key: GraphYAxisSeriesKey
-  view: GraphYAxisSeriesView
-}
-
 export type GraphYAxisScale = {
   data: GraphYAxisDataPoint[]
   domain: [number, number]
   formatTick: (value: string | number | undefined) => string
   isCompressedZeroScale: boolean
   ticks?: number[]
-  zeroLabels: GraphYAxisZeroLabel[]
 }
 
 export type GraphYAxisValueRange = {
@@ -51,7 +44,19 @@ function isFiniteNumber(value: number | null | undefined): value is number {
 }
 
 function formatTickValue(value: number) {
-  return String(Math.round(value))
+  if (value === 0) {
+    return '0'
+  }
+
+  if (value > 0 && value < 1) {
+    return '1'
+  }
+
+  if (value < 0 && value > -1) {
+    return '-1'
+  }
+
+  return String(Math.floor(value))
 }
 
 function getChartValueKey(key: GraphYAxisSeriesKey) {
@@ -87,8 +92,7 @@ function createLegacyScale(data: GraphYAxisPoint[]): GraphYAxisScale {
     data: createLegacyData(data),
     domain: [0, getDefaultYAxisMax(data)],
     formatTick: (value) => (value === undefined ? '' : String(value)),
-    isCompressedZeroScale: false,
-    zeroLabels: []
+    isCompressedZeroScale: false
   }
 }
 
@@ -181,12 +185,10 @@ export function createGraphYAxisScale({
 
         return value === undefined ? '' : String(value)
       },
-      isCompressedZeroScale: false,
-      zeroLabels: []
+      isCompressedZeroScale: false
     }
   }
 
-  const zeroLabels: GraphYAxisZeroLabel[] = []
   const normalizedData = data.map((point) => {
     const nextPoint: GraphYAxisDataPoint = {
       ...point,
@@ -206,13 +208,8 @@ export function createGraphYAxisScale({
 
       if (value === 0 && seriesView[key] === 'bar') {
         nextPoint[chartValueKey] = null
-        zeroLabels.push({ date: point.date, key, view: seriesView[key] })
 
         return
-      }
-
-      if (value === 0) {
-        zeroLabels.push({ date: point.date, key, view: seriesView[key] })
       }
 
       nextPoint[chartValueKey] = normalizeCompressedValue(value, minValue, maxValue)
@@ -234,7 +231,6 @@ export function createGraphYAxisScale({
       return formatTickValue(denormalizeCompressedValue(numericValue, minValue, maxValue))
     },
     isCompressedZeroScale: true,
-    ticks: createCompressedTicks(minValue, maxValue),
-    zeroLabels
+    ticks: createCompressedTicks(minValue, maxValue)
   }
 }
