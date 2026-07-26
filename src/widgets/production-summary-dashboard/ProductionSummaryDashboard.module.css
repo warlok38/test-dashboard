@@ -2,7 +2,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  min-height: 100%;
   padding: var(--space-4);
   background: var(--color-bg-default);
 }
@@ -170,24 +169,136 @@
   min-width: 0;
 }
 
-.generalSummaryShowAll {
+.sideActions {
   display: flex;
-  flex: 0 0 var(--space-8);
+  flex: 0 0 var(--space-12);
+  flex-direction: column;
   gap: var(--space-2);
+  align-items: center;
+  width: var(--space-12);
+  padding: var(--space-3) var(--space-2);
+  border-left: var(--border-width-hairline) solid var(--palette-dashboard-card-border);
+  background: var(--color-bg-card);
+}
+
+.sideActionTarget {
+  display: inline-flex;
+}
+
+.sideActionsChildren {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: var(--space-1);
+  padding-top: var(--space-2);
+  border-top: var(--border-width-hairline) solid var(--palette-dashboard-card-border);
+}
+
+.sideActionButton.sideActionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--space-8);
+  width: var(--space-8);
+  height: var(--space-8);
+  padding: 0;
+  border-radius: 50%;
+  color: var(--color-text-muted);
+  background: var(--palette-bg-muted);
+}
+
+.sideActionButton.sideActionButton:hover,
+.sideActionButton.sideActionButton:focus-visible {
+  color: var(--color-text-strong);
+  background: var(--color-bg-interactive-hover);
+}
+
+.cameraToggleButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--space-8);
+  width: var(--space-8);
+  height: var(--space-8);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-5);
+  color: var(--color-text-muted);
+  background: transparent;
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  line-height: 1;
+}
+
+.cameraToggleButtonActive {
+  color: #000;
+  background: var(--color-kpi-fact);
+}
+
+.graphDetailModeSelector.graphDetailModeSelector {
+  padding: 0;
+  background: transparent;
+}
+
+.graphDetailModeSelector.graphDetailModeSelector :global(.ant-segmented-group) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.graphDetailModeSelector.graphDetailModeSelector :global(.ant-segmented-thumb) {
+  border-radius: var(--radius-5);
+  background: var(--color-kpi-fact);
+  box-shadow: none;
+}
+
+.graphDetailModeSelector.graphDetailModeSelector :global(.ant-segmented-item) {
+  display: flex;
   align-items: center;
   justify-content: center;
   width: var(--space-8);
-  padding: var(--space-2) var(--space-1);
-  border-left: var(--border-width-hairline) solid var(--palette-dashboard-card-border);
+  height: var(--space-8);
+  min-height: var(--space-8);
+  border-radius: 50%;
   color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  white-space: nowrap;
-  writing-mode: vertical-rl;
-  cursor: pointer;
+  background: transparent;
+}
+
+.graphDetailModeSelector.graphDetailModeSelector :global(.ant-segmented-item-label) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--space-8);
+  padding: 0;
+  line-height: 1;
+}
+
+.graphDetailModeSelector.graphDetailModeSelector
+  :global(.ant-segmented-item:not(.ant-segmented-item-selected):hover) {
+  color: var(--color-text-strong);
+  background: var(--color-bg-interactive-hover);
+}
+
+.graphDetailModeSelector.graphDetailModeSelector
+  :global(.ant-segmented-item-selected.ant-segmented-item-selected) {
+  color: var(--palette-accent-on-solid);
+  background: var(--color-kpi-fact);
+  box-shadow: none;
+}
+
+.graphDetailModeIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-8);
+  height: var(--space-8);
+  font-size: var(--font-size-base);
 }
 
 .generalSummaryTopIndicator {
   min-width: 22%;
+  border-right: var(--border-width-hairline) solid var(--palette-dashboard-card-border);
 }
 
 .generalSummaryIndicatorsWrapper {
@@ -210,7 +321,6 @@
   flex-direction: column;
   gap: var(--space-1);
   width: 100%;
-  height: 100%;
   padding: var(--space-3) var(--space-4);
   border-right: var(--border-width-hairline) solid var(--palette-dashboard-card-border);
   border-bottom: var(--border-width-hairline) solid var(--palette-dashboard-card-border);
@@ -222,6 +332,10 @@
 
 .generalSummaryCardActive {
   background-color: var(--color-bg-kpi-active);
+}
+
+.generalSummaryCardActive .generalSummaryCardTitle {
+  color: var(--color-text-strong);
 }
 
 .generalSummaryCardWrapperLarge {
@@ -255,7 +369,7 @@
 }
 
 .generalSummaryCardTitleLarge {
-  font-size: var(--font-size-5xl);
+  font-size: var(--font-size-4xl);
 }
 
 .generalSummaryCardTitleSmall {
@@ -280,7 +394,7 @@
 }
 
 .generalSummaryCardFactLarge {
-  font-size: var(--font-size-11xl);
+  font-size: var(--font-size-10xl);
 }
 
 .generalSummaryCardFactSmall {
@@ -622,12 +736,103 @@
   gap: var(--space-4);
 }
 
+.graphTabs {
+  min-width: 0;
+}
+
+.graphTabs :global(.ant-tabs-nav) {
+  margin-bottom: var(--space-2);
+}
+
+.graphTabs :global(.ant-tabs-tab) {
+  padding: 0 0 var(--space-2);
+}
+
+.graphTabs :global(.ant-tabs-tab + .ant-tabs-tab) {
+  margin-left: var(--space-6);
+}
+
+.graphTabs :global(.ant-tabs-content-holder) {
+  min-width: 0;
+}
+
+.graphTabsExtra {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-bottom: var(--space-2);
+}
+
+.graphTabLabel,
+.graphTabLabelDetail {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  max-width: 22rem;
+  color: inherit;
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.graphTabLabelDetail {
+  font-size: var(--font-size-lg);
+  font-weight: 500;
+}
+
+.graphTabUnit {
+  flex: 0 0 auto;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.graphDetailsStatus {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.graphSettingsButton {
+  color: var(--color-text-muted);
+}
+
+.graphSettingsButton:hover,
+.graphSettingsButton:focus-visible {
+  color: var(--color-text-strong);
+}
+
+.graphSettingsPopoverRoot.graphSettingsPopoverRoot {
+  max-width: calc(100vw - var(--space-8));
+}
+
+.graphSettingsPopoverContent {
+  padding: var(--space-1);
+}
+
+.graphSettingsMenu {
+  min-width: 12rem;
+}
+
 .graphPanel {
-  padding: var(--space-3) var(--space-4);
+  display: flex;
+  overflow: hidden;
+  padding: 0;
   border: var(--border-width-hairline) solid var(--palette-border-soft);
   border-radius: var(--radius-5);
   background: var(--color-bg-card);
   box-shadow: var(--color-shadow-card);
+}
+
+.graphPanelContent {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
 }
 
 .graphHeader {
@@ -677,14 +882,14 @@
 }
 
 .graphViewControls {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
+  display: grid;
+  gap: var(--space-2);
 }
 
 .graphPeriodControl,
 .seriesViewControl {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(3.5rem, 1fr) auto;
   align-items: center;
   gap: var(--space-2);
 }
@@ -693,6 +898,14 @@
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
   font-weight: 500;
+}
+
+.detailScaleModeLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  font-size: var(--font-size-xs);
 }
 
 .seriesViewIconLabel {
@@ -711,17 +924,110 @@
 
 .chartBox {
   width: 100%;
-  height: 14rem;
+  height: 16rem;
+  overflow: visible;
+}
+
+.chartBox :global(.recharts-wrapper),
+.chartBox :global(.recharts-surface) {
+  overflow: visible;
 }
 
 .compactChartBox {
   width: 100%;
   height: 6.5rem;
+  overflow: visible;
 }
 
 .graphWheelArea {
   position: relative;
   min-width: 0;
+}
+
+.graphMainChartArea {
+  position: relative;
+  min-width: 0;
+}
+
+.graphVideoOverlay {
+  position: absolute;
+  z-index: 3;
+  top: var(--space-4);
+  right: var(--space-4);
+  width: min(20rem, 17%);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: var(--border-width-hairline) solid color-mix(in srgb, var(--color-bg-card) 30%, #000);
+  border-radius: var(--radius-5);
+  background: #000;
+  box-shadow: var(--color-shadow-card);
+}
+
+.graphVideoPreviewButton {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: block;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.graphVideoPreviewHover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: rgb(0 0 0 / 36%);
+  font-size: var(--font-size-2xl);
+  opacity: 0;
+  transition: opacity 0.16s ease;
+  pointer-events: none;
+}
+
+.graphVideoPreviewButton:hover .graphVideoPreviewHover,
+.graphVideoPreviewButton:focus-visible .graphVideoPreviewHover {
+  opacity: 1;
+}
+
+.graphCameraModal.graphCameraModal :global(.ant-modal-content) {
+  padding: var(--space-5);
+}
+
+.graphCameraModal.graphCameraModal :global(.ant-modal-header) {
+  margin-bottom: var(--space-4);
+}
+
+.graphCameraModal.graphCameraModal :global(.ant-modal-title) {
+  color: var(--color-text-strong);
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.graphCameraModalContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.graphCameraModalVideo {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-5);
+  background: #000;
+}
+
+.graphCameraModalDescription {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-base);
+  line-height: 1.4;
 }
 
 .graphEmptyChartLabel {
@@ -740,6 +1046,9 @@
   z-index: 2;
   top: var(--space-2);
   right: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   padding: 0.125rem var(--space-2);
   border: var(--border-width-hairline) solid var(--palette-border-soft);
   border-radius: var(--radius-2);
@@ -755,6 +1064,27 @@
 .graphYAxisTick {
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
+}
+
+.graphTopAnnotation {
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.graphTopAnnotationLabel {
+  fill: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+.graphTopAnnotationFact {
+  fill: var(--color-kpi-fact);
+  font-size: var(--font-size-sm);
+}
+
+.graphTopAnnotationDelta {
+  font-size: var(--font-size-xs);
+  font-weight: 500;
 }
 
 .graphTooltip {
@@ -781,12 +1111,30 @@
 
 .graphTooltipItem {
   font-size: var(--font-size-base);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.25;
+}
+
+.graphTooltipItemLabel {
+  color: var(--color-text-default);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.graphTooltipItemValue {
+  margin-left: var(--space-1);
+  font-weight: 600;
 }
 
 .graphTooltipFactValue {
   font-weight: 600;
+}
+
+.graphTooltipDelta {
+  margin-top: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: 1.25;
 }
 
 .graphBrush :global(.recharts-brush-slide) {
@@ -857,6 +1205,10 @@
   line-height: 1.2;
 }
 
+.depositGraphTitlePlaceholder {
+  color: transparent;
+}
+
 .detailGraphsSection {
   min-width: 0;
 }
@@ -925,7 +1277,7 @@
   }
 
   .chartBox {
-    height: 15rem;
+    height: 17rem;
   }
 
   .compactChartBox {
@@ -948,12 +1300,33 @@
     min-width: 0;
   }
 
-  .generalSummaryShowAll {
+  .generalSummaryWrapper .sideActions,
+  .graphPanel .sideActions {
     flex: initial;
     width: 100%;
-    padding: 0;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding: var(--space-2);
     border-left: none;
-    writing-mode: initial;
+    border-top: var(--border-width-hairline) solid var(--palette-dashboard-card-border);
+  }
+
+  .graphPanel .sideActionsChildren {
+    width: auto;
+    margin-top: 0;
+    margin-left: var(--space-1);
+    padding-top: 0;
+    padding-left: var(--space-2);
+    border-top: none;
+    border-left: var(--border-width-hairline) solid var(--palette-dashboard-card-border);
+  }
+
+  .graphDetailModeSelector.graphDetailModeSelector :global(.ant-segmented-group) {
+    flex-direction: row;
+  }
+
+  .graphPanel {
+    flex-direction: column;
   }
 
   .kpiGrid,
@@ -973,7 +1346,16 @@
 
   .graphViewControls,
   .graphPeriodControl,
-  .graphControls {
+  .graphControls,
+  .graphTabsExtra {
     flex-wrap: wrap;
+  }
+
+  .graphTabs :global(.ant-tabs-tab + .ant-tabs-tab) {
+    margin-left: var(--space-3);
+  }
+
+  .graphVideoOverlay {
+    width: min(12rem, 45%);
   }
 }

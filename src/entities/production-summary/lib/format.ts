@@ -21,7 +21,7 @@ export function formatDeviation(value: number | null | undefined) {
 
   const sign = value > 0 ? '+' : ''
 
-  return `${sign}${formatSummaryNumber(value, 1)}% к плану`
+  return `${sign}${formatSummaryNumber(value, 1)}%`
 }
 
 export function formatFooterCount(value: number | null | undefined) {

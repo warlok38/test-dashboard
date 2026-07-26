@@ -2,6 +2,8 @@ export const API_TAGS = {
   gtk: 'Gtk',
   summary: 'Summary',
   graph: 'Graph',
+  graphByMode: 'GraphByMode',
+  graphMapping: 'GraphMapping',
   graphWithGtk: 'GraphWithGtk',
   graphWithDetails: 'GraphWithDetails',
   generalSummary: 'GeneralSummary'

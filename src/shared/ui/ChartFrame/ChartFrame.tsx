@@ -16,7 +16,6 @@ type ChartFrameSize = {
   height: number
 }
 
-const SKELETON_BARS = [36, 62, 48, 78, 54, 68, 42]
 const CHART_RESIZE_DEBOUNCE_MS = 120
 
 export function ChartFrame({ className, children }: ChartFrameProps) {
@@ -86,17 +85,7 @@ export function ChartFrame({ className, children }: ChartFrameProps) {
 
   const renderChart = () => {
     if (!hasMeasuredSize) {
-      return (
-        <div className={styles.skeleton}>
-          <div className={styles.skeletonGrid} />
-          <div className={styles.skeletonLine} />
-          <div className={styles.skeletonBars}>
-            {SKELETON_BARS.map((height, index) => (
-              <span key={index} style={{ height: `${height}%` }} />
-            ))}
-          </div>
-        </div>
-      )
+      return null
     }
 
     const chart = typeof children === 'function' ? children(size) : children

@@ -1,12 +1,12 @@
-import { type SummaryQuery } from '../model/types'
+import { type SummaryPeriod, type SummaryQuery } from '../model/types'
 
-const DEFAULT_SHIFT = 3
-const SUPPORTED_SHIFTS = new Set([3, 5, 99])
+const DEFAULT_PERIOD: SummaryPeriod = 'day'
+const SUPPORTED_PERIODS = new Set<SummaryPeriod>(['day', 'week', 'month', 'quarter', 'year'])
 
 type SearchParamValue = string | string[] | undefined
 
 export type SummarySearchParams = {
-  shift?: SearchParamValue
+  period?: SearchParamValue
   indicator?: SearchParamValue
 }
 
@@ -14,10 +14,10 @@ function getSearchParamValue(value: SearchParamValue) {
   return Array.isArray(value) ? value[0] : value
 }
 
-function getShiftParam(value: SearchParamValue) {
-  const shift = Number(getSearchParamValue(value))
+function getPeriodParam(value: SearchParamValue): SummaryPeriod {
+  const period = getSearchParamValue(value)
 
-  return SUPPORTED_SHIFTS.has(shift) ? shift : DEFAULT_SHIFT
+  return SUPPORTED_PERIODS.has(period as SummaryPeriod) ? (period as SummaryPeriod) : DEFAULT_PERIOD
 }
 
 export function getSummaryQueryFromSearchParams(
@@ -25,7 +25,7 @@ export function getSummaryQueryFromSearchParams(
   gtk?: string
 ): SummaryQuery {
   return {
-    shift: getShiftParam(searchParams?.shift),
+    period: getPeriodParam(searchParams?.period),
     indicator: getSearchParamValue(searchParams?.indicator),
     ...(gtk ? { gtk } : {})
   }

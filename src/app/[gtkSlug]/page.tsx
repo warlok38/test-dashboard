@@ -8,6 +8,8 @@ import {
 import { PageShell, PageSurface } from '@/shared/ui'
 import { ContentHeader, homeBreadcrumbIcon, ProductionSummaryDashboard } from '@/widgets'
 
+const CAMERA_BUTTON_GTK_SLUGS = new Set<string>(['natalka'])
+
 type GtkPageProps = {
   params: {
     gtkSlug: string
@@ -26,13 +28,14 @@ export default function GtkPage({ params, searchParams }: GtkPageProps) {
     <PageShell>
       <ContentHeader
         breadcrumbs={[
-          { label: 'Группа', href: '/', icon: homeBreadcrumbIcon },
+          { label: 'ГРУППА', href: '/', icon: homeBreadcrumbIcon },
           { label: gtkName.toUpperCase() }
         ]}
       />
       <PageSurface variant="constrained">
         <ProductionSummaryDashboard
           query={getSummaryQueryFromSearchParams(searchParams, gtkName)}
+          showCameraButton={CAMERA_BUTTON_GTK_SLUGS.has(params.gtkSlug)}
           showGraph
         />
       </PageSurface>

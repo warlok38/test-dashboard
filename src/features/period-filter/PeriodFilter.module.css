@@ -13,12 +13,12 @@
 }
 
 .scopeLabel {
-  min-width: 4.5rem;
+  min-width: 7.5rem;
   display: inline-flex;
   align-items: baseline;
   justify-content: center;
   gap: var(--space-1);
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl);
   font-weight: 500;
   color: var(--ant-color-text);
   text-transform: lowercase;
@@ -26,7 +26,7 @@
 
 .scopeLabelSecondary {
   color: var(--ant-color-text-tertiary);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   font-weight: 500;
 }
 
@@ -38,7 +38,41 @@
   color: var(--ant-color-text-disabled);
 }
 
+.periodSegment:global(.ant-segmented) {
+  background: transparent;
+}
+
+.periodSegment :global(.ant-segmented-group) {
+  align-items: center;
+}
+
+.periodSegment :global(.ant-segmented-item) {
+  position: relative;
+}
+
+.periodSegment :global(.ant-segmented-item:not(:last-child)) {
+  margin-inline-end: var(--space-2);
+}
+
+.periodSegment :global(.ant-segmented-item:not(:last-child)::before) {
+  content: '|';
+  position: absolute;
+  inset-inline-end: calc(var(--space-2) / -2);
+  top: 50%;
+  z-index: 2;
+  color: var(--color-text-muted);
+  font-weight: 400;
+  transform: translate(50%, -50%);
+  pointer-events: none;
+}
+
+.periodSegment :global(.ant-segmented-item) {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
 .periodSegment :global(.ant-segmented-item-label) {
+  font-size: var(--font-size-lg) !important;
   font-weight: 500;
 }
 

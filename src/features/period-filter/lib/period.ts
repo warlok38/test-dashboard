@@ -1,9 +1,8 @@
-export type PeriodKey = 'day' | 'month' | 'year'
+export type PeriodKey = 'day' | 'week' | 'month' | 'quarter' | 'year'
 
 export type PeriodOption = {
   key: PeriodKey
   label: string
-  shift: number
   disabled?: boolean
 }
 
@@ -20,12 +19,20 @@ export type PeriodRequestParams = {
 export const DEFAULT_PERIOD_KEY: PeriodKey = 'day'
 
 export const PERIOD_OPTIONS: PeriodOption[] = [
-  { key: 'day', label: 'Сутки', shift: 3 },
-  { key: 'month', label: 'Месяц', shift: 99 },
-  // TODO: уточнить код смены для периода "год"
-  { key: 'year', label: 'Год', shift: 100, disabled: true }
+  { key: 'day', label: 'Сутки' },
+  { key: 'week', label: 'Неделя', disabled: true },
+  { key: 'month', label: 'Месяц' },
+  { key: 'quarter', label: 'Квартал', disabled: true },
+  { key: 'year', label: 'Год', disabled: true }
 ]
 
+const DAY_INFO_CURRENT_SHIFT = 4
+const DAY_INFO_ARCHIVE_SHIFT = 99
+const DAY_GRAPH_SHIFT = 3
+const MONTH_INFO_SHIFT = 5
+const MONTH_GRAPH_SHIFT = 99
+const YEAR_SHIFT = 100
+const DAY_MS = 24 * 60 * 60 * 1000
 const MONTH_LABELS = [
   'январь',
   'февраль',
@@ -48,8 +55,18 @@ function createUtcDate(year: number, monthIndex: number) {
   return new Date(Date.UTC(year, monthIndex, 1))
 }
 
-function formatDate(year: number, month: number) {
+function formatProductionMonth(year: number, month: number) {
   return `${year.toString().padStart(4, '0')}-${month.toString().padStart(2, '0')}-01`
+}
+
+function formatFullDate(date: Date) {
+  const year = date.getUTCFullYear()
+  const month = date.getUTCMonth() + 1
+  const day = date.getUTCDate()
+
+  return `${year.toString().padStart(4, '0')}-${month.toString().padStart(2, '0')}-${day
+    .toString()
+    .padStart(2, '0')}`
 }
 
 function parseProductionDate(value: string | undefined) {
@@ -70,16 +87,18 @@ function parseProductionDate(value: string | undefined) {
 }
 
 export function getCurrentProductionDate() {
-  const now = new Date()
+  const now = getActualProductionDate()
 
-  return formatDate(now.getFullYear(), now.getMonth() + 1)
+  return formatProductionMonth(now.getUTCFullYear(), now.getUTCMonth() + 1)
 }
 
-export function getPeriodByShift(shift: string | number | undefined): PeriodOption {
-  const numericShift = Number(shift)
+export function getActualProductionDate(now = new Date()) {
+  return new Date(now.getTime() - DAY_MS)
+}
 
+export function getPeriodByKey(key: string | undefined): PeriodOption {
   return (
-    PERIOD_OPTIONS.find((option) => option.shift === numericShift) ??
+    PERIOD_OPTIONS.find((option) => option.key === key) ??
     PERIOD_OPTIONS.find((option) => option.key === DEFAULT_PERIOD_KEY) ??
     PERIOD_OPTIONS[0]
   )
@@ -89,22 +108,60 @@ export function normalizeProductionDate(period: PeriodOption, productionDate: st
   const { year, month } = parseProductionDate(productionDate ?? DEFAULT_PRODUCTION_DATE)
 
   if (period.key === 'month') {
-    return formatDate(year, 1)
+    return formatProductionMonth(year, 1)
   }
 
-  return formatDate(year, month)
+  return formatProductionMonth(year, month)
+}
+
+function isSameProductionMonth(firstDate: string | undefined, secondDate: string | undefined) {
+  const first = parseProductionDate(firstDate)
+  const second = parseProductionDate(secondDate)
+
+  return first.year === second.year && first.month === second.month
+}
+
+export function getInfoShift(
+  period: PeriodOption,
+  productionDate: string | undefined,
+  actualProductionDate = formatFullDate(getActualProductionDate())
+) {
+  if (period.key === 'day') {
+    return isSameProductionMonth(productionDate, actualProductionDate)
+      ? DAY_INFO_CURRENT_SHIFT
+      : DAY_INFO_ARCHIVE_SHIFT
+  }
+
+  if (period.key === 'month') {
+    return MONTH_INFO_SHIFT
+  }
+
+  return YEAR_SHIFT
+}
+
+export function getGraphShift(period: PeriodOption) {
+  if (period.key === 'day') {
+    return DAY_GRAPH_SHIFT
+  }
+
+  if (period.key === 'month') {
+    return MONTH_GRAPH_SHIFT
+  }
+
+  return YEAR_SHIFT
 }
 
 export function createPeriodRequestParams(
   period: PeriodOption,
-  productionDate: string | undefined
+  productionDate: string | undefined,
+  kind: 'info' | 'graph'
 ): PeriodRequestParams {
   if (period.key === 'year') {
-    return { shift: period.shift }
+    return { shift: YEAR_SHIFT }
   }
 
   return {
-    shift: period.shift,
+    shift: kind === 'info' ? getInfoShift(period, productionDate) : getGraphShift(period),
     production_date: normalizeProductionDate(period, productionDate)
   }
 }
@@ -124,7 +181,7 @@ export function shiftProductionDate(
       ? createUtcDate(year, month - 1 + direction)
       : createUtcDate(year + direction, 0)
 
-  return formatDate(date.getUTCFullYear(), date.getUTCMonth() + 1)
+  return formatProductionMonth(date.getUTCFullYear(), date.getUTCMonth() + 1)
 }
 
 export function formatPeriodScopeLabel(

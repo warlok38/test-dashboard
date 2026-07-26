@@ -7,6 +7,7 @@ import {
   CartesianGrid,
   ComposedChart,
   Line,
+  ReferenceDot,
   ReferenceLine,
   Tooltip,
   XAxis,
@@ -14,8 +15,13 @@ import {
   type TooltipContentProps
 } from 'recharts'
 
-import { type GraphPeriod, type GraphPoint } from '@/entities/production-summary'
-import { ChartFrame } from '@/shared/ui'
+import {
+  formatDeviation,
+  getDeviationClassName,
+  type GraphPeriod,
+  type GraphPoint
+} from '@/entities/production-summary'
+import { ChartFrame, Loader } from '@/shared/ui'
 import { formatNumber } from '@/shared/utils/formatNumber'
 
 import styles from '../../ProductionSummaryDashboard.module.css'
@@ -25,6 +31,12 @@ import {
   getXAxisInterval,
   type GraphChartSize
 } from './graph-axis'
+import {
+  createGraphYAxisScale,
+  type GraphYAxisDataPoint,
+  type GraphYAxisValueRange
+} from './graph-y-axis'
+import { getGraphTopAnnotations, type GraphTopAnnotation } from './graph-top-annotations'
 
 const COMPACT_POINT_LIMIT = 10
 const COMPACT_POINT_WIDTH = 150
@@ -35,6 +47,7 @@ const BRUSH_WHEEL_PIXELS_PER_POINT = 80
 const BRUSH_WHEEL_MAX_STEP = 8
 const CHART_HORIZONTAL_MARGIN = 32
 const Y_AXIS_TICK_COUNT = 5
+const COMPACT_Y_AXIS_TICK_COUNT = 3
 const FACT_COLOR = 'var(--color-kpi-fact)'
 const PLAN_COLOR = 'var(--color-chart-plan)'
 const GRID_COLOR = 'var(--palette-dashboard-grid-border)'
@@ -64,9 +77,20 @@ type AxisTickPayload = {
 }
 
 type AxisTickProps = {
+  tickFormatter?: (value: string | number | undefined) => string
   x?: number | string
   y?: number | string
   payload?: AxisTickPayload
+}
+
+type GraphTopAnnotationLabelProps = {
+  annotation: GraphTopAnnotation
+  viewBox?: {
+    x?: number | string
+    y?: number | string
+  }
+  x?: number | string
+  y?: number | string
 }
 
 type GraphChartProps = {
@@ -75,6 +99,9 @@ type GraphChartProps = {
   emptyText?: string
   graphPeriod: GraphPeriod
   isUpdating?: boolean
+  normalizeValueRange?: boolean
+  normalizedValueRange?: GraphYAxisValueRange
+  updatingText?: string
   seriesView: Record<GraphSeriesKey, GraphSeriesView>
   showBrush?: boolean
   size?: GraphChartSize
@@ -100,7 +127,7 @@ function formatCompactAxisNumber(value: string | number | undefined) {
     return `${Number((numberValue / 1_000_000).toFixed(1)).toString()}m`
   }
 
-  if (Math.abs(numberValue) >= 10_000) {
+  if (Math.abs(numberValue) >= 1_000) {
     return `${Number((numberValue / 1_000).toFixed(1)).toString()}k`
   }
 
@@ -127,6 +154,17 @@ function formatTooltipNumber(value: unknown) {
   return formatNumber(numberValue)
 }
 
+function getTooltipDelta(point: Partial<Record<GraphSeriesKey, unknown>> | undefined) {
+  const fact = Number(point?.fact)
+  const plan = Number(point?.plan)
+
+  if (!Number.isFinite(fact) || !Number.isFinite(plan) || plan === 0) {
+    return null
+  }
+
+  return ((fact - plan) / plan) * 100
+}
+
 function formatTooltipDate(value: string) {
   const match = value.match(GRAPH_DATE_REGEXP)
 
@@ -142,39 +180,98 @@ function GraphTooltip({ active, label, payload }: TooltipContentProps) {
     return null
   }
 
+  const point = payload[0]?.payload as Partial<Record<GraphSeriesKey, unknown>> | undefined
+  const delta = getTooltipDelta(point)
+  const items = GRAPH_SERIES_CONFIGS.map((series) => ({
+    ...series,
+    value: point?.[series.key]
+  })).filter((item) => item.value !== null && item.value !== undefined)
+
   return (
     <div className={styles.graphTooltip}>
       <div className={styles.graphTooltipDate}>{formatTooltipDate(String(label))}</div>
       <div className={styles.graphTooltipItems}>
-        {payload.map((item) => {
-          const isFact = String(item.dataKey) === 'fact'
+        {items.map((item) => {
+          const isFact = item.key === 'fact'
 
           return (
-            <div
-              key={String(item.dataKey)}
-              className={styles.graphTooltipItem}
-              style={{ color: item.color }}
-            >
-              <span>{item.name}</span>
-              <span> : </span>
-              <span className={isFact ? styles.graphTooltipFactValue : undefined}>
+            <div key={item.key} className={styles.graphTooltipItem}>
+              <span className={styles.graphTooltipItemLabel}>{item.name}:</span>
+              <span
+                className={`${styles.graphTooltipItemValue} ${
+                  isFact ? styles.graphTooltipFactValue : ''
+                }`}
+                style={{ color: item.color }}
+              >
                 {formatTooltipNumber(item.value)}
               </span>
             </div>
           )
         })}
       </div>
+      {delta === null ? null : (
+        <div className={`${styles.graphTooltipDelta} ${styles[getDeviationClassName(delta)]}`}>
+          {formatDeviation(delta)}
+        </div>
+      )}
     </div>
   )
 }
 
-function YAxisTick({ x = 0, y = 0, payload }: AxisTickProps) {
-  const fullValue = formatFullAxisNumber(payload?.value)
+function getCoordinate(value: string | number | undefined) {
+  const coordinate = Number(value)
+
+  return Number.isFinite(coordinate) ? coordinate : undefined
+}
+
+function GraphTopAnnotationLabel({ annotation, viewBox, x, y }: GraphTopAnnotationLabelProps) {
+  const labelX = getCoordinate(x ?? viewBox?.x)
+  const labelY = getCoordinate(y ?? viewBox?.y)
+
+  if (labelX === undefined || labelY === undefined) {
+    return null
+  }
+
+  const deltaClassName =
+    annotation.delta === null ? '' : styles[getDeviationClassName(annotation.delta)]
+
+  return (
+    <text
+      className={styles.graphTopAnnotation}
+      fill="currentColor"
+      textAnchor="middle"
+      x={labelX}
+      y={labelY - (annotation.label ? 34 : 22)}
+    >
+      {annotation.label ? (
+        <tspan className={styles.graphTopAnnotationLabel} x={labelX}>
+          {annotation.label}
+        </tspan>
+      ) : null}
+      <tspan
+        className={styles.graphTopAnnotationFact}
+        dy={annotation.label ? 12 : undefined}
+        x={annotation.label ? labelX : undefined}
+      >
+        {formatCompactAxisNumber(annotation.fact)}
+      </tspan>
+      {annotation.delta === null ? null : (
+        <tspan className={`${styles.graphTopAnnotationDelta} ${deltaClassName}`} dy="12" x={labelX}>
+          {formatDeviation(annotation.delta)}
+        </tspan>
+      )}
+    </text>
+  )
+}
+
+function YAxisTick({ tickFormatter, x = 0, y = 0, payload }: AxisTickProps) {
+  const formattedValue = tickFormatter ? tickFormatter(payload?.value) : payload?.value
+  const fullValue = formatFullAxisNumber(formattedValue)
 
   return (
     <text className={styles.graphYAxisTick} dy={4} fill="currentColor" textAnchor="end" x={x} y={y}>
       <title>{fullValue}</title>
-      {formatCompactAxisNumber(payload?.value)}
+      {formatCompactAxisNumber(formattedValue)}
     </text>
   )
 }
@@ -190,16 +287,12 @@ function getCompactXAxisPadding(chartWidth: number, visiblePointCount: number) {
   return Math.max(availableWidth - compactWidth, 0)
 }
 
-function getYAxisMax(data: GraphPoint[]) {
-  const maxValue = Math.max(...data.flatMap((point) => [point.fact ?? 0, point.plan ?? 0]), 0)
-
-  if (maxValue <= 0) {
-    return 1
+function getCompactYAxisTicks(ticks: number[] | undefined) {
+  if (!ticks || ticks.length <= COMPACT_Y_AXIS_TICK_COUNT) {
+    return ticks
   }
 
-  const magnitude = 10 ** Math.max(Math.floor(Math.log10(maxValue)) - 1, 0)
-
-  return Math.ceil((maxValue * 1.05) / magnitude) * magnitude
+  return [ticks[0], ticks[Math.floor(ticks.length / 2)], ticks[ticks.length - 1]]
 }
 
 function getDefaultBrushRange(dataLength: number): BrushRange | undefined {
@@ -273,6 +366,9 @@ export function GraphChart({
   emptyText = 'Нет данных',
   graphPeriod,
   isUpdating = false,
+  normalizeValueRange = false,
+  normalizedValueRange,
+  updatingText = 'Обновление...',
   seriesView,
   showBrush = true,
   size = 'default'
@@ -280,7 +376,16 @@ export function GraphChart({
   const [brushRange, setBrushRange] = useState<BrushState | undefined>()
   const shouldUseBrush =
     showBrush && graphPeriod === 'day' && data.length > BRUSH_VISIBLE_POINT_COUNT
-  const yAxisMax = useMemo(() => getYAxisMax(data), [data])
+  const yAxisScale = useMemo(
+    () =>
+      createGraphYAxisScale({
+        data,
+        normalizeValueRange,
+        seriesView,
+        valueRange: normalizedValueRange
+      }),
+    [data, normalizeValueRange, normalizedValueRange, seriesView]
+  )
   const lastDataDate = data[data.length - 1]?.date
   const defaultBrushRange = useMemo(() => getDefaultBrushRange(data.length), [data.length])
   const isBrushRangeActual =
@@ -321,11 +426,13 @@ export function GraphChart({
 
   const renderSeries = (view: GraphSeriesView, barSize: number | undefined) =>
     GRAPH_SERIES_CONFIGS.filter((series) => seriesView[series.key] === view).map((series) => {
+      const chartDataKey = `${series.key}ChartValue` satisfies keyof GraphYAxisDataPoint
+
       if (view === 'line') {
         return (
           <Line
             key={series.key}
-            dataKey={series.key}
+            dataKey={chartDataKey}
             name={series.name}
             stroke={series.color}
             strokeWidth={2}
@@ -341,7 +448,7 @@ export function GraphChart({
       return (
         <Bar
           key={series.key}
-          dataKey={series.key}
+          dataKey={chartDataKey}
           name={series.name}
           fill={series.color}
           radius={[3, 3, 0, 0]}
@@ -428,6 +535,12 @@ export function GraphChart({
           )}
         </ChartFrame>
         <div className={styles.graphEmptyChartLabel}>{emptyText}</div>
+        {isUpdating ? (
+          <div className={styles.graphUpdatingOverlay}>
+            <span>{updatingText}</span>
+            <Loader size="small" />
+          </div>
+        ) : null}
       </div>
     )
   }
@@ -448,13 +561,22 @@ export function GraphChart({
           )
           const tickFormatter = (value: string | number) =>
             formatGraphTick(String(value), graphPeriod, size)
+          const yAxisTicks =
+            size === 'compact' ? getCompactYAxisTicks(yAxisScale.ticks) : yAxisScale.ticks
+          const yAxisTickCount = size === 'compact' ? COMPACT_Y_AXIS_TICK_COUNT : Y_AXIS_TICK_COUNT
+          const topAnnotations = size === 'compact' ? [] : getGraphTopAnnotations(visibleXAxisData)
 
           return (
             <ComposedChart
               barGap={0}
-              data={data}
+              data={yAxisScale.data}
               height={height}
-              margin={{ top: 8, right: 16, bottom: shouldUseBrush ? 8 : 0, left: -16 }}
+              margin={{
+                top: size === 'compact' ? 8 : 40,
+                right: 16,
+                bottom: shouldUseBrush ? 8 : 0,
+                left: -16
+              }}
               width={width}
             >
               <CartesianGrid stroke={GRID_COLOR} vertical={false} />
@@ -469,13 +591,27 @@ export function GraphChart({
                 padding={{ left: 0, right: compactXAxisPadding }}
               />
               <YAxis
-                domain={[0, yAxisMax]}
-                tickCount={Y_AXIS_TICK_COUNT}
+                domain={yAxisScale.domain}
+                tickCount={yAxisTickCount}
                 tickLine={false}
                 axisLine={false}
-                tick={YAxisTick}
+                tickFormatter={yAxisScale.formatTick}
+                ticks={yAxisTicks}
+                interval={yAxisTicks ? 0 : undefined}
+                tick={(props) => <YAxisTick {...props} tickFormatter={yAxisScale.formatTick} />}
               />
               <Tooltip content={(props) => <GraphTooltip {...props} />} isAnimationActive={false} />
+              {topAnnotations.map((annotation) => (
+                <ReferenceDot
+                  key={`${annotation.date}-${annotation.index}`}
+                  x={annotation.date}
+                  y={yAxisScale.domain[1]}
+                  r={0}
+                  fill="none"
+                  stroke="none"
+                  label={(props) => <GraphTopAnnotationLabel {...props} annotation={annotation} />}
+                />
+              ))}
               {renderSeries('bar', barSize)}
               {renderSeries('line', barSize)}
               {shouldUseBrush ? (
@@ -497,7 +633,12 @@ export function GraphChart({
           )
         }}
       </ChartFrame>
-      {isUpdating ? <div className={styles.graphUpdatingOverlay}>Обновление...</div> : null}
+      {isUpdating ? (
+        <div className={styles.graphUpdatingOverlay}>
+          <span>{updatingText}</span>
+          <Loader size="small" />
+        </div>
+      ) : null}
     </div>
   )
 }

@@ -11,7 +11,8 @@ import {
 import {
   applyBackendProductionDate,
   createPeriodRequestParams,
-  getPeriodByShift,
+  getCurrentProductionDate,
+  getPeriodByKey,
   normalizeProductionDate
 } from '@/features/period-filter'
 import { useAppDispatch, useAppSelector } from '@/shared/hooks'
@@ -22,11 +23,12 @@ import { GeneralSummary, GraphPanel } from './ui'
 
 type SummaryDashboardProps = {
   query: SummaryQuery
+  showCameraButton?: boolean
   showGraph?: boolean
 }
 
 type PeriodScopeState = {
-  shift: number | null
+  periodKey: string | null
   productionDate: string | null
   committedProductionDate: string | null
 }
@@ -35,32 +37,42 @@ function getSelectedGeneralSummaryIndicator(
   cards: GeneralSummaryCard[],
   indicator: string | undefined
 ) {
-  const indicators = cards[0]?.cards ?? []
+  let topIndicators: GeneralSummaryCard[] = []
+  if (indicator) {
+    topIndicators = cards?.[0] ? [cards[0]] : []
+  }
+  const detailIndicators = cards[0]?.cards ?? []
+  const indicators = [...topIndicators, ...detailIndicators]
 
   return indicators.some((card) => card.indicator_name === indicator)
     ? indicator
     : indicators[0]?.indicator_name
 }
 
-export function ProductionSummaryDashboard({ query, showGraph = false }: SummaryDashboardProps) {
+export function ProductionSummaryDashboard({
+  query,
+  showCameraButton = false,
+  showGraph = false
+}: SummaryDashboardProps) {
   const dispatch = useAppDispatch()
   const periodScope = useAppSelector(
     (state: { periodFilter: PeriodScopeState }) => state.periodFilter
   )
-  const { indicator, ...summaryQuery } = query
-  const period = getPeriodByShift(summaryQuery.shift)
+  const { indicator, period: queryPeriod, ...summaryQuery } = query
+  const period = getPeriodByKey(queryPeriod)
   const fallbackProductionDate = useMemo(
-    () => normalizeProductionDate(period, new Date().toISOString().slice(0, 10)),
+    () => normalizeProductionDate(period, getCurrentProductionDate()),
     [period]
   )
   const committedProductionDate =
-    periodScope.shift === period.shift && periodScope.committedProductionDate
+    periodScope.periodKey === period.key && periodScope.committedProductionDate
       ? periodScope.committedProductionDate
       : fallbackProductionDate
-  const periodParams = createPeriodRequestParams(period, committedProductionDate)
+  const infoPeriodParams = createPeriodRequestParams(period, committedProductionDate, 'info')
+  const graphPeriodParams = createPeriodRequestParams(period, committedProductionDate, 'graph')
   const generalSummaryQuery = {
     ...summaryQuery,
-    ...periodParams
+    ...infoPeriodParams
   }
   const {
     data: generalSummary,
@@ -76,8 +88,8 @@ export function ProductionSummaryDashboard({ query, showGraph = false }: Summary
     showGraph && selectedIndicator
       ? {
           indicator: selectedIndicator,
-          ...periodParams,
-          ...(query.gtk ? { gtk: query.gtk } : {})
+          ...graphPeriodParams,
+          ...(query.gtk ? { gtk_name: query.gtk } : {})
         }
       : undefined
 
@@ -88,7 +100,7 @@ export function ProductionSummaryDashboard({ query, showGraph = false }: Summary
 
     dispatch(
       applyBackendProductionDate({
-        shift: period.shift,
+        periodKey: period.key,
         productionDate: normalizeProductionDate(period, generalSummary.production_date)
       })
     )
@@ -120,7 +132,13 @@ export function ProductionSummaryDashboard({ query, showGraph = false }: Summary
         activeIndicator={selectedIndicator}
         loading={isGeneralSummaryLoading}
       />
-      {showGraph && <GraphPanel graphPeriod={period.key} query={graphQuery} />}
+      {showGraph && (
+        <GraphPanel
+          graphPeriod={period.key}
+          query={graphQuery}
+          showCameraButton={showCameraButton}
+        />
+      )}
     </section>
   )
 }
