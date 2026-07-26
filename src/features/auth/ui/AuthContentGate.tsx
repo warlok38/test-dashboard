@@ -13,14 +13,15 @@ import { selectAuth } from '@/shared/auth'
 import { HTTP_ERROR_CODES, getHttpErrorStatus } from '@/shared/errors'
 import { useAppSelector } from '@/shared/hooks'
 import {
-  getAuthErrorHref,
   getForbiddenHref,
   getSafeForbiddenReturnPath,
   isAuthStatusPath,
   isAuthErrorPath,
   isForbiddenPath
 } from '@/shared/routing'
+import { ApiErrorAlert, PageShell, PageSurface } from '@/shared/ui'
 
+import { getPermissionErrorAction } from '../lib'
 import { AuthLoadingIndicator } from './AuthLoadingIndicator'
 
 type AuthContentGateProps = {
@@ -49,11 +50,20 @@ export function AuthContentGate({ children }: AuthContentGateProps) {
     PERMISSION_RESOURCES.ServiceAccess,
     PERMISSION_ACTIONS.R
   )
+  const permissionsErrorStatus = getHttpErrorStatus(permissionsError)
+  const permissionErrorAction = isPermissionsError
+    ? getPermissionErrorAction(isAccessErrorStatus(permissionsErrorStatus), isForbiddenPage)
+    : null
   const shouldBlockProtectedContent = isInitialized && !isAuthorized && !isAuthStatusPage
   const isWaitingForPermissions = !permissions && (isPermissionsLoading || isPermissionsFetching)
-  const shouldBlockPermissionsError = isPermissionsError && !isForbiddenPage
-  const shouldRedirectFromForbidden = Boolean(permissions && hasServiceAccess && isForbiddenPage)
-  const shouldRedirectToForbidden = Boolean(permissions && !hasServiceAccess && !isForbiddenPage)
+  const shouldBlockPermissionsError =
+    permissionErrorAction !== null && permissionErrorAction !== 'stay-forbidden'
+  const shouldRedirectFromForbidden = Boolean(
+    !isPermissionsError && permissions && hasServiceAccess && isForbiddenPage
+  )
+  const shouldRedirectToForbidden = Boolean(
+    !isPermissionsError && permissions && !hasServiceAccess && !isForbiddenPage
+  )
   const shouldBlockForPermissionDecision =
     shouldLoadPermissions &&
     (isWaitingForPermissions ||
@@ -70,17 +80,9 @@ export function AuthContentGate({ children }: AuthContentGateProps) {
     }
 
     if (isPermissionsError) {
-      const status = getHttpErrorStatus(permissionsError)
-
-      if (isForbiddenPage && isAccessErrorStatus(status)) {
-        return
+      if (permissionErrorAction === 'redirect-forbidden') {
+        router.replace(getForbiddenHref(pathname, searchParams))
       }
-
-      const href = isAccessErrorStatus(status)
-        ? getForbiddenHref(pathname, searchParams)
-        : getAuthErrorHref(pathname, searchParams)
-
-      router.replace(href)
 
       return
     }
@@ -98,6 +100,7 @@ export function AuthContentGate({ children }: AuthContentGateProps) {
     isForbiddenPage,
     isPermissionsError,
     pathname,
+    permissionErrorAction,
     permissionsError,
     router,
     searchParams,
@@ -105,6 +108,16 @@ export function AuthContentGate({ children }: AuthContentGateProps) {
     shouldRedirectToForbidden,
     shouldLoadPermissions
   ])
+
+  if (permissionErrorAction === 'show-error') {
+    return (
+      <PageShell>
+        <PageSurface variant="constrained">
+          <ApiErrorAlert error={permissionsError} title="Не удалось проверить доступ" />
+        </PageSurface>
+      </PageShell>
+    )
+  }
 
   if (isContentBlocked) {
     return <AuthLoadingIndicator text={loadingText} />
