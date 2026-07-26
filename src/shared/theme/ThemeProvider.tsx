@@ -14,7 +14,7 @@ import ruRU from 'antd/locale/ru_RU'
 import { App as AntApp, ConfigProvider, theme as antdTheme } from 'antd'
 import type { ThemeConfig } from 'antd'
 
-import { THEME_COOKIE_MAX_AGE, THEME_STORAGE_KEY, isThemeMode, type ThemeMode } from './constants'
+import { THEME_STORAGE_KEY, isThemeMode, type ThemeMode } from './constants'
 import { darkThemeConfig, themeConfig } from './themeConfig'
 
 interface ThemeContextType {
@@ -25,9 +25,9 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | null>(null)
 
-function readStoredMode(fallback: ThemeMode): ThemeMode {
+function readStoredMode(): ThemeMode {
   if (typeof window === 'undefined') {
-    return fallback
+    return 'light'
   }
 
   try {
@@ -36,31 +36,33 @@ function readStoredMode(fallback: ThemeMode): ThemeMode {
       return current
     }
   } catch {
-    // Ignore storage access errors and fall back to the document attribute.
+    // Ignore storage access errors and fall back to the light theme.
   }
 
-  const fromAttr = document.documentElement.dataset.theme
-  return isThemeMode(fromAttr) ? fromAttr : fallback
+  return 'light'
 }
 
-export function ThemeProvider({
-  children,
-  initialMode = 'light'
-}: {
-  children: ReactNode
-  initialMode?: ThemeMode
-}) {
-  const [mode, setModeInternal] = useState<ThemeMode>(() => readStoredMode(initialMode))
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [mode, setModeInternal] = useState<ThemeMode>('light')
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setModeInternal(readStoredMode())
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) {
+      return
+    }
+
     document.documentElement.dataset.theme = mode
     try {
       window.localStorage.setItem(THEME_STORAGE_KEY, mode)
     } catch {
       // Ignore storage access errors; the in-memory theme still applies.
     }
-    document.cookie = `${THEME_STORAGE_KEY}=${mode}; path=/; max-age=${THEME_COOKIE_MAX_AGE}; SameSite=Lax`
-  }, [mode])
+  }, [mode, mounted])
 
   const setMode = useCallback((next: ThemeMode) => {
     setModeInternal(next)

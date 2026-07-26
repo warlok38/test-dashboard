@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, type ReactNode } from 'react'
+import { Suspense, useEffect, useState, type ReactNode } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 import {
@@ -28,7 +28,18 @@ type AuthContentGateProps = {
   children: ReactNode
 }
 
+const INITIAL_LOADING_TEXT = 'Загружаем интерфейс...'
+
 export function AuthContentGate({ children }: AuthContentGateProps) {
+  return (
+    <Suspense fallback={<AuthLoadingIndicator text={INITIAL_LOADING_TEXT} />}>
+      <AuthContentGateContent>{children}</AuthContentGateContent>
+    </Suspense>
+  )
+}
+
+function AuthContentGateContent({ children }: AuthContentGateProps) {
+  const [isHydrated, setIsHydrated] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -76,6 +87,10 @@ export function AuthContentGate({ children }: AuthContentGateProps) {
   const loadingText = getLoadingText(isInitialized, isInitializing)
 
   useEffect(() => {
+    setIsHydrated(true)
+  }, [])
+
+  useEffect(() => {
     if (!shouldLoadPermissions) {
       return
     }
@@ -110,6 +125,10 @@ export function AuthContentGate({ children }: AuthContentGateProps) {
     shouldLoadPermissions
   ])
 
+  if (!isHydrated) {
+    return <AuthLoadingIndicator text={INITIAL_LOADING_TEXT} />
+  }
+
   if (permissionErrorAction === 'show-error') {
     return (
       <PageShell>
@@ -141,5 +160,5 @@ function getLoadingText(isInitialized: boolean, isInitializing: boolean) {
     return 'Проверяем доступ...'
   }
 
-  return isInitializing ? 'Авторизация...' : 'Загружаем интерфейс...'
+  return isInitializing ? 'Авторизация...' : INITIAL_LOADING_TEXT
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 import { selectAuth } from '@/shared/auth'
@@ -16,6 +16,14 @@ import {
 } from '@/shared/routing'
 
 export function AuthRedirectWatcher() {
+  return (
+    <Suspense fallback={null}>
+      <AuthRedirectWatcherContent />
+    </Suspense>
+  )
+}
+
+function AuthRedirectWatcherContent() {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
