@@ -483,7 +483,8 @@ function GraphTabContent({
     currentData: mainGraphData,
     error: mainGraphError,
     isFetching: isMainGraphFetching,
-    isLoading: isMainGraphLoading
+    isLoading: isMainGraphLoading,
+    refetch: refetchMainGraph
   } = useGetGraphByModeQuery(mainGraphQuery as GraphByModeQuery, {
     skip: !mainGraphQuery
   })
@@ -491,7 +492,8 @@ function GraphTabContent({
     currentData: detailGraphData,
     error: detailGraphError,
     isFetching: isDetailGraphFetching,
-    isLoading: isDetailGraphLoading
+    isLoading: isDetailGraphLoading,
+    refetch: refetchDetailGraph
   } = useGetGraphByModeQuery(detailGraphQuery as GraphByModeQuery, {
     skip: !detailGraphQuery
   })
@@ -560,7 +562,14 @@ function GraphTabContent({
     }
 
     if (mainGraphError) {
-      return <ApiErrorAlert error={mainGraphError} title="Не удалось загрузить график" />
+      return (
+        <ApiErrorAlert
+          error={mainGraphError}
+          title="Не удалось загрузить график"
+          endpoint="graphByMode"
+          onRetry={refetchMainGraph}
+        />
+      )
     }
 
     return (
@@ -581,7 +590,7 @@ function GraphTabContent({
 
   const renderDetailsContent = () => {
     if (!detailGraphQuery) {
-      return <Empty />
+      return null
     }
 
     if (detailGraphError) {
@@ -589,7 +598,14 @@ function GraphTabContent({
         return null
       }
 
-      return <ApiErrorAlert error={detailGraphError} title="Не удалось загрузить детали" />
+      return (
+        <ApiErrorAlert
+          error={detailGraphError}
+          title="Не удалось загрузить детальные графики"
+          endpoint="graphByMode"
+          onRetry={refetchDetailGraph}
+        />
+      )
     }
 
     if (detailGraphs.length === 0) {

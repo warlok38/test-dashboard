@@ -41,7 +41,8 @@ export function AuthContentGate({ children }: AuthContentGateProps) {
     error: permissionsError,
     isError: isPermissionsError,
     isFetching: isPermissionsFetching,
-    isLoading: isPermissionsLoading
+    isLoading: isPermissionsLoading,
+    refetch: refetchPermissions
   } = useGetPermissionsQuery(undefined, {
     skip: !shouldLoadPermissions
   })
@@ -112,8 +113,13 @@ export function AuthContentGate({ children }: AuthContentGateProps) {
   if (permissionErrorAction === 'show-error') {
     return (
       <PageShell>
-        <PageSurface variant="constrained">
-          <ApiErrorAlert error={permissionsError} title="Не удалось проверить доступ" />
+        <PageSurface variant="constrained" style={{ padding: 'var(--space-4)' }}>
+          <ApiErrorAlert
+            error={permissionsError}
+            title="Не удалось проверить доступ"
+            endpoint="permissions"
+            onRetry={refetchPermissions}
+          />
         </PageSurface>
       </PageShell>
     )

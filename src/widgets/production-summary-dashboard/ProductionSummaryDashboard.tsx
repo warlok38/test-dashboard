@@ -77,7 +77,8 @@ export function ProductionSummaryDashboard({
   const {
     data: generalSummary,
     error: generalSummaryError,
-    isLoading: isGeneralSummaryLoading
+    isLoading: isGeneralSummaryLoading,
+    refetch: refetchGeneralSummary
   } = useGetGeneralSummaryQuery(generalSummaryQuery)
 
   const generalSummaryCards = generalSummary?.cards || []
@@ -120,7 +121,12 @@ export function ProductionSummaryDashboard({
   if (generalSummaryError && !generalSummary) {
     return (
       <section className={styles.dashboard}>
-        <ApiErrorAlert error={generalSummaryError} title="Не удалось загрузить общие показатели" />
+        <ApiErrorAlert
+          error={generalSummaryError}
+          title="Не удалось загрузить общие показатели"
+          endpoint="generalSummary"
+          onRetry={refetchGeneralSummary}
+        />
       </section>
     )
   }
