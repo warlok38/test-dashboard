@@ -1,4 +1,5 @@
 export * from './auth'
 export * from './date-range-filter'
+export * from './permissions'
 export * from './period-filter'
 export * from './theme-switch'

@@ -1,4 +1,4 @@
-import { ReloadPageButton } from '@/features/auth/ui/ReloadPageButton'
+import { ReloadPageButton } from '@/features/auth'
 import { PageShell, PageSurface } from '@/shared/ui'
 
 import styles from './page.module.css'
