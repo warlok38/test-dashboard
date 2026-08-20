@@ -5,8 +5,6 @@ export {
   useGetGraphQuery,
   useGetGraphWithDetailsQuery,
   useGetGraphWithGtkQuery,
-  useGetVideoRecordStreamQuery,
-  useGetVideoRecordsQuery,
   useGetGtkQuery,
   useGetSummaryQuery,
   useGetGeneralSummaryQuery
@@ -50,10 +48,5 @@ export type {
   GeneralSummaryCard,
   GeneralSummaryGtkBreakdown,
   GeneralSummaryParams,
-  GeneralSummaryResponse,
-  VideoRecord,
-  VideoRecordListParams,
-  VideoRecordStreamParams,
-  VideoRecordStreamResponse,
-  VideoRecordStreamType
+  GeneralSummaryResponse
 } from './model/types'

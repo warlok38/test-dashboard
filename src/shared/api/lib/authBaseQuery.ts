@@ -7,7 +7,6 @@ import {
 } from '@reduxjs/toolkit/query/react'
 
 import { API_BASE_URL } from '@/shared/api/config'
-import { isDevelopmentRunMode } from '@/shared/constants'
 import {
   authActions,
   clearAuthSession,
@@ -15,6 +14,7 @@ import {
   saveAuthSession,
   type AuthResponse
 } from '@/shared/auth'
+import { isDevelopmentRunMode } from '@/shared/constants'
 import {
   createErrorFromRtkError,
   createHttpErrorFromResponse,
@@ -24,6 +24,7 @@ import {
 type ParamsSerializer = (params: Record<string, unknown>) => string
 
 type CreateAuthBaseQueryOptions = {
+  baseUrl?: string
   paramsSerializer: ParamsSerializer
 }
 
@@ -102,10 +103,11 @@ function getAuthTokenFromState(state: unknown) {
 }
 
 export function createAuthBaseQuery({
+  baseUrl = API_BASE_URL,
   paramsSerializer
 }: CreateAuthBaseQueryOptions): BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> {
   const rawBaseQuery = fetchBaseQuery({
-    baseUrl: API_BASE_URL,
+    baseUrl,
     credentials: 'include',
     paramsSerializer,
     prepareHeaders: (headers, { getState }) => {

@@ -5,10 +5,7 @@ import { Modal, Select } from 'antd'
 import classNames from 'classnames'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import {
-  useGetVideoRecordStreamQuery,
-  useGetVideoRecordsQuery
-} from '@/entities/production-summary'
+import { useGetVideoRecordStreamQuery, useGetVideoRecordsQuery } from '@/entities/video-record'
 import { useClickOutside } from '@/shared/hooks'
 import { Loader, VideoStream } from '@/shared/ui'
 import { formatSmartDateTime } from '@/shared/utils/formatDateTime'
