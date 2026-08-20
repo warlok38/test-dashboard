@@ -1,4 +1,4 @@
-import { MEDIA_API_TAGS, mediaApi } from '@/shared/api'
+import { mediaApi } from '@/shared/api'
 
 import type {
   VideoRecord,
@@ -7,21 +7,26 @@ import type {
   VideoRecordStreamResponse
 } from '../model/types'
 import { VIDEO_RECORD_API_ROUTES } from './routes'
+import { VIDEO_RECORD_API_TAGS, VIDEO_RECORD_API_TAG_TYPES } from './tagTypes'
 
-export const videoRecordApi = mediaApi.injectEndpoints({
+const videoRecordApiWithTags = mediaApi.enhanceEndpoints({
+  addTagTypes: VIDEO_RECORD_API_TAG_TYPES
+})
+
+export const videoRecordApi = videoRecordApiWithTags.injectEndpoints({
   endpoints: (build) => ({
     getVideoRecords: build.query<VideoRecord[], VideoRecordListParams>({
       query: (params) => ({
         url: VIDEO_RECORD_API_ROUTES.list,
         params
       }),
-      providesTags: [MEDIA_API_TAGS.videoRecords]
+      providesTags: [VIDEO_RECORD_API_TAGS.records]
     }),
     getVideoRecordStream: build.query<VideoRecordStreamResponse, VideoRecordStreamParams>({
       query: ({ objectGuid, siteSlug, stream }) => ({
         url: `${VIDEO_RECORD_API_ROUTES.stream}/${siteSlug}/${objectGuid}/${stream}`
       }),
-      providesTags: [MEDIA_API_TAGS.videoRecordStream]
+      providesTags: [VIDEO_RECORD_API_TAGS.stream]
     })
   })
 })

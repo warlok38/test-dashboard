@@ -1,11 +1,12 @@
-import { API_ROUTES, mainApi } from '@/shared/api'
+import { mainApi } from '@/shared/api'
 
 import type { Permission } from '../model'
+import { PERMISSION_API_ROUTES } from './routes'
 
 export const permissionApi = mainApi.injectEndpoints({
   endpoints: (build) => ({
     getPermissions: build.query<Permission, void>({
-      query: () => API_ROUTES.permissions
+      query: () => PERMISSION_API_ROUTES.permissions
     })
   })
 })

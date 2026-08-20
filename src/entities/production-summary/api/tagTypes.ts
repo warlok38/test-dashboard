@@ -1,4 +1,4 @@
-export const API_TAGS = {
+export const PRODUCTION_SUMMARY_API_TAGS = {
   gtk: 'Gtk',
   summary: 'Summary',
   graph: 'Graph',
@@ -9,6 +9,4 @@ export const API_TAGS = {
   generalSummary: 'GeneralSummary'
 } as const
 
-export const API_TAG_TYPES = Object.values(API_TAGS)
-
-export type ApiTagType = (typeof API_TAG_TYPES)[number]
+export const PRODUCTION_SUMMARY_API_TAG_TYPES = Object.values(PRODUCTION_SUMMARY_API_TAGS)

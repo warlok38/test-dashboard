@@ -1,4 +1,4 @@
-import { API_ROUTES, API_TAGS, mainApi } from '@/shared/api'
+import { mainApi } from '@/shared/api'
 
 import {
   GeneralSummaryParams,
@@ -14,58 +14,64 @@ import {
   type GtkName,
   type SummaryQuery
 } from '../model/types'
+import { PRODUCTION_SUMMARY_API_ROUTES } from './routes'
+import { PRODUCTION_SUMMARY_API_TAGS, PRODUCTION_SUMMARY_API_TAG_TYPES } from './tagTypes'
 
-export const productionSummaryApi = mainApi.injectEndpoints({
+const productionSummaryApiWithTags = mainApi.enhanceEndpoints({
+  addTagTypes: PRODUCTION_SUMMARY_API_TAG_TYPES
+})
+
+export const productionSummaryApi = productionSummaryApiWithTags.injectEndpoints({
   endpoints: (build) => ({
     getGtk: build.query<GtkName[], void>({
-      query: () => API_ROUTES.gtk,
-      providesTags: [API_TAGS.gtk]
+      query: () => PRODUCTION_SUMMARY_API_ROUTES.gtk,
+      providesTags: [PRODUCTION_SUMMARY_API_TAGS.gtk]
     }),
     getSummary: build.query<AlarmSummaryResponse, SummaryQuery>({
       query: (params) => ({
-        url: API_ROUTES.summary,
+        url: PRODUCTION_SUMMARY_API_ROUTES.summary,
         params
       }),
-      providesTags: [API_TAGS.summary]
+      providesTags: [PRODUCTION_SUMMARY_API_TAGS.summary]
     }),
     getGraph: build.query<GraphPoint[], GraphQuery>({
       query: (params) => ({
-        url: API_ROUTES.graph,
+        url: PRODUCTION_SUMMARY_API_ROUTES.graph,
         params
       }),
-      providesTags: [API_TAGS.graph]
+      providesTags: [PRODUCTION_SUMMARY_API_TAGS.graph]
     }),
     getGraphMapping: build.query<GraphMappingResponse, void>({
-      query: () => API_ROUTES.graphMapping,
-      providesTags: [API_TAGS.graphMapping]
+      query: () => PRODUCTION_SUMMARY_API_ROUTES.graphMapping,
+      providesTags: [PRODUCTION_SUMMARY_API_TAGS.graphMapping]
     }),
     getGraphByMode: build.query<GraphByModeResponse, GraphByModeQuery>({
       query: (params) => ({
-        url: API_ROUTES.graphByMode,
+        url: PRODUCTION_SUMMARY_API_ROUTES.graphByMode,
         params
       }),
-      providesTags: [API_TAGS.graphByMode]
+      providesTags: [PRODUCTION_SUMMARY_API_TAGS.graphByMode]
     }),
     getGraphWithGtk: build.query<GraphWithGtkResponse, GraphQuery>({
       query: (params) => ({
-        url: API_ROUTES.graphWithGtk,
+        url: PRODUCTION_SUMMARY_API_ROUTES.graphWithGtk,
         params
       }),
-      providesTags: [API_TAGS.graphWithGtk]
+      providesTags: [PRODUCTION_SUMMARY_API_TAGS.graphWithGtk]
     }),
     getGraphWithDetails: build.query<GraphWithDetailsResponse, GraphQuery>({
       query: (params) => ({
-        url: API_ROUTES.graphWithDetails,
+        url: PRODUCTION_SUMMARY_API_ROUTES.graphWithDetails,
         params
       }),
-      providesTags: [API_TAGS.graphWithDetails]
+      providesTags: [PRODUCTION_SUMMARY_API_TAGS.graphWithDetails]
     }),
     getGeneralSummary: build.query<GeneralSummaryResponse, GeneralSummaryParams>({
       query: (params) => ({
-        url: API_ROUTES.generalSummary,
+        url: PRODUCTION_SUMMARY_API_ROUTES.generalSummary,
         params
       }),
-      providesTags: [API_TAGS.generalSummary]
+      providesTags: [PRODUCTION_SUMMARY_API_TAGS.generalSummary]
     })
   })
 })

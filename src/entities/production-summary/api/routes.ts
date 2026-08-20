@@ -1,5 +1,4 @@
-export const API_ROUTES = {
-  permissions: '/permissions',
+export const PRODUCTION_SUMMARY_API_ROUTES = {
   gtk: '/gtk',
   summary: '/summary',
   graph: '/graph',

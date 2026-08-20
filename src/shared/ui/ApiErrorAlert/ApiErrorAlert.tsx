@@ -22,14 +22,14 @@ export function ApiErrorAlert({
   description,
   onRetry,
   retryText = 'Повторить запрос',
-  endpoint
+  endpointPath
 }: ApiErrorAlertProps) {
   const { token } = theme.useToken()
   const {
     canAbortRetry,
     closeDevModal,
     devPayload,
-    endpointPath,
+    endpointPath: displayedEndpointPath,
     handleRetry,
     handleRetryAnimationEnd,
     isDevModalOpen,
@@ -38,7 +38,7 @@ export function ApiErrorAlert({
     message,
     openDevModal,
     statusCode
-  } = useApiErrorAlert({ endpoint, error, onRetry })
+  } = useApiErrorAlert({ endpointPath, error, onRetry })
 
   return (
     <div className={styles.root}>
@@ -97,7 +97,7 @@ export function ApiErrorAlert({
             </>
           ) : null}
           <dt>Endpoint</dt>
-          <dd>{endpointPath}</dd>
+          <dd>{displayedEndpointPath}</dd>
           {devPayload ? (
             <>
               <dt>Payload</dt>

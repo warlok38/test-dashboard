@@ -4,6 +4,7 @@ import { Spin } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 
 import {
+  PRODUCTION_SUMMARY_API_ROUTES,
   type GeneralSummaryCard,
   type SummaryQuery,
   useGetGeneralSummaryQuery
@@ -135,7 +136,7 @@ export function ProductionSummaryDashboard({
         <ApiErrorAlert
           error={generalSummaryError}
           title="Не удалось загрузить общие показатели"
-          endpoint="generalSummary"
+          endpointPath={PRODUCTION_SUMMARY_API_ROUTES.generalSummary}
           onRetry={refetchGeneralSummary}
         />
       </section>

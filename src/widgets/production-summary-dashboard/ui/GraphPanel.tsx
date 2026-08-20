@@ -14,6 +14,7 @@ import { Popover, Segmented, Tabs, Tooltip } from 'antd'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 
 import {
+  PRODUCTION_SUMMARY_API_ROUTES,
   useGetGraphByModeQuery,
   useGetGraphMappingQuery,
   type GraphByModeDetail,
@@ -536,7 +537,7 @@ function GraphTabContent({
         <ApiErrorAlert
           error={mainGraphError}
           title="Не удалось загрузить график"
-          endpoint="graphByMode"
+          endpointPath={PRODUCTION_SUMMARY_API_ROUTES.graphByMode}
           onRetry={refetchMainGraph}
         />
       )
@@ -572,7 +573,7 @@ function GraphTabContent({
         <ApiErrorAlert
           error={detailGraphError}
           title="Не удалось загрузить детальные графики"
-          endpoint="graphByMode"
+          endpointPath={PRODUCTION_SUMMARY_API_ROUTES.graphByMode}
           onRetry={refetchDetailGraph}
         />
       )

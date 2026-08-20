@@ -9,6 +9,7 @@ export {
   useGetSummaryQuery,
   useGetGeneralSummaryQuery
 } from './api/productionSummaryApi'
+export { PRODUCTION_SUMMARY_API_ROUTES } from './api/routes'
 export {
   getGtkHrefByName,
   getGtkNameBySlug,

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 
-import { API_ROUTES } from '@/shared/api'
 import { getErrorMessage, getHttpErrorStatus } from '@/shared/errors'
 
 import {
@@ -11,8 +10,6 @@ import {
   type ApiErrorRetryHandle
 } from '../lib/api-error-alert'
 
-export type ApiErrorEndpoint = keyof typeof API_ROUTES
-
 export type ApiErrorRetryResult = void | PromiseLike<unknown> | ApiErrorRetryHandle
 
 export type ApiErrorAlertProps = {
@@ -21,12 +18,12 @@ export type ApiErrorAlertProps = {
   description?: ReactNode
   onRetry?: () => ApiErrorRetryResult
   retryText?: string
-  endpoint?: ApiErrorEndpoint
+  endpointPath?: string
 }
 
-type UseApiErrorAlertParams = Pick<ApiErrorAlertProps, 'endpoint' | 'error' | 'onRetry'>
+type UseApiErrorAlertParams = Pick<ApiErrorAlertProps, 'endpointPath' | 'error' | 'onRetry'>
 
-export function useApiErrorAlert({ endpoint, error, onRetry }: UseApiErrorAlertParams) {
+export function useApiErrorAlert({ endpointPath, error, onRetry }: UseApiErrorAlertParams) {
   const [displayError, setDisplayError] = useState(error)
   const [isDevModalOpen, setIsDevModalOpen] = useState(false)
   const [isRetrying, setIsRetrying] = useState(false)
@@ -35,7 +32,7 @@ export function useApiErrorAlert({ endpoint, error, onRetry }: UseApiErrorAlertP
   const retryRequestIdRef = useRef(0)
   const isRetryAbortRequestedRef = useRef(false)
   const message = getErrorMessage(displayError)
-  const endpointPath = endpoint ? API_ROUTES[endpoint] : 'Неизвестно'
+  const displayedEndpointPath = endpointPath ?? 'Неизвестно'
   const statusCode = getHttpErrorStatus(error)
   const devPayload = formatDevPayload(error)
   const canAbortRetry = Boolean(retryResultRef.current?.abort)
@@ -107,7 +104,7 @@ export function useApiErrorAlert({ endpoint, error, onRetry }: UseApiErrorAlertP
   return {
     canAbortRetry,
     devPayload,
-    endpointPath,
+    endpointPath: displayedEndpointPath,
     handleRetry,
     handleRetryAnimationEnd,
     isDevModalOpen,

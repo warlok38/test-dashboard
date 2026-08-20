@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, type ReactNode } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 import {
+  PERMISSION_API_ROUTES,
   hasPermission,
   PERMISSION_ACTIONS,
   PERMISSION_RESOURCES,
@@ -136,7 +137,7 @@ function AuthContentGateContent({ children }: AuthContentGateProps) {
           <ApiErrorAlert
             error={permissionsError}
             title="Не удалось проверить доступ"
-            endpoint="permissions"
+            endpointPath={PERMISSION_API_ROUTES.permissions}
             onRetry={refetchPermissions}
           />
         </PageSurface>

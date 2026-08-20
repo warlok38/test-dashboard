@@ -1,5 +1,3 @@
 export { createAppApi } from './lib'
-export { mainApi, API_ROUTES, API_TAGS, API_TAG_TYPES } from './main'
-export { mediaApi, MEDIA_API_TAGS, MEDIA_API_TAG_TYPES } from './media'
-export type { ApiTagType } from './main'
-export type { MediaApiTagType } from './media'
+export { mainApi } from './mainApi'
+export { mediaApi } from './mediaApi'

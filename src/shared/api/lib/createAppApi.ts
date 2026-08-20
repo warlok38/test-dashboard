@@ -12,7 +12,7 @@ import { createAuthBaseQuery } from './authBaseQuery'
 type CreateAppApiOptions<ReducerPath extends string, TagType extends string> = {
   baseUrl?: string
   reducerPath: ReducerPath
-  tagTypes: readonly TagType[]
+  tagTypes?: readonly TagType[]
 }
 
 export function createAppApi<ReducerPath extends string, TagType extends string>({
@@ -36,7 +36,7 @@ export function createAppApi<ReducerPath extends string, TagType extends string>
   return createApi({
     reducerPath,
     baseQuery,
-    tagTypes,
+    tagTypes: tagTypes ?? [],
     endpoints: () => ({})
   })
 }
