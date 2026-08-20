@@ -8,7 +8,8 @@ import {
 import { PageShell, PageSurface } from '@/shared/ui'
 import { ContentHeader, homeBreadcrumbIcon, ProductionSummaryDashboard } from '@/widgets'
 
-const CAMERA_BUTTON_GTK_SLUGS = new Set<string>(['natalka'])
+const CAMERA_BUTTON_GTK_SLUGS = new Set<string>(['natalka', 'suhoy-log'])
+const VIDEO_RECORDS_BUTTON_GTK_SLUGS = new Set<string>(['suhoy-log'])
 
 type GtkPageProps = {
   params: {
@@ -36,6 +37,7 @@ export default function GtkPage({ params, searchParams }: GtkPageProps) {
         <ProductionSummaryDashboard
           query={getSummaryQueryFromSearchParams(searchParams, gtkName)}
           showCameraButton={CAMERA_BUTTON_GTK_SLUGS.has(params.gtkSlug)}
+          showVideoRecordsButton={VIDEO_RECORDS_BUTTON_GTK_SLUGS.has(params.gtkSlug)}
           showGraph
         />
       </PageSurface>

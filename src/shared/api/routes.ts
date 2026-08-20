@@ -7,5 +7,7 @@ export const API_ROUTES = {
   graphMapping: '/productivity/graph-mapping',
   graphWithGtk: '/productivity/graph-with-gtk',
   graphWithDetails: '/productivity/graph-with-details',
-  generalSummary: '/general/info'
+  generalSummary: '/general/info',
+  videoRecords: '/records/list',
+  videoRecordStream: '/watch'
 } as const

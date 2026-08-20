@@ -144,6 +144,7 @@
 }
 
 .generalSummaryWrapper {
+  position: relative;
   display: flex;
   flex-direction: row;
   overflow: hidden;
@@ -956,11 +957,16 @@
   right: var(--space-4);
   width: min(20rem, 17%);
   aspect-ratio: 16 / 9;
-  overflow: hidden;
+  overflow: visible;
   border: var(--border-width-hairline) solid color-mix(in srgb, var(--color-bg-card) 30%, #000);
   border-radius: var(--radius-5);
   background: #000;
   box-shadow: var(--color-shadow-card);
+}
+
+.generalSummaryVideoOverlay {
+  top: var(--space-4);
+  right: calc(var(--space-12) + var(--space-4));
 }
 
 .graphVideoPreviewButton {
@@ -970,6 +976,7 @@
   display: block;
   padding: 0;
   border: 0;
+  overflow: hidden;
   color: inherit;
   background: transparent;
   cursor: pointer;
@@ -992,6 +999,140 @@
 .graphVideoPreviewButton:hover .graphVideoPreviewHover,
 .graphVideoPreviewButton:focus-visible .graphVideoPreviewHover {
   opacity: 1;
+}
+
+.videoRecordPreview {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.videoRecordControls {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  max-width: calc(100% - var(--space-4));
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+
+.videoRecordDateBadge {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  max-width: calc(100% - var(--space-4));
+  padding: 0.125rem var(--space-1);
+  border-radius: var(--radius-2);
+  color: #fff;
+  background: rgb(0 0 0 / 48%);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1.2;
+  transition: opacity 0.16s ease;
+  pointer-events: none;
+}
+
+.videoRecordSelect.videoRecordSelect {
+  min-width: 7rem;
+}
+
+.videoRecordSelect.videoRecordSelect :global(.ant-select-selector) {
+  border: none;
+  color: #fff;
+  background: rgb(20 26 38 / 88%);
+}
+
+.videoRecordSelect.videoRecordSelect :global(.ant-select-arrow) {
+  color: #fff;
+}
+
+.videoRecordFullscreenButton {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  color: #fff;
+  background: rgb(0 0 0 / 36%);
+  cursor: pointer;
+  font-size: var(--font-size-2xl);
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+
+.videoRecordFullscreenButton:disabled {
+  cursor: default;
+}
+
+.videoRecordPreview:hover .videoRecordDateBadge,
+.videoRecordPreviewSelectOpen .videoRecordDateBadge {
+  opacity: 0;
+}
+
+.videoRecordPreview:hover .videoRecordControls,
+.videoRecordPreviewSelectOpen .videoRecordControls,
+.videoRecordPreview:hover .videoRecordFullscreenButton,
+.videoRecordFullscreenButton:focus-visible,
+.videoRecordSelect:focus-within {
+  opacity: 1;
+}
+
+.videoRecordModalControls {
+  position: absolute;
+  z-index: 2;
+  top: var(--space-3);
+  left: var(--space-3);
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+
+.videoRecordModalVideo {
+  position: relative;
+  overflow: visible;
+}
+
+.videoRecordModalVideoFrame {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-5);
+  background: #000;
+}
+
+.videoRecordModalVideo:hover .videoRecordModalControls,
+.videoRecordModalVideoPaused .videoRecordModalControls,
+.videoRecordModalVideoSelectOpen .videoRecordModalControls {
+  opacity: 1;
+}
+
+.videoRecordStatus,
+.videoRecordModalStatus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: var(--space-3);
+  color: #fff;
+  background: #000;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-align: center;
+}
+
+.videoRecordModalStatus {
+  color: var(--color-text-muted);
+  background: var(--color-bg-card);
 }
 
 .graphCameraModal.graphCameraModal :global(.ant-modal-content) {
@@ -1357,5 +1498,10 @@
 
   .graphVideoOverlay {
     width: min(12rem, 45%);
+  }
+
+  .generalSummaryVideoOverlay {
+    top: var(--space-3);
+    right: var(--space-3);
   }
 }

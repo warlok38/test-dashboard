@@ -12,7 +12,11 @@ import {
   type GraphWithDetailsResponse,
   type GraphWithGtkResponse,
   type GtkName,
-  type SummaryQuery
+  type SummaryQuery,
+  type VideoRecord,
+  type VideoRecordListParams,
+  type VideoRecordStreamParams,
+  type VideoRecordStreamResponse
 } from '../model/types'
 
 export const productionSummaryApi = mainApi.injectEndpoints({
@@ -66,6 +70,19 @@ export const productionSummaryApi = mainApi.injectEndpoints({
         params
       }),
       providesTags: [API_TAGS.generalSummary]
+    }),
+    getVideoRecords: build.query<VideoRecord[], VideoRecordListParams>({
+      query: (params) => ({
+        url: API_ROUTES.videoRecords,
+        params
+      }),
+      providesTags: [API_TAGS.videoRecords]
+    }),
+    getVideoRecordStream: build.query<VideoRecordStreamResponse, VideoRecordStreamParams>({
+      query: ({ objectGuid, siteSlug, stream }) => ({
+        url: `${API_ROUTES.videoRecordStream}/${siteSlug}/${objectGuid}/${stream}`
+      }),
+      providesTags: [API_TAGS.videoRecordStream]
     })
   })
 })
@@ -78,5 +95,7 @@ export const {
   useGetGraphMappingQuery,
   useGetGraphWithDetailsQuery,
   useGetGraphWithGtkQuery,
-  useGetGeneralSummaryQuery
+  useGetGeneralSummaryQuery,
+  useGetVideoRecordStreamQuery,
+  useGetVideoRecordsQuery
 } = productionSummaryApi

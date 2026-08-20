@@ -1,4 +1,11 @@
-import { DownOutlined, UpOutlined } from '@ant-design/icons'
+import {
+  DownOutlined,
+  PlaySquareFilled,
+  PlaySquareOutlined,
+  UpOutlined,
+  VideoCameraFilled,
+  VideoCameraOutlined
+} from '@ant-design/icons'
 import classNames from 'classnames'
 import { Empty, Popover } from 'antd'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -8,25 +15,46 @@ import {
   type GeneralSummaryCard,
   type GeneralSummaryGtkBreakdown
 } from '@/entities/production-summary'
-import { Loader } from '@/shared/ui'
+import { DEFAULT_CAMERA_STREAM, Loader } from '@/shared/ui'
 import { formatNumber } from '@/shared/utils/formatNumber'
 
 import styles from '../ProductionSummaryDashboard.module.css'
+import type { CameraOverlayType } from '../ProductionSummaryDashboard'
+import { GraphCameraOverlay } from './GraphCameraOverlay'
 import { SideActions } from './SideActions'
+import { VideoRecordsOverlay } from './VideoRecordsOverlay'
 
 type GeneralSummaryProps = {
   cards: GeneralSummaryCard[]
+  activeCameraOverlay?: CameraOverlayType | null
   activeIndicator?: string
   loading?: boolean
+  showCameraButton?: boolean
+  showVideoRecordsButton?: boolean
+  onCameraOverlayChange?: (overlay: CameraOverlayType | null) => void
+  onCameraPreviewClose?: () => void
 }
 
 export function GeneralSummary({
   cards,
+  activeCameraOverlay = null,
   activeIndicator = 'Объем бурения',
-  loading
+  loading,
+  showCameraButton = false,
+  showVideoRecordsButton = false,
+  onCameraOverlayChange,
+  onCameraPreviewClose
 }: GeneralSummaryProps) {
   const [isShowAll, setIsShowAll] = useState(false)
   const showAllLabel = isShowAll ? 'Скрыть все' : 'Показать все'
+  const isLiveCameraVisible = activeCameraOverlay === 'live'
+  const isVideoRecordsVisible = activeCameraOverlay === 'records'
+  const cameraToggleIcon = isLiveCameraVisible ? <VideoCameraFilled /> : <VideoCameraOutlined />
+  const videoRecordsToggleIcon = isVideoRecordsVisible ? (
+    <PlaySquareFilled />
+  ) : (
+    <PlaySquareOutlined />
+  )
 
   if (loading && cards.length === 0) {
     return (
@@ -124,6 +152,23 @@ export function GeneralSummary({
                 )}
           </div>
         </div>
+        {showCameraButton && isLiveCameraVisible ? (
+          <GraphCameraOverlay
+            className={styles.generalSummaryVideoOverlay}
+            description={DEFAULT_CAMERA_STREAM.description}
+            detailSrc={DEFAULT_CAMERA_STREAM.detailSrc}
+            onClosePreview={onCameraPreviewClose ?? (() => undefined)}
+            previewSrc={DEFAULT_CAMERA_STREAM.previewSrc}
+            title={DEFAULT_CAMERA_STREAM.title}
+          />
+        ) : null}
+        {showVideoRecordsButton && isVideoRecordsVisible ? (
+          <VideoRecordsOverlay
+            className={styles.generalSummaryVideoOverlay}
+            siteSlug="sl"
+            onClosePreview={onCameraPreviewClose ?? (() => undefined)}
+          />
+        ) : null}
         <SideActions
           actions={[
             {
@@ -131,7 +176,53 @@ export function GeneralSummary({
               key: 'show-all',
               label: showAllLabel,
               onClick: () => setIsShowAll(!isShowAll)
-            }
+            },
+            ...(showCameraButton
+              ? [
+                  {
+                    icon: <VideoCameraOutlined />,
+                    key: 'cameras',
+                    label: isLiveCameraVisible ? 'Выключить камеры' : 'Включить камеры',
+                    render: () => (
+                      <button
+                        className={classNames(styles.cameraToggleButton, {
+                          [styles.cameraToggleButtonActive]: isLiveCameraVisible
+                        })}
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          onCameraOverlayChange?.(isLiveCameraVisible ? null : 'live')
+                        }}
+                      >
+                        {cameraToggleIcon}
+                      </button>
+                    )
+                  }
+                ]
+              : []),
+            ...(showVideoRecordsButton
+              ? [
+                  {
+                    icon: <PlaySquareOutlined />,
+                    key: 'video-records',
+                    label: isVideoRecordsVisible ? 'Скрыть записи' : 'Показать записи',
+                    render: () => (
+                      <button
+                        className={classNames(styles.cameraToggleButton, {
+                          [styles.cameraToggleButtonActive]: isVideoRecordsVisible
+                        })}
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          onCameraOverlayChange?.(isVideoRecordsVisible ? null : 'records')
+                        }}
+                      >
+                        {videoRecordsToggleIcon}
+                      </button>
+                    )
+                  }
+                ]
+              : [])
           ]}
         />
       </div>

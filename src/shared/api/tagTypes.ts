@@ -6,7 +6,9 @@ export const API_TAGS = {
   graphMapping: 'GraphMapping',
   graphWithGtk: 'GraphWithGtk',
   graphWithDetails: 'GraphWithDetails',
-  generalSummary: 'GeneralSummary'
+  generalSummary: 'GeneralSummary',
+  videoRecords: 'VideoRecords',
+  videoRecordStream: 'VideoRecordStream'
 } as const
 
 export const API_TAG_TYPES = Object.values(API_TAGS)

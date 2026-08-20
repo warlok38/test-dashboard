@@ -1,7 +1,7 @@
 'use client'
 
 import { Spin } from 'antd'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import {
   type GeneralSummaryCard,
@@ -25,7 +25,10 @@ type SummaryDashboardProps = {
   query: SummaryQuery
   showCameraButton?: boolean
   showGraph?: boolean
+  showVideoRecordsButton?: boolean
 }
+
+export type CameraOverlayType = 'live' | 'records'
 
 type PeriodScopeState = {
   periodKey: string | null
@@ -52,9 +55,11 @@ function getSelectedGeneralSummaryIndicator(
 export function ProductionSummaryDashboard({
   query,
   showCameraButton = false,
-  showGraph = false
+  showGraph = false,
+  showVideoRecordsButton = false
 }: SummaryDashboardProps) {
   const dispatch = useAppDispatch()
+  const [activeCameraOverlay, setActiveCameraOverlay] = useState<CameraOverlayType | null>(null)
   const periodScope = useAppSelector(
     (state: { periodFilter: PeriodScopeState }) => state.periodFilter
   )
@@ -107,6 +112,12 @@ export function ProductionSummaryDashboard({
     )
   }, [dispatch, generalSummary?.production_date, period])
 
+  useEffect(() => {
+    if ((!showCameraButton && !showVideoRecordsButton) || !showGraph) {
+      setActiveCameraOverlay(null)
+    }
+  }, [showCameraButton, showGraph, showVideoRecordsButton])
+
   if (isInitialLoading) {
     return (
       <section className={styles.dashboard}>
@@ -136,15 +147,14 @@ export function ProductionSummaryDashboard({
       <GeneralSummary
         cards={generalSummaryCards}
         activeIndicator={selectedIndicator}
+        activeCameraOverlay={activeCameraOverlay}
         loading={isGeneralSummaryLoading}
+        showCameraButton={showCameraButton && showGraph}
+        showVideoRecordsButton={showVideoRecordsButton && showGraph}
+        onCameraOverlayChange={setActiveCameraOverlay}
+        onCameraPreviewClose={() => setActiveCameraOverlay(null)}
       />
-      {showGraph && (
-        <GraphPanel
-          graphPeriod={period.key}
-          query={graphQuery}
-          showCameraButton={showCameraButton}
-        />
-      )}
+      {showGraph && <GraphPanel graphPeriod={period.key} query={graphQuery} />}
     </section>
   )
 }

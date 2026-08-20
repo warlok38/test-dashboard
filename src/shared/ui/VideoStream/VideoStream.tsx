@@ -10,12 +10,14 @@ import styles from './VideoStream.module.css'
 type VideoStreamProps = {
   controls?: boolean
   isPlaying?: boolean
+  onPlayingChange?: (isPlaying: boolean) => void
   src?: string
 }
 
 export function VideoStream({
   controls = true,
   isPlaying = true,
+  onPlayingChange,
   src = DEFAULT_CAMERA_STREAM.previewSrc
 }: VideoStreamProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -94,7 +96,15 @@ export function VideoStream({
 
   return (
     <div className={styles.streamContainer}>
-      <video ref={videoRef} className={styles.streamVideo} controls={controls} muted playsInline />
+      <video
+        ref={videoRef}
+        className={styles.streamVideo}
+        controls={controls}
+        muted
+        playsInline
+        onPause={() => onPlayingChange?.(false)}
+        onPlay={() => onPlayingChange?.(true)}
+      />
     </div>
   )
 }
