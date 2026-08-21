@@ -1018,23 +1018,6 @@
   transition: opacity 0.16s ease;
 }
 
-.videoRecordDateBadge {
-  position: absolute;
-  z-index: 2;
-  top: 0;
-  left: 0;
-  max-width: calc(100% - var(--space-4));
-  padding: 0.125rem var(--space-1);
-  border-radius: var(--radius-2);
-  color: #fff;
-  background: rgb(0 0 0 / 48%);
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-  line-height: 1.2;
-  transition: opacity 0.16s ease;
-  pointer-events: none;
-}
-
 .videoRecordSelect.videoRecordSelect {
   min-width: 7rem;
 }
@@ -1070,11 +1053,6 @@
 
 .videoRecordFullscreenButton:disabled {
   cursor: default;
-}
-
-.videoRecordPreview:hover .videoRecordDateBadge,
-.videoRecordPreviewSelectOpen .videoRecordDateBadge {
-  opacity: 0;
 }
 
 .videoRecordPreview:hover .videoRecordControls,

@@ -157,11 +157,6 @@ export function VideoRecordsOverlay({
           })}
         >
           {!isModalOpen ? renderPreviewContent() : null}
-          {selectedRecord ? (
-            <span className={styles.videoRecordDateBadge}>
-              {formatSmartDateTime(selectedRecord.record_date)}
-            </span>
-          ) : null}
           <div className={styles.videoRecordControls} onClick={(event) => event.stopPropagation()}>
             <Select
               className={styles.videoRecordSelect}
