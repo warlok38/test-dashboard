@@ -10,49 +10,45 @@ import type { VideoRecordStreamResponse } from '../model/types'
 
 type UseVideoWatchSessionOptions = {
   enabled?: boolean
+  sessionId?: string
   stream?: VideoRecordStreamResponse
 }
 
 const pendingStopTimers = new Map<string, number>()
 
-export function useVideoWatchSession({ enabled = true, stream }: UseVideoWatchSessionOptions) {
+export function useVideoWatchSession({
+  enabled = true,
+  sessionId,
+  stream
+}: UseVideoWatchSessionOptions) {
   const [keepVideoWatchSession] = useKeepVideoWatchSessionMutation()
   const [stopVideoWatchSession] = useStopVideoWatchSessionMutation()
   const keepAliveSeconds = stream?.keep_alive_seconds
-  const keepAliveUrl = stream?.keep_alive_url
-  const stopUrl = stream?.stop_url
 
   useEffect(() => {
-    if (!enabled || !keepAliveUrl || !stopUrl || !keepAliveSeconds) {
+    if (!enabled || !sessionId || !keepAliveSeconds) {
       return
     }
 
-    const pendingStopTimer = pendingStopTimers.get(stopUrl)
+    const pendingStopTimer = pendingStopTimers.get(sessionId)
     if (pendingStopTimer) {
       window.clearTimeout(pendingStopTimer)
-      pendingStopTimers.delete(stopUrl)
+      pendingStopTimers.delete(sessionId)
     }
 
     const keepSession = () => {
-      void keepVideoWatchSession({ session: keepAliveUrl })
+      void keepVideoWatchSession({ session: sessionId })
     }
     const intervalId = window.setInterval(keepSession, keepAliveSeconds * 1000)
 
     return () => {
       window.clearInterval(intervalId)
       const stopTimer = window.setTimeout(() => {
-        pendingStopTimers.delete(stopUrl)
-        void stopVideoWatchSession({ session: stopUrl })
+        pendingStopTimers.delete(sessionId)
+        void stopVideoWatchSession({ session: sessionId })
       }, 0)
 
-      pendingStopTimers.set(stopUrl, stopTimer)
+      pendingStopTimers.set(sessionId, stopTimer)
     }
-  }, [
-    enabled,
-    keepAliveSeconds,
-    keepAliveUrl,
-    keepVideoWatchSession,
-    stopUrl,
-    stopVideoWatchSession
-  ])
+  }, [enabled, keepAliveSeconds, keepVideoWatchSession, sessionId, stopVideoWatchSession])
 }

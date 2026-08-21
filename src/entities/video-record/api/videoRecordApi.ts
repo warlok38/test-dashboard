@@ -1,4 +1,5 @@
 import { mediaApi } from '@/shared/api'
+import { MEDIA_API_BASE_URL } from '@/shared/api/config'
 
 import type {
   VideoCamera,
@@ -15,6 +16,14 @@ import { VIDEO_RECORD_API_TAGS, VIDEO_RECORD_API_TAG_TYPES } from './tagTypes'
 const videoRecordApiWithTags = mediaApi.enhanceEndpoints({
   addTagTypes: VIDEO_RECORD_API_TAG_TYPES
 })
+
+function withMediaApiBaseUrl(url: string) {
+  if (/^https?:\/\//.test(url)) {
+    return url
+  }
+
+  return `${MEDIA_API_BASE_URL}${url.startsWith('/') ? url : `/${url}`}`
+}
 
 export const videoRecordApi = videoRecordApiWithTags.injectEndpoints({
   endpoints: (build) => ({
@@ -35,6 +44,10 @@ export const videoRecordApi = videoRecordApiWithTags.injectEndpoints({
     getVideoRecordStream: build.query<VideoRecordStreamResponse, VideoRecordStreamParams>({
       query: ({ objectGuid, siteSlug, stream }) => ({
         url: `${VIDEO_RECORD_API_ROUTES.stream}/${siteSlug}/${objectGuid}/${stream}`
+      }),
+      transformResponse: (response: VideoRecordStreamResponse) => ({
+        ...response,
+        stream_url: withMediaApiBaseUrl(response.stream_url)
       }),
       providesTags: [VIDEO_RECORD_API_TAGS.stream]
     }),

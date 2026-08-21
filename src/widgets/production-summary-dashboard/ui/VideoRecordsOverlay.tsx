@@ -77,10 +77,12 @@ export function VideoRecordsOverlay({
 
   useVideoWatchSession({
     enabled: !isModalOpen,
+    sessionId: selectedRecordId,
     stream: previewStream
   })
   useVideoWatchSession({
     enabled: isModalOpen,
+    sessionId: selectedRecordId,
     stream: liveStream
   })
 

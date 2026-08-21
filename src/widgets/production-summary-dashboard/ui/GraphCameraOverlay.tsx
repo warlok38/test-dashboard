@@ -70,6 +70,7 @@ export function GraphCameraOverlay({
 
   useVideoWatchSession({
     enabled: isModalOpen && !selectedCamera?.detailSrc,
+    sessionId: selectedCamera?.id,
     stream: liveStream
   })
 
@@ -178,6 +179,7 @@ function CameraPreview({ camera, isStopped, onOpen, siteSlug }: CameraPreviewPro
 
   useVideoWatchSession({
     enabled: !isStopped && !camera.previewSrc,
+    sessionId: camera.id,
     stream: previewStream
   })
 
