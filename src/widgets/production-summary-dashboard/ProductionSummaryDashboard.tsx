@@ -23,6 +23,7 @@ import styles from './ProductionSummaryDashboard.module.css'
 import { GeneralSummary, GraphPanel } from './ui'
 
 type SummaryDashboardProps = {
+  gtkSlug?: string
   query: SummaryQuery
   showCameraButton?: boolean
   showGraph?: boolean
@@ -54,6 +55,7 @@ function getSelectedGeneralSummaryIndicator(
 }
 
 export function ProductionSummaryDashboard({
+  gtkSlug,
   query,
   showCameraButton = false,
   showGraph = false,
@@ -149,6 +151,7 @@ export function ProductionSummaryDashboard({
         cards={generalSummaryCards}
         activeIndicator={selectedIndicator}
         activeCameraOverlay={activeCameraOverlay}
+        gtkSlug={gtkSlug}
         loading={isGeneralSummaryLoading}
         showCameraButton={showCameraButton && showGraph}
         showVideoRecordsButton={showVideoRecordsButton && showGraph}

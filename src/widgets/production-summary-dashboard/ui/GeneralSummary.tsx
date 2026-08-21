@@ -20,7 +20,7 @@ import { formatNumber } from '@/shared/utils/formatNumber'
 
 import styles from '../ProductionSummaryDashboard.module.css'
 import type { CameraOverlayType } from '../ProductionSummaryDashboard'
-import { GraphCameraOverlay } from './GraphCameraOverlay'
+import { GraphCameraOverlay, type GraphCamera } from './GraphCameraOverlay'
 import { SideActions } from './SideActions'
 import { VideoRecordsOverlay } from './VideoRecordsOverlay'
 
@@ -28,6 +28,7 @@ type GeneralSummaryProps = {
   cards: GeneralSummaryCard[]
   activeCameraOverlay?: CameraOverlayType | null
   activeIndicator?: string
+  gtkSlug?: string
   loading?: boolean
   showCameraButton?: boolean
   showVideoRecordsButton?: boolean
@@ -35,10 +36,22 @@ type GeneralSummaryProps = {
   onCameraPreviewClose?: () => void
 }
 
+const CAMERA_ITEMS_BY_GTK_SLUG: Partial<Record<string, GraphCamera[]>> = {
+  natalka: [
+    {
+      id: 'natalka-default-camera',
+      detailSrc: DEFAULT_CAMERA_STREAM.detailSrc,
+      name: DEFAULT_CAMERA_STREAM.title,
+      previewSrc: DEFAULT_CAMERA_STREAM.previewSrc
+    }
+  ]
+}
+
 export function GeneralSummary({
   cards,
   activeCameraOverlay = null,
   activeIndicator = 'Объем бурения',
+  gtkSlug,
   loading,
   showCameraButton = false,
   showVideoRecordsButton = false,
@@ -49,6 +62,7 @@ export function GeneralSummary({
   const showAllLabel = isShowAll ? 'Скрыть все' : 'Показать все'
   const isLiveCameraVisible = activeCameraOverlay === 'live'
   const isVideoRecordsVisible = activeCameraOverlay === 'records'
+  const cameraItems = gtkSlug ? CAMERA_ITEMS_BY_GTK_SLUG[gtkSlug] : undefined
   const cameraToggleIcon = isLiveCameraVisible ? <VideoCameraFilled /> : <VideoCameraOutlined />
   const videoRecordsToggleIcon = isVideoRecordsVisible ? (
     <PlaySquareFilled />
@@ -154,12 +168,10 @@ export function GeneralSummary({
         </div>
         {showCameraButton && isLiveCameraVisible ? (
           <GraphCameraOverlay
+            cameras={cameraItems}
             className={styles.generalSummaryVideoOverlay}
-            description={DEFAULT_CAMERA_STREAM.description}
-            detailSrc={DEFAULT_CAMERA_STREAM.detailSrc}
             onClosePreview={onCameraPreviewClose ?? (() => undefined)}
-            previewSrc={DEFAULT_CAMERA_STREAM.previewSrc}
-            title={DEFAULT_CAMERA_STREAM.title}
+            siteSlug="sl"
           />
         ) : null}
         {showVideoRecordsButton && isVideoRecordsVisible ? (

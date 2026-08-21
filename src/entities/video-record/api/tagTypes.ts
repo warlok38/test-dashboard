@@ -1,4 +1,5 @@
 export const VIDEO_RECORD_API_TAGS = {
+  cameras: 'VideoCameras',
   records: 'VideoRecords',
   stream: 'VideoRecordStream'
 } as const

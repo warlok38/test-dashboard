@@ -5,7 +5,11 @@ import { Modal, Select } from 'antd'
 import classNames from 'classnames'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { useGetVideoRecordStreamQuery, useGetVideoRecordsQuery } from '@/entities/video-record'
+import {
+  useGetVideoRecordStreamQuery,
+  useGetVideoRecordsQuery,
+  useVideoWatchSession
+} from '@/entities/video-record'
 import { useClickOutside } from '@/shared/hooks'
 import { Loader, VideoStream } from '@/shared/ui'
 import { formatSmartDateTime } from '@/shared/utils/formatDateTime'
@@ -51,6 +55,7 @@ export function VideoRecordsOverlay({
       stream: 'preview'
     },
     {
+      refetchOnMountOrArgChange: true,
       skip: !selectedRecordId || isModalOpen
     }
   )
@@ -65,9 +70,20 @@ export function VideoRecordsOverlay({
       stream: 'live'
     },
     {
+      refetchOnMountOrArgChange: true,
       skip: !selectedRecordId || !isModalOpen
     }
   )
+
+  useVideoWatchSession({
+    enabled: !isModalOpen,
+    stream: previewStream
+  })
+  useVideoWatchSession({
+    enabled: isModalOpen,
+    stream: liveStream
+  })
+
   const closePreview = useCallback(() => {
     if (!isModalOpen) {
       onClosePreview()

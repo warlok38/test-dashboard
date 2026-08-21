@@ -35,6 +35,7 @@ export default function GtkPage({ params, searchParams }: GtkPageProps) {
       />
       <PageSurface variant="constrained">
         <ProductionSummaryDashboard
+          gtkSlug={params.gtkSlug}
           query={getSummaryQueryFromSearchParams(searchParams, gtkName)}
           showCameraButton={CAMERA_BUTTON_GTK_SLUGS.has(params.gtkSlug)}
           showVideoRecordsButton={VIDEO_RECORDS_BUTTON_GTK_SLUGS.has(params.gtkSlug)}
