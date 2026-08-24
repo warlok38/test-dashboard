@@ -1,0 +1,21 @@
+.overlayToggleButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--space-8);
+  width: var(--space-8);
+  height: var(--space-8);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-5);
+  color: var(--color-text-muted);
+  background: transparent;
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  line-height: 1;
+}
+
+.overlayToggleButtonActive {
+  color: #000;
+  background: var(--color-kpi-fact);
+}

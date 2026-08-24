@@ -19,18 +19,15 @@ import {
 import { useAppDispatch, useAppSelector } from '@/shared/hooks'
 import { ApiErrorAlert } from '@/shared/ui'
 
+import { isMediaOverlayAvailable, type SummaryOverlayType } from './model'
 import styles from './ProductionSummaryDashboard.module.css'
 import { GeneralSummary, GraphPanel } from './ui'
 
 type SummaryDashboardProps = {
   gtkSlug?: string
   query: SummaryQuery
-  showCameraButton?: boolean
   showGraph?: boolean
-  showVideoRecordsButton?: boolean
 }
-
-export type CameraOverlayType = 'live' | 'records'
 
 type PeriodScopeState = {
   periodKey: string | null
@@ -57,12 +54,10 @@ function getSelectedGeneralSummaryIndicator(
 export function ProductionSummaryDashboard({
   gtkSlug,
   query,
-  showCameraButton = false,
-  showGraph = false,
-  showVideoRecordsButton = false
+  showGraph = false
 }: SummaryDashboardProps) {
   const dispatch = useAppDispatch()
-  const [activeCameraOverlay, setActiveCameraOverlay] = useState<CameraOverlayType | null>(null)
+  const [activeOverlay, setActiveOverlay] = useState<SummaryOverlayType | null>(null)
   const periodScope = useAppSelector(
     (state: { periodFilter: PeriodScopeState }) => state.periodFilter
   )
@@ -116,10 +111,10 @@ export function ProductionSummaryDashboard({
   }, [dispatch, generalSummary?.production_date, period])
 
   useEffect(() => {
-    if ((!showCameraButton && !showVideoRecordsButton) || !showGraph) {
-      setActiveCameraOverlay(null)
+    if (!showGraph || (activeOverlay && !isMediaOverlayAvailable(activeOverlay, gtkSlug))) {
+      setActiveOverlay(null)
     }
-  }, [showCameraButton, showGraph, showVideoRecordsButton])
+  }, [activeOverlay, gtkSlug, showGraph])
 
   if (isInitialLoading) {
     return (
@@ -150,13 +145,12 @@ export function ProductionSummaryDashboard({
       <GeneralSummary
         cards={generalSummaryCards}
         activeIndicator={selectedIndicator}
-        activeCameraOverlay={activeCameraOverlay}
+        activeOverlay={activeOverlay}
         gtkSlug={gtkSlug}
         loading={isGeneralSummaryLoading}
-        showCameraButton={showCameraButton && showGraph}
-        showVideoRecordsButton={showVideoRecordsButton && showGraph}
-        onCameraOverlayChange={setActiveCameraOverlay}
-        onCameraPreviewClose={() => setActiveCameraOverlay(null)}
+        showGraph={showGraph}
+        onOverlayChange={setActiveOverlay}
+        onOverlayPreviewClose={() => setActiveOverlay(null)}
       />
       {showGraph && <GraphPanel graphPeriod={period.key} query={graphQuery} />}
     </section>

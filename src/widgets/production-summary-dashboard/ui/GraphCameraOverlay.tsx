@@ -13,20 +13,14 @@ import {
 import { useClickOutside } from '@/shared/hooks'
 import { Loader, VideoStream } from '@/shared/ui'
 
+import type { MediaCamera } from '../model'
 import styles from '../ProductionSummaryDashboard.module.css'
 
 type GraphCameraOverlayProps = {
-  cameras?: GraphCamera[]
+  cameras?: MediaCamera[]
   className?: string
   onClosePreview: () => void
   siteSlug: string
-}
-
-export type GraphCamera = {
-  detailSrc?: string
-  id: string
-  name: string
-  previewSrc?: string
 }
 
 export function GraphCameraOverlay({
@@ -36,7 +30,7 @@ export function GraphCameraOverlay({
   siteSlug
 }: GraphCameraOverlayProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedCamera, setSelectedCamera] = useState<GraphCamera>()
+  const [selectedCamera, setSelectedCamera] = useState<MediaCamera>()
   const shouldFetchCameras = !providedCameras
   const previewRef = useRef<HTMLDivElement>(null)
   const {
@@ -92,7 +86,7 @@ export function GraphCameraOverlay({
     setSelectedCamera(undefined)
   }, [])
 
-  const openCamera = useCallback((camera: GraphCamera) => {
+  const openCamera = useCallback((camera: MediaCamera) => {
     setSelectedCamera(camera)
     setIsModalOpen(true)
   }, [])
@@ -154,9 +148,9 @@ export function GraphCameraOverlay({
 }
 
 type CameraPreviewProps = {
-  camera: GraphCamera
+  camera: MediaCamera
   isStopped: boolean
-  onOpen: (camera: GraphCamera) => void
+  onOpen: (camera: MediaCamera) => void
   siteSlug: string
 }
 
