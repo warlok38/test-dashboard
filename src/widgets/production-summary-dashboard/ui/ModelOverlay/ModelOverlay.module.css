@@ -105,6 +105,20 @@
   border-bottom: 0;
 }
 
+.sliderControlRow {
+  min-height: 2.25rem;
+  display: grid;
+  grid-template-columns: minmax(0, 4.75rem) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--border-width-hairline) solid rgb(255 255 255 / 8%);
+  color: #fff;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
 .controlLabel {
   overflow: hidden;
   color: rgb(255 255 255 / 86%);
@@ -124,6 +138,49 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
+}
+
+.sliderControl {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(4rem, 1fr) 3.5rem;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.axisSlider.axisSlider {
+  margin: 0;
+}
+
+.axisSlider.axisSlider :global(.ant-slider-rail) {
+  background: rgb(255 255 255 / 78%);
+}
+
+.axisSlider.axisSlider :global(.ant-slider-track) {
+  background: var(--color-kpi-fact);
+}
+
+.axisSlider.axisSlider :global(.ant-slider-handle::after) {
+  box-shadow: 0 0 0 2px var(--color-kpi-fact);
+}
+
+.axisInput {
+  width: 3.5rem;
+  padding: 0;
+  border: 0;
+  color: #fff;
+  font-family: var(--font-family-monospace, monospace);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  line-height: 1;
+  text-align: right;
+  background: transparent;
+  outline: none;
+}
+
+.axisInput:disabled {
+  color: rgb(255 255 255 / 36%);
+  cursor: default;
 }
 
 .colorButton {
@@ -179,6 +236,26 @@
   background: rgb(28 32 39 / 96%);
 }
 
+.defaultButton {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-height: 1.75rem;
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-3);
+  color: #fff;
+  background: rgb(61 86 130 / 82%);
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.defaultButton:hover {
+  background: rgb(75 104 157 / 92%);
+}
+
 .modelToggleIcon {
   display: inline-flex;
   align-items: center;
@@ -208,5 +285,14 @@
     grid-template-columns: 1fr;
     gap: var(--space-2);
     justify-items: end;
+  }
+
+  .sliderControlRow {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+
+  .sliderControl {
+    width: 100%;
   }
 }
