@@ -77,8 +77,8 @@ export function ModelOverlay({ className, models, onClosePreview }: ModelOverlay
             {overlayState.isModalOpen && overlayState.selectedModel ? (
               <ModelViewer
                 {...overlayState.viewerProps}
+                config={overlayState.selectedModel.config}
                 interactive
-                initialRotationDeg={overlayState.selectedModel.initialRotationDeg}
                 loadingDescription="Загружаем модель..."
                 src={overlayState.selectedModel.src}
               />

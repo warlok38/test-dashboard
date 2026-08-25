@@ -1,9 +1,9 @@
-import type { ModelInitialRotation } from '@/shared/ui'
+import type { ModelViewerConfig } from '@/shared/ui'
 import { type GtkSlug, isKnownGtkSlug } from '@/entities/production-summary'
 
 export type MediaModel = {
+  config?: ModelViewerConfig
   id: string
-  initialRotationDeg?: ModelInitialRotation
   name: string
   src: string
 }
@@ -11,10 +11,14 @@ export type MediaModel = {
 const MODELS_BY_GTK_SLUG: Partial<Record<GtkSlug, MediaModel[]>> = {
   olimpiada: [
     {
-      id: 'olimpiada-low-poly-mine',
-      initialRotationDeg: {
-        x: 90
+      config: {
+        cameraDistanceMultiplier: 1.65,
+        rotationDeg: {
+          x: 78,
+          z: -12
+        }
       },
+      id: 'olimpiada-low-poly-mine',
       name: 'Олимпиада',
       src: '/models/olimpiada/low-poly_mine.glb'
     }

@@ -33,7 +33,7 @@ import {
   INTERACTION_IDLE_DELAY_MS,
   type ModelAxisBounds,
   type ModelAxisControls,
-  type ModelInitialRotation,
+  type ModelViewerConfig,
   type ModelLoadState
 } from './viewer'
 
@@ -42,8 +42,8 @@ type UseModelViewerSceneParams = {
   autoRotate: boolean
   cameraDistanceMultiplier?: number
   color?: string
+  config?: ModelViewerConfig
   interactive: boolean
-  initialRotationDeg?: ModelInitialRotation
   onAxisBoundsChange?: (bounds: ModelAxisBounds) => void
   onAxisControlsChange?: (controls: ModelAxisControls) => void
   resetKey: number
@@ -56,8 +56,8 @@ export function useModelViewerScene({
   autoRotate,
   cameraDistanceMultiplier,
   color,
+  config,
   interactive,
-  initialRotationDeg,
   onAxisBoundsChange,
   onAxisControlsChange,
   resetKey,
@@ -387,11 +387,12 @@ export function useModelViewerScene({
         }
 
         const model = gltf.scene
+        const rotationDeg = config?.rotationDeg
 
         model.rotation.set(
-          THREE.MathUtils.degToRad(initialRotationDeg?.x ?? 0),
-          THREE.MathUtils.degToRad(initialRotationDeg?.y ?? 0),
-          THREE.MathUtils.degToRad(initialRotationDeg?.z ?? 0)
+          THREE.MathUtils.degToRad(rotationDeg?.x ?? 0),
+          THREE.MathUtils.degToRad(rotationDeg?.y ?? 0),
+          THREE.MathUtils.degToRad(rotationDeg?.z ?? 0)
         )
 
         const {
@@ -500,7 +501,7 @@ export function useModelViewerScene({
       renderer.dispose()
       renderer.domElement.remove()
     }
-  }, [cameraDistanceMultiplier, initialRotationDeg, interactive, src])
+  }, [cameraDistanceMultiplier, config, interactive, src])
 
   return {
     containerRef,

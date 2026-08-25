@@ -18,10 +18,15 @@ export type ModelAxisBounds = {
 
 export type ModelLoadState = 'idle' | 'loading' | 'ready' | 'error'
 
-export type ModelInitialRotation = {
+export type ModelRotation = {
   x?: number
   y?: number
   z?: number
+}
+
+export type ModelViewerConfig = {
+  cameraDistanceMultiplier?: number
+  rotationDeg?: ModelRotation
 }
 
 export const AUTO_ROTATE_SPEED = 0.003
