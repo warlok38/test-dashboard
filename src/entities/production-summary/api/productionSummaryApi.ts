@@ -1,4 +1,4 @@
-import { mainApi } from '@/shared/api'
+import { mainApi, withTags } from '@/shared/api'
 
 import {
   GeneralSummaryParams,
@@ -14,14 +14,16 @@ import {
   type GtkName,
   type SummaryQuery
 } from '../model/types'
-import { PRODUCTION_SUMMARY_API_ROUTES } from './routes'
-import { PRODUCTION_SUMMARY_API_TAGS, PRODUCTION_SUMMARY_API_TAG_TYPES } from './tagTypes'
+import {
+  PRODUCTION_SUMMARY_API_ROUTES,
+  PRODUCTION_SUMMARY_API_TAGS,
+  PRODUCTION_SUMMARY_API_TAG_TYPES
+} from './consts'
 
-const productionSummaryApiWithTags = mainApi.enhanceEndpoints({
-  addTagTypes: PRODUCTION_SUMMARY_API_TAG_TYPES
-})
-
-export const productionSummaryApi = productionSummaryApiWithTags.injectEndpoints({
+export const productionSummaryApi = withTags(
+  mainApi,
+  PRODUCTION_SUMMARY_API_TAG_TYPES
+).injectEndpoints({
   endpoints: (build) => ({
     getGtk: build.query<GtkName[], void>({
       query: () => PRODUCTION_SUMMARY_API_ROUTES.gtk,
