@@ -3,7 +3,7 @@
 import classNames from 'classnames'
 
 import styles from './ModelViewer.module.css'
-import type { ModelAxisBounds, ModelAxisControls } from './model/viewer'
+import type { ModelAxisBounds, ModelAxisControls, ModelInitialRotation } from './model/viewer'
 import { useModelViewerScene } from './model/useModelViewerScene'
 import { Loader } from '../Loader'
 
@@ -15,6 +15,7 @@ type ModelViewerProps = {
   color?: string
   errorDescription?: string
   interactive?: boolean
+  initialRotationDeg?: ModelInitialRotation
   loadingDescription?: string
   onAxisBoundsChange?: (bounds: ModelAxisBounds) => void
   onAxisControlsChange?: (controls: ModelAxisControls) => void
@@ -31,6 +32,7 @@ export function ModelViewer({
   color,
   errorDescription = 'Модель недоступна',
   interactive = false,
+  initialRotationDeg,
   loadingDescription = 'Загружаем модель...',
   onAxisBoundsChange,
   onAxisControlsChange,
@@ -44,6 +46,7 @@ export function ModelViewer({
     cameraDistanceMultiplier,
     color,
     interactive,
+    initialRotationDeg,
     onAxisBoundsChange,
     onAxisControlsChange,
     resetKey,

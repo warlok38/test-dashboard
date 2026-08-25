@@ -1,2 +1,2 @@
 export { ModelViewer } from './ModelViewer'
-export type { ModelAxisBounds, ModelAxisControls } from './model/viewer'
+export type { ModelAxisBounds, ModelAxisControls, ModelInitialRotation } from './model/viewer'

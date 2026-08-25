@@ -18,6 +18,7 @@ export function Preview({ cameraDistanceMultiplier, model, onOpen }: PreviewProp
     <button className={styles.previewButton} type="button" onClick={() => onOpen(model)}>
       <ModelViewer
         cameraDistanceMultiplier={cameraDistanceMultiplier}
+        initialRotationDeg={model.initialRotationDeg}
         loadingDescription="Загружаем модель..."
         src={model.src}
       />

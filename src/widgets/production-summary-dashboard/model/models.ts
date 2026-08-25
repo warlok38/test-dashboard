@@ -1,7 +1,9 @@
+import type { ModelInitialRotation } from '@/shared/ui'
 import { type GtkSlug, isKnownGtkSlug } from '@/entities/production-summary'
 
 export type MediaModel = {
   id: string
+  initialRotationDeg?: ModelInitialRotation
   name: string
   src: string
 }
@@ -10,6 +12,9 @@ const MODELS_BY_GTK_SLUG: Partial<Record<GtkSlug, MediaModel[]>> = {
   olimpiada: [
     {
       id: 'olimpiada-low-poly-mine',
+      initialRotationDeg: {
+        x: 90
+      },
       name: 'Олимпиада',
       src: '/models/olimpiada/low-poly_mine.glb'
     }
