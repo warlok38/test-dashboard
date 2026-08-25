@@ -24,7 +24,13 @@ export type ModelRotation = {
   z?: number
 }
 
+export type ModelAutoRotateConfig = {
+  pauseOnInteraction?: boolean
+  resumeDelayMs?: number
+}
+
 export type ModelViewerConfig = {
+  autoRotate?: ModelAutoRotateConfig
   cameraDistanceMultiplier?: number
   rotationDeg?: ModelRotation
 }
@@ -32,7 +38,7 @@ export type ModelViewerConfig = {
 export const AUTO_ROTATE_SPEED = 0.003
 export const CAMERA_DISTANCE_MULTIPLIER = 2.4
 export const DEFAULT_CAMERA_DISTANCE = 8
-export const INTERACTION_IDLE_DELAY_MS = 5000
+export const DEFAULT_AUTO_ROTATE_RESUME_DELAY_MS = 5000
 
 export const MODEL_LIGHTING = {
   ambientIntensity: 1.15,

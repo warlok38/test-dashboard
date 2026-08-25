@@ -30,7 +30,7 @@ import { createSceneLights, resizeRenderer } from '../lib/scene'
 import { applyAxisTransform } from '../lib/transform'
 import {
   AUTO_ROTATE_SPEED,
-  INTERACTION_IDLE_DELAY_MS,
+  DEFAULT_AUTO_ROTATE_RESUME_DELAY_MS,
   type ModelAxisBounds,
   type ModelAxisControls,
   type ModelViewerConfig,
@@ -138,6 +138,10 @@ export function useModelViewerScene({
     const defaultTarget = new THREE.Vector3()
     const defaultAxisControls = { ...DEFAULT_AXIS_CONTROLS }
     const defaultModelPivotPosition = new THREE.Vector3()
+    const autoRotateConfig = config?.autoRotate
+    const shouldPauseAutoRotateOnInteraction = autoRotateConfig?.pauseOnInteraction ?? false
+    const autoRotateResumeDelayMs =
+      autoRotateConfig?.resumeDelayMs ?? DEFAULT_AUTO_ROTATE_RESUME_DELAY_MS
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 10000)
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
@@ -230,7 +234,7 @@ export function useModelViewerScene({
     }
 
     const pauseAutoRotate = () => {
-      if (!interactive) {
+      if (!interactive || !shouldPauseAutoRotateOnInteraction) {
         return
       }
 
@@ -242,7 +246,7 @@ export function useModelViewerScene({
     }
 
     const resumeAutoRotateLater = () => {
-      if (!interactive) {
+      if (!interactive || !shouldPauseAutoRotateOnInteraction) {
         return
       }
 
@@ -250,7 +254,7 @@ export function useModelViewerScene({
 
       interactionTimerRef.current = setTimeout(() => {
         isAutoRotatePausedByInteraction = false
-      }, INTERACTION_IDLE_DELAY_MS)
+      }, autoRotateResumeDelayMs)
     }
 
     const stopAxisDrag = () => {
