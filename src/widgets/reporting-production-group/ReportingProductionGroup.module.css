@@ -8,7 +8,6 @@
   margin: 0;
   color: var(--color-text-strong);
   font-size: var(--font-size-3xl);
-  font-weight: 700;
   line-height: 1.2;
   text-transform: uppercase;
 }
@@ -33,9 +32,7 @@
   margin: 0;
   color: var(--color-text-strong);
   font-size: var(--font-size-lg);
-  font-weight: 800;
   line-height: 1.15;
-  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -84,19 +81,11 @@
 }
 
 .barConnectorLine {
-  position: absolute;
-  z-index: 1;
-  top: calc(var(--space-module) * 9);
-  left: var(--space-8);
-  right: var(--space-8);
-  width: calc(100% - var(--space-16));
-  height: 8rem;
   color: var(--color-text-muted);
   pointer-events: none;
 }
 
-.barConnectorLine path {
-  fill: none;
+.barConnectorLine line {
   stroke: currentcolor;
   stroke-dasharray: 3 3;
   stroke-linecap: round;

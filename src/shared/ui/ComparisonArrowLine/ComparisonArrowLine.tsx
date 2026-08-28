@@ -16,8 +16,8 @@ export function ComparisonArrowLine({ className, deltas }: ComparisonArrowLinePr
           <path d="M0 4H98.5" />
           <path d="M50 4V10" />
           <path d="M98.5 4V9.8" />
-          <path d="M98.5 12.8L95.9 9.4H101.1Z" />
         </svg>
+        <div className={styles.arrowHead} />
         {deltas.map((delta, index) => (
           <span className={styles.badge} key={`${delta}-${index}`}>
             {delta}

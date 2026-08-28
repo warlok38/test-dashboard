@@ -30,6 +30,10 @@ import styles from './ReportingOverview.module.css'
 
 const ASSET_PARAM = 'asset'
 const DEFAULT_ASSET_KEY: ReportingAssetKey = 'group'
+const MONTHLY_CHART_HEIGHT = 118
+const MONTHLY_BAR_SIZE = 12
+const MONTHLY_BAR_GAP = 2
+const MONTHLY_Y_AXIS_HEADROOM = 0.35
 const { CheckableTag } = Tag
 const chartColors = {
   fact: 'var(--color-kpi-fact)',
@@ -91,7 +95,7 @@ export function ReportingOverview() {
                 key={metric.key}
                 onChange={() => setActiveMetricKey(metric.key)}
               >
-                {metric.label}
+                {metric.label.toUpperCase()}
               </CheckableTag>
             ))}
           </div>
@@ -133,15 +137,15 @@ export function ReportingOverview() {
           </div>
         </div>
         <div className={styles.monthlyChart}>
-          <ResponsiveContainer height={104} width="100%">
-            <BarChart barGap={2} barSize={8} data={overview.monthly}>
+          <ResponsiveContainer height={MONTHLY_CHART_HEIGHT} width="100%">
+            <BarChart barGap={MONTHLY_BAR_GAP} barSize={MONTHLY_BAR_SIZE} data={overview.monthly}>
               <XAxis
                 dataKey="month"
                 interval={0}
                 tickLine={false}
                 tick={{ fill: 'var(--color-text-muted)', fontSize: 9, fontWeight: 600 }}
               />
-              <YAxis hide domain={[0, 'dataMax + 1']} />
+              <YAxis hide domain={[0, `dataMax + ${MONTHLY_Y_AXIS_HEADROOM}`]} />
               <Bar dataKey="forecast" fill={chartColors.forecast} isAnimationActive={false} />
               <Bar dataKey="plan" fill={chartColors.plan} isAnimationActive={false} />
               <Bar dataKey="fact" fill={chartColors.fact} isAnimationActive={false} />

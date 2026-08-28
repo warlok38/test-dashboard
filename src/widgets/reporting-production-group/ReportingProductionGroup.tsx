@@ -1,6 +1,7 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useState } from 'react'
 import {
   Bar,
   BarChart,
@@ -22,10 +23,12 @@ import {
 import { ComparisonArrowLine } from '@/shared/ui'
 import { formatNumber } from '@/shared/utils'
 
+import { getBarConnectorSegments, type BarConnectorPoint } from './lib/bar-connector-line'
 import styles from './ReportingProductionGroup.module.css'
 
 const ASSET_PARAM = 'asset'
 const DEFAULT_ASSET_KEY: ReportingAssetKey = 'group'
+const PRODUCTION_BAR_SIZE = 60
 
 function getDataset(assetKey: string | null): ReportingDataset {
   return (
@@ -58,6 +61,23 @@ type ProductionCardProps = {
 const productionBarColors = ['#c3cfe1', '#cfd0d2', 'var(--color-kpi-fact)'] as const
 
 function ProductionCard({ card }: ProductionCardProps) {
+  const [barPoints, setBarPoints] = useState<BarConnectorPoint[]>([])
+
+  const handleBarGeometryChange = useCallback((index: number, point: BarConnectorPoint) => {
+    setBarPoints((currentPoints) => {
+      const currentPoint = currentPoints[index]
+
+      if (currentPoint && isSameBarConnectorPoint(currentPoint, point)) {
+        return currentPoints
+      }
+
+      const nextPoints = [...currentPoints]
+      nextPoints[index] = point
+
+      return nextPoints
+    })
+  }, [])
+
   return (
     <article className={styles.card}>
       <div className={styles.cardBody}>
@@ -69,17 +89,10 @@ function ProductionCard({ card }: ProductionCardProps) {
           </div>
           <div className={styles.chartFrame}>
             <ComparisonArrowLine className={styles.comparisonTrack} deltas={card.deltas} />
-            <svg
-              className={styles.barConnectorLine}
-              preserveAspectRatio="none"
-              viewBox="0 0 100 100"
-            >
-              <path d="M16 62L50 36L84 43" />
-            </svg>
             <ResponsiveContainer height={204} width="100%">
               <BarChart
                 barCategoryGap="20%"
-                barSize={60}
+                barSize={PRODUCTION_BAR_SIZE}
                 data={card.bars}
                 margin={{ top: 44, right: 20, left: 20, bottom: 0 }}
               >
@@ -92,11 +105,17 @@ function ProductionCard({ card }: ProductionCardProps) {
                   tickLine={false}
                 />
                 <YAxis hide domain={[0, 'dataMax + 36']} />
+                <ProductionBarConnectorLine
+                  expectedPointCount={card.bars.length}
+                  points={barPoints}
+                />
                 <Bar
                   dataKey="value"
                   isAnimationActive={false}
                   radius={[0, 0, 0, 0]}
-                  shape={renderProductionBar}
+                  shape={(props: BarShapeProps) => (
+                    <ProductionBarShape {...props} onGeometryChange={handleBarGeometryChange} />
+                  )}
                 >
                   <LabelList
                     content={(props) => {
@@ -132,15 +151,61 @@ function ProductionCard({ card }: ProductionCardProps) {
         </div>
         <div className={styles.textColumn}>
           <div className={styles.description}>{card.description}</div>
-          <div className={styles.editHint}>Нажмите, чтобы отредактировать</div>
+          {/* <div className={styles.editHint}>Нажмите, чтобы отредактировать</div> */}
         </div>
       </div>
     </article>
   )
 }
 
-function renderProductionBar(props: BarShapeProps) {
+type ProductionBarConnectorLineProps = {
+  expectedPointCount: number
+  points: BarConnectorPoint[]
+}
+
+function ProductionBarConnectorLine({
+  expectedPointCount,
+  points
+}: ProductionBarConnectorLineProps) {
+  const completePoints = Array.from({ length: expectedPointCount }, (_, index) => points[index])
+
+  if (!completePoints.every(isBarConnectorPoint)) {
+    return null
+  }
+
+  return (
+    <g className={styles.barConnectorLine}>
+      {getBarConnectorSegments(completePoints).map((segment) => (
+        <line
+          key={`${segment.x1}-${segment.y1}-${segment.x2}-${segment.y2}`}
+          x1={segment.x1}
+          x2={segment.x2}
+          y1={segment.y1}
+          y2={segment.y2}
+        />
+      ))}
+    </g>
+  )
+}
+
+type ProductionBarShapeProps = BarShapeProps & {
+  onGeometryChange: (index: number, point: BarConnectorPoint) => void
+}
+
+function ProductionBarShape({ onGeometryChange, ...props }: ProductionBarShapeProps) {
   const payload = props.payload as ReportingProductionCard['bars'][number] | undefined
+  const { index, width, x, y } = props
+
+  useEffect(() => {
+    if (
+      typeof index === 'number' &&
+      typeof x === 'number' &&
+      typeof y === 'number' &&
+      typeof width === 'number'
+    ) {
+      onGeometryChange(index, { x, y, width })
+    }
+  }, [index, onGeometryChange, width, x, y])
 
   return (
     <Rectangle
@@ -152,6 +217,14 @@ function renderProductionBar(props: BarShapeProps) {
       y={props.y}
     />
   )
+}
+
+function isSameBarConnectorPoint(left: BarConnectorPoint, right: BarConnectorPoint) {
+  return left.x === right.x && left.y === right.y && left.width === right.width
+}
+
+function isBarConnectorPoint(point: BarConnectorPoint | undefined): point is BarConnectorPoint {
+  return Boolean(point)
 }
 
 function renderProductionTick(props: XAxisTickContentProps) {

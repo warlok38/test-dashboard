@@ -8,6 +8,9 @@
   --comparison-badge-line-height: 1.15;
   --comparison-badge-padding: 0.125rem var(--space-2);
   --comparison-badge-border-color: var(--palette-dashboard-card-border);
+  --comparison-arrow-head-position: 98.5%;
+  --comparison-arrow-head-width: 0.4125rem;
+  --comparison-arrow-head-height: 0.4125rem;
 
   position: relative;
   height: var(--comparison-line-height);
@@ -37,6 +40,17 @@
   stroke: currentcolor;
   stroke-width: 0.35;
   vector-effect: non-scaling-stroke;
+}
+
+.arrowHead {
+  position: absolute;
+  top: calc(var(--comparison-line-top) + 0.5rem);
+  left: var(--comparison-arrow-head-position);
+  width: var(--comparison-arrow-head-width);
+  height: var(--comparison-arrow-head-height);
+  background: currentcolor;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform: translateX(-50%);
 }
 
 .badge {
