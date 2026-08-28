@@ -23,26 +23,6 @@
   object-position: right center;
 }
 
-.mapPanel {
-  /* position: relative;
-  min-height: 26.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 0; */
-}
-
-.mapImage {
-  /* width: auto;
-  min-width: calc(100% + 7rem);
-  max-width: none;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-  transform: translateX(-10rem);
-  transform-origin: left center; */
-}
-
 .analyticsPanel {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 11.5rem;

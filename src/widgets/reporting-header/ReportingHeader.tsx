@@ -1,7 +1,7 @@
 'use client'
 
 import { LeftOutlined, RightOutlined } from '@ant-design/icons'
-import { Button, Segmented, type SegmentedProps } from 'antd'
+import { Button, Radio, RadioGroupProps, Segmented, type SegmentedProps } from 'antd'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useMemo } from 'react'
 
@@ -24,8 +24,8 @@ const DEFAULT_MODE: ReportingMode = 'period'
 const assetKeys = new Set<ReportingAssetKey>(reportingAssetMockOptions.map((option) => option.key))
 const modeKeys = new Set<ReportingMode>(reportingModeMockOptions.map((option) => option.key))
 
-const assetOptions: SegmentedProps['options'] = reportingAssetMockOptions.map((option) => ({
-  label: option.label,
+const assetOptions: RadioGroupProps['options'] = reportingAssetMockOptions.map((option) => ({
+  label: option.label.toUpperCase(),
   value: option.key
 }))
 
@@ -120,12 +120,13 @@ export function ReportingHeader() {
 
   return (
     <header className={styles.header}>
-      <Segmented
+      <Radio.Group
         className={styles.assetSegment}
+        optionType="button"
+        buttonStyle="solid"
         options={assetOptions}
-        size="large"
         value={asset}
-        onChange={(value) => replaceParams({ [ASSET_PARAM]: String(value) })}
+        onChange={(value) => replaceParams({ [ASSET_PARAM]: String(value.target.value) })}
       />
       <div className={styles.rightControls}>
         <div className={styles.quarterControl}>
@@ -152,7 +153,6 @@ export function ReportingHeader() {
         <Segmented
           className={styles.modeSegment}
           options={modeOptions}
-          size="large"
           value={mode}
           onChange={(value) => replaceParams({ [MODE_PARAM]: String(value) })}
         />
