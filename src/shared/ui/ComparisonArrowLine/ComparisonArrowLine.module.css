@@ -1,0 +1,63 @@
+.root {
+  --comparison-line-height: var(--space-8);
+  --comparison-line-top: var(--space-1);
+  --comparison-line-inset-left: 0;
+  --comparison-line-inset-right: 0;
+  --comparison-line-color: var(--color-text-muted);
+  --comparison-badge-font-size: var(--font-size-xs);
+  --comparison-badge-line-height: 1.15;
+  --comparison-badge-padding: 0.125rem var(--space-2);
+  --comparison-badge-border-color: var(--palette-dashboard-card-border);
+
+  position: relative;
+  height: var(--comparison-line-height);
+  color: var(--comparison-line-color);
+  pointer-events: none;
+}
+
+.rail {
+  position: absolute;
+  top: 0;
+  right: var(--comparison-line-inset-right);
+  left: var(--comparison-line-inset-left);
+  height: 100%;
+}
+
+.line {
+  position: absolute;
+  top: var(--comparison-line-top);
+  left: 0;
+  width: 100%;
+  height: var(--space-3);
+  overflow: visible;
+}
+
+.line path {
+  fill: currentcolor;
+  stroke: currentcolor;
+  stroke-width: 0.35;
+  vector-effect: non-scaling-stroke;
+}
+
+.badge {
+  position: absolute;
+  top: calc(var(--comparison-line-top) + var(--space-1));
+  z-index: 1;
+  padding: var(--comparison-badge-padding);
+  border: var(--border-width-hairline) solid var(--comparison-badge-border-color);
+  border-radius: var(--radius-10);
+  color: var(--color-text-strong);
+  background: var(--color-bg-card);
+  font-size: var(--comparison-badge-font-size);
+  font-weight: 600;
+  line-height: var(--comparison-badge-line-height);
+  transform: translate(-50%, -50%);
+}
+
+.badge:nth-of-type(1) {
+  left: 25%;
+}
+
+.badge:nth-of-type(2) {
+  left: 75%;
+}

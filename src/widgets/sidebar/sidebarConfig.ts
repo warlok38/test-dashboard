@@ -1,4 +1,5 @@
 import {
+  BarChartOutlined,
   EnvironmentOutlined,
   ExportOutlined,
   HomeOutlined,
@@ -32,6 +33,12 @@ export const BASE_SIDEBAR_ITEMS: SidebarMenuItem[] = [
     label: 'Месторождения',
     icon: EnvironmentOutlined,
     children: []
+  },
+  {
+    key: '/reporting',
+    href: '/reporting',
+    label: 'Отчётность',
+    icon: BarChartOutlined
   },
   {
     key: 'factor-analysis',
