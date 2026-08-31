@@ -1,0 +1,244 @@
+.section {
+  display: grid;
+  grid-template-columns: minmax(0, 45%) minmax(34rem, 55%);
+  align-items: stretch;
+
+  min-height: 26.5rem;
+  width: 100%;
+  min-width: 0;
+
+  border-bottom: var(--border-width-hairline) solid var(--palette-border-soft);
+  background: var(--color-bg-card);
+}
+
+.mapPanel {
+  position: relative;
+  min-width: 0;
+  min-height: 26.5rem;
+  overflow: hidden;
+}
+
+.mapImage {
+  object-fit: cover;
+  object-position: right center;
+}
+
+.analyticsPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 11.5rem;
+  grid-template-rows: auto auto minmax(7rem, 1fr);
+  gap: var(--space-4) var(--space-6);
+  align-items: start;
+  min-width: 0;
+  padding: var(--space-10) var(--space-10) var(--space-5) var(--space-4);
+}
+
+.analyticsMain {
+  min-width: 0;
+}
+
+.assetTitle {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--color-text-strong);
+  font-size: var(--font-size-3xl);
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.assetTitle span {
+  color: var(--color-text-muted);
+}
+
+.titleSeparator {
+  margin: 0 var(--space-2);
+}
+
+.metricTabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-3) var(--space-6);
+  max-width: 38rem;
+  max-height: 4rem;
+  margin-bottom: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.metricTag.metricTag {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.metricTag.metricTag:global(.ant-tag-checkable):hover {
+  color: var(--palette-accent-on-solid);
+}
+
+.metricTag.metricTag:global(.ant-tag-checkable-checked) {
+  color: var(--palette-accent-on-solid);
+}
+
+.metricLabel,
+.metricUom {
+  display: inline-block;
+}
+
+.metricUom {
+  text-transform: none;
+}
+
+.kpiBlock {
+  margin-top: var(--space-8);
+}
+
+.comparisonLine {
+  margin: 0;
+  --comparison-line-top: 0.25rem;
+  --comparison-line-height: var(--space-8);
+  /* 1/6 keeps the rail between the first and third KPI centers. */
+  --comparison-line-inset-left: 16.6667%;
+  --comparison-line-inset-right: 16.6667%;
+}
+
+.kpiRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+}
+
+.kpiItem {
+  min-width: 0;
+  text-align: center;
+}
+
+.kpiValue {
+  display: block;
+  color: var(--color-kpi-fact);
+  font-size: var(--font-size-12xl);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.kpiItem:nth-child(1) .kpiValue {
+  color: #c5d0e3;
+}
+
+.kpiItem:nth-child(2) .kpiValue {
+  color: #cfd1d3;
+}
+
+.kpiLabel,
+.kpiCaption {
+  display: block;
+  margin-top: var(--space-2);
+  color: var(--color-text-strong);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.kpiCaption {
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.monthlyChart {
+  grid-column: 1 / -1;
+  align-self: end;
+  min-width: 0;
+  margin-top: 0;
+}
+
+.donutChart {
+  position: relative;
+  min-width: 0;
+  align-self: start;
+  margin-top: 0;
+}
+
+.donutChart :global(.recharts-wrapper),
+.donutChart :global(.recharts-surface) {
+  overflow: visible;
+}
+
+.donutValue {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-strong);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+}
+
+.donutLabel {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  dominant-baseline: middle;
+  fill: currentcolor;
+}
+
+@media (--screen-tablet) {
+  .section {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .analyticsPanel {
+    grid-template-columns: minmax(0, 1fr) 9rem;
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .mapImage {
+    width: 100%;
+    min-width: 100%;
+    height: auto;
+    transform: scale(1.04);
+    transform-origin: center;
+  }
+}
+
+@media (--screen-mobile) {
+  .section {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+    min-height: auto;
+  }
+
+  .mapPanel {
+    min-height: 14rem;
+  }
+
+  .analyticsPanel {
+    grid-template-columns: 1fr;
+    padding: var(--space-3);
+  }
+
+  .kpiRow {
+    grid-template-columns: 1fr;
+  }
+
+  .comparisonLine {
+    display: none;
+  }
+
+  .kpiValue {
+    font-size: var(--font-size-9xl);
+  }
+}

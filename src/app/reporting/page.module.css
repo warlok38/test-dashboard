@@ -1,0 +1,15 @@
+.surface {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.productionSection {
+  padding: var(--space-4);
+}
+
+@media (--screen-mobile) {
+  .productionSection {
+    padding: var(--space-3);
+  }
+}

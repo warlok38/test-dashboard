@@ -1,6 +1,7 @@
 export * from './ApiErrorAlert'
 export * from './Breadcrumbs'
 export * from './ChartFrame'
+export * from './ComparisonArrowLine'
 export * from './DateRangePicker'
 export * from './Empty'
 export * from './KpiValue'
