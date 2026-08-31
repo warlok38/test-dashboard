@@ -4,6 +4,7 @@ import type {
   ReportingMetricOption,
   ReportingModeOption
 } from './reporting'
+import { reportingStageOptions } from './reporting-stage'
 
 export const reportingAssetMockOptions: ReportingAssetOption[] = [
   { key: 'group', label: 'Группа' },
@@ -21,24 +22,12 @@ export const reportingModeMockOptions: ReportingModeOption[] = [
   { key: 'forecast', label: 'Прогноз' }
 ]
 
-export const reportingMetricMockOptions: ReportingMetricOption[] = [
-  { key: 'ore-volume', label: 'Объём ГМ, млн м3' },
-  { key: 'cargo-turnover', label: 'Грузооборот' },
-  { key: 'ore-processing', label: 'Переработка руды' },
-  { key: 'au-processing', label: 'Au в переработке' },
-  { key: 'gold-recovery', label: 'Извлечение' },
-  { key: 'avg-ore-au', label: 'ПР-во Au' },
-  { key: 'avg-dore-au', label: 'ПР-во доре' }
-]
+export const reportingMetricMockOptions: ReportingMetricOption[] = reportingStageOptions.flatMap(
+  (stage) => stage.metrics
+)
 
-const reportingMetricMockUnits: Record<ReportingMetricOption['key'], string> = {
-  'ore-volume': 'млн м3',
-  'au-processing': 'кг',
-  'cargo-turnover': 'млн ткм',
-  'ore-processing': 'млн т',
-  'gold-recovery': '%',
-  'avg-ore-au': 'кг',
-  'avg-dore-au': 'кг'
+function getMetricUnit(metric: ReportingMetricOption) {
+  return metric.uom ?? ''
 }
 
 const months = ['ЯНВ', 'ФЕВ', 'МАР', 'АПР', 'МАЙ', 'ИЮН', 'ИЮЛ', 'АВГ', 'СЕН', 'ОКТ', 'НОЯ', 'ДЕК']
@@ -82,7 +71,7 @@ function createOverviewMock(metric: ReportingMetricOption, seed: number, metricI
 
   return {
     metricKey: metric.key,
-    unit: reportingMetricMockUnits[metric.key],
+    unit: getMetricUnit(metric),
     kpis: [
       { label: 'Факт', value: fact, caption: 'Авг 2025' },
       { label: 'БП', value: plan, caption: 'Авг 2025' },

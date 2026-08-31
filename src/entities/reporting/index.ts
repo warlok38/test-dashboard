@@ -1,4 +1,10 @@
 export {
+  DEFAULT_REPORTING_STAGE_KEY,
+  getReportingStage,
+  isReportingStageKey,
+  reportingStageOptions
+} from './model/reporting-stage'
+export {
   reportingAssetMockOptions,
   reportingMetricMockOptions,
   reportingMockData,
@@ -17,5 +23,7 @@ export type {
   ReportingMonthlyPoint,
   ReportingOverview,
   ReportingProductionCard,
-  ReportingQuarter
+  ReportingQuarter,
+  ReportingStageKey,
+  ReportingStageOption
 } from './model/reporting'

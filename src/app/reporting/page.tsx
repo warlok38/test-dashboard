@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 
+import { ReportingStageTabs } from '@/features'
 import { PageShell, PageSurface } from '@/shared/ui'
 import { ReportingHeader, ReportingOverview, ReportingProductionGroup } from '@/widgets'
 
@@ -10,6 +11,7 @@ export default function ReportingPage() {
     <PageShell>
       <Suspense fallback={null}>
         <ReportingHeader />
+        <ReportingStageTabs />
       </Suspense>
       <PageSurface className={styles.surface} padding={false} variant="constrained">
         <Suspense fallback={null}>

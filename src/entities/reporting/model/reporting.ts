@@ -24,18 +24,26 @@ export type ReportingModeOption = {
   label: string
 }
 
-export type ReportingMetricKey =
-  | 'ore-volume'
-  | 'au-processing'
-  | 'cargo-turnover'
-  | 'ore-processing'
-  | 'gold-recovery'
-  | 'avg-ore-au'
-  | 'avg-dore-au'
+export type ReportingStageKey =
+  | 'mining'
+  | 'drilling-blasting'
+  | 'excavation'
+  | 'transportation'
+  | 'processing-feed'
+  | 'factory'
+
+export type ReportingMetricKey = string
 
 export type ReportingMetricOption = {
   key: ReportingMetricKey
   label: string
+  uom?: string
+}
+
+export type ReportingStageOption = {
+  key: ReportingStageKey
+  label: string
+  metrics: ReportingMetricOption[]
 }
 
 export type ReportingKpiPoint = {

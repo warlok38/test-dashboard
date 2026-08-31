@@ -17,7 +17,7 @@ import {
 
 import {
   reportingAssetMockOptions,
-  reportingMetricMockOptions,
+  getReportingStage,
   reportingMockData,
   type ReportingAssetKey,
   type ReportingDataset,
@@ -29,6 +29,7 @@ import { formatNumber } from '@/shared/utils'
 import styles from './ReportingOverview.module.css'
 
 const ASSET_PARAM = 'asset'
+const STAGE_PARAM = 'stage'
 const DEFAULT_ASSET_KEY: ReportingAssetKey = 'group'
 const MONTHLY_CHART_HEIGHT = 118
 const MONTHLY_BAR_SIZE = 12
@@ -52,16 +53,19 @@ function getDataset(assetKey: string | null): ReportingDataset {
 export function ReportingOverview() {
   const searchParams = useSearchParams()
   const assetKey = searchParams.get(ASSET_PARAM)
+  const stage = getReportingStage(searchParams.get(STAGE_PARAM))
   const dataset = getDataset(assetKey)
   const assetLabel =
     reportingAssetMockOptions.find((asset) => asset.key === dataset.assetKey)?.label ?? ''
-  const [activeMetricKey, setActiveMetricKey] = useState<ReportingMetricKey>(
-    reportingMetricMockOptions[0].key
-  )
+  const [activeMetricKey, setActiveMetricKey] = useState<ReportingMetricKey>(stage.metrics[0].key)
+  const activeMetricKeyForStage = stage.metrics.some((metric) => metric.key === activeMetricKey)
+    ? activeMetricKey
+    : stage.metrics[0].key
   const overview = useMemo(
     () =>
-      dataset.overviews.find((item) => item.metricKey === activeMetricKey) ?? dataset.overviews[0],
-    [activeMetricKey, dataset.overviews]
+      dataset.overviews.find((item) => item.metricKey === activeMetricKeyForStage) ??
+      dataset.overviews[0],
+    [activeMetricKeyForStage, dataset.overviews]
   )
   const donutData = useMemo(
     () =>
@@ -85,17 +89,22 @@ export function ReportingOverview() {
         />
       </div>
       <aside className={styles.analyticsPanel}>
+        <h3 className={styles.assetTitle}>
+          {assetLabel}
+          <span className={styles.titleSeparator}>•</span>
+          <span>{stage.label}</span>
+        </h3>
         <div className={styles.analyticsMain}>
-          <h2 className={styles.assetTitle}>{assetLabel}</h2>
           <div className={styles.metricTabs}>
-            {reportingMetricMockOptions.map((metric) => (
+            {stage.metrics.map((metric) => (
               <CheckableTag
-                checked={metric.key === overview.metricKey}
+                checked={metric.key === activeMetricKeyForStage}
                 className={styles.metricTag}
                 key={metric.key}
                 onChange={() => setActiveMetricKey(metric.key)}
               >
-                {metric.label.toUpperCase()}
+                <span className={styles.metricLabel}>{metric.label.toUpperCase()}</span>
+                {metric.uom ? <span className={styles.metricUom}>, {metric.uom}</span> : null}
               </CheckableTag>
             ))}
           </div>
