@@ -18,9 +18,111 @@
   overflow: hidden;
 }
 
+.mapImagePlane {
+  position: absolute;
+  overflow: visible;
+}
+
 .mapImage {
-  object-fit: cover;
-  object-position: right center;
+  object-fit: fill;
+}
+
+.mapPoints {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.mapPoint {
+  position: absolute;
+  display: inline-flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: var(--space-8);
+  height: var(--space-12);
+  padding: 0;
+  border: 0;
+  color: #546775;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  transform: translate(-50%, -100%);
+}
+
+.mapPoint::after {
+  position: absolute;
+  z-index: 0;
+  bottom: -0.25rem;
+  left: 50%;
+  width: 1.75rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: rgb(74 91 105 / 28%);
+  filter: blur(0.1875rem);
+  content: '';
+  transform: translateX(-50%) translateY(50%) skewX(-18deg);
+  transition: transform 0.16s ease;
+}
+
+.mapPointPin {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.95rem;
+  height: 1.95rem;
+  border: var(--border-width-hairline) solid rgb(255 255 255 / 78%);
+  border-radius: 50% 50% 50% 0;
+  background: #aebbc3;
+  box-shadow:
+    0 0.125rem 0.25rem rgb(44 57 67 / 22%),
+    inset 0 0.0625rem 0 rgb(255 255 255 / 48%);
+  transform: rotate(-45deg);
+}
+
+.mapPointLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 82%);
+  color: currentcolor;
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  line-height: 1;
+  transform: rotate(45deg);
+}
+
+.mapPoint:hover .mapPointPin {
+  background: #c5cfd6;
+  box-shadow:
+    0 0.1875rem 0.5rem rgb(44 57 67 / 24%),
+    inset 0 0.0625rem 0 rgb(255 255 255 / 54%);
+}
+
+.mapPointActive {
+  color: var(--palette-accent-on-solid);
+}
+
+.mapPointActive::after {
+  background: rgb(92 64 16 / 34%);
+  opacity: 1;
+  transform: translateX(-50%) translateY(50%) skewX(-18deg) scale(1.16);
+}
+
+.mapPointActive .mapPointPin {
+  background: var(--palette-accent-primary);
+  box-shadow:
+    0 0.1875rem 0.625rem rgb(120 85 20 / 28%),
+    inset 0 0.0625rem 0 rgb(255 255 255 / 62%);
+}
+
+.mapPointActive:hover .mapPointPin {
+  background: var(--palette-accent-primary-hover);
 }
 
 .analyticsPanel {

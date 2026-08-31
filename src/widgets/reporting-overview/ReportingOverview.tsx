@@ -1,7 +1,6 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
-import Image from 'next/image'
 import { useMemo, useState } from 'react'
 import { Tag } from 'antd'
 import {
@@ -26,6 +25,7 @@ import {
 import { ComparisonArrowLine } from '@/shared/ui'
 import { formatNumber } from '@/shared/utils'
 
+import { ReportingMap } from './ui/ReportingMap'
 import styles from './ReportingOverview.module.css'
 
 const ASSET_PARAM = 'asset'
@@ -78,16 +78,7 @@ export function ReportingOverview() {
 
   return (
     <section className={styles.section}>
-      <div className={styles.mapPanel}>
-        <Image
-          alt=""
-          className={styles.mapImage}
-          fill
-          priority
-          src="/reporting/russia-map.png"
-          sizes="49vw"
-        />
-      </div>
+      <ReportingMap activeAssetKey={dataset.assetKey} />
       <aside className={styles.analyticsPanel}>
         <h3 className={styles.assetTitle}>
           {assetLabel}

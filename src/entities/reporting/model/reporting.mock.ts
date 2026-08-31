@@ -8,12 +8,11 @@ import { reportingStageOptions } from './reporting-stage'
 
 export const reportingAssetMockOptions: ReportingAssetOption[] = [
   { key: 'group', label: 'Группа' },
-  { key: 'kbe', label: 'КБЕ' },
   { key: 'olimpiada', label: 'Олимпиада' },
   { key: 'blagodatnoe', label: 'Благодатное' },
+  { key: 'natalka', label: 'Наталка' },
   { key: 'kuranah', label: 'Куранах' },
-  { key: 'suhoy-log-opr', label: 'ОПР Сухого Лога' },
-  { key: 'natalka', label: 'Наталка' }
+  { key: 'suhoy-log', label: 'Сухой лог' }
 ]
 
 export const reportingModeMockOptions: ReportingModeOption[] = [

@@ -1,10 +1,9 @@
 export type ReportingAssetKey =
   | 'group'
-  | 'kbe'
   | 'olimpiada'
   | 'blagodatnoe'
   | 'kuranah'
-  | 'suhoy-log-opr'
+  | 'suhoy-log'
   | 'natalka'
 
 export type ReportingMode = 'period' | 'cumulative' | 'forecast'
