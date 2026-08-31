@@ -36,6 +36,7 @@
 
 .mapPoint {
   position: absolute;
+  isolation: isolate;
   display: inline-flex;
   align-items: flex-end;
   justify-content: center;
@@ -65,6 +66,14 @@
   transition: transform 0.16s ease;
 }
 
+.mapPointMotion {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  transform: translateY(0);
+  transition: transform 0.16s ease;
+}
+
 .mapPointPin {
   position: relative;
   z-index: 1;
@@ -76,9 +85,6 @@
   border: var(--border-width-hairline) solid rgb(255 255 255 / 78%);
   border-radius: 50% 50% 50% 0;
   background: #aebbc3;
-  box-shadow:
-    0 0.125rem 0.25rem rgb(44 57 67 / 22%),
-    inset 0 0.0625rem 0 rgb(255 255 255 / 48%);
   transform: rotate(-45deg);
 }
 
@@ -99,9 +105,10 @@
 
 .mapPoint:hover .mapPointPin {
   background: #c5cfd6;
-  box-shadow:
-    0 0.1875rem 0.5rem rgb(44 57 67 / 24%),
-    inset 0 0.0625rem 0 rgb(255 255 255 / 54%);
+}
+
+.mapPoint:hover .mapPointMotion {
+  transform: translateY(-0.125rem);
 }
 
 .mapPointActive {
@@ -116,9 +123,6 @@
 
 .mapPointActive .mapPointPin {
   background: var(--palette-accent-primary);
-  box-shadow:
-    0 0.1875rem 0.625rem rgb(120 85 20 / 28%),
-    inset 0 0.0625rem 0 rgb(255 255 255 / 62%);
 }
 
 .mapPointActive:hover .mapPointPin {

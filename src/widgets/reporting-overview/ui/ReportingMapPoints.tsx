@@ -52,8 +52,10 @@ export function ReportingMapPoints({ activeAssetKey }: ReportingMapPointsProps) 
             type="button"
             onClick={() => selectAsset(point.assetKey)}
           >
-            <span className={styles.mapPointPin}>
-              <span className={styles.mapPointLabel}>{pointLabel}</span>
+            <span className={styles.mapPointMotion}>
+              <span className={styles.mapPointPin}>
+                <span className={styles.mapPointLabel}>{pointLabel}</span>
+              </span>
             </span>
           </button>
         )
