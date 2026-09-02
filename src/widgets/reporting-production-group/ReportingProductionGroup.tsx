@@ -7,7 +7,6 @@ import {
   BarChart,
   LabelList,
   Rectangle,
-  ResponsiveContainer,
   XAxis,
   YAxis,
   type BarShapeProps,
@@ -15,20 +14,24 @@ import {
 } from 'recharts'
 
 import {
+  getReportingStage,
   reportingMockData,
   type ReportingAssetKey,
   type ReportingDataset,
+  type ReportingMetricOption,
   type ReportingProductionCard
 } from '@/entities/reporting'
-import { ComparisonArrowLine } from '@/shared/ui'
+import { ChartFrame, ComparisonArrowLine } from '@/shared/ui'
 import { formatNumber } from '@/shared/utils'
 
 import { getBarConnectorSegments, type BarConnectorPoint } from './lib/bar-connector-line'
 import styles from './ReportingProductionGroup.module.css'
 
 const ASSET_PARAM = 'asset'
+const STAGE_PARAM = 'stage'
 const DEFAULT_ASSET_KEY: ReportingAssetKey = 'group'
 const PRODUCTION_BAR_SIZE = 60
+const PRODUCTION_CHART_MARGIN = { top: 44, right: 20, left: 20, bottom: 0 } as const
 
 function getDataset(assetKey: string | null): ReportingDataset {
   return (
@@ -41,12 +44,13 @@ function getDataset(assetKey: string | null): ReportingDataset {
 export function ReportingProductionGroup() {
   const searchParams = useSearchParams()
   const dataset = getDataset(searchParams.get(ASSET_PARAM))
+  const stage = getReportingStage(searchParams.get(STAGE_PARAM))
+  const cards = getStageProductionCards(dataset, stage.metrics)
 
   return (
     <section className={styles.section}>
-      <h2>Производство по группе</h2>
       <div className={styles.cardGrid}>
-        {dataset.productionCards.map((card) => (
+        {cards.map((card) => (
           <ProductionCard card={card} key={card.id} />
         ))}
       </div>
@@ -62,6 +66,7 @@ const productionBarColors = ['#c3cfe1', '#cfd0d2', 'var(--color-kpi-fact)'] as c
 
 function ProductionCard({ card }: ProductionCardProps) {
   const [barPoints, setBarPoints] = useState<BarConnectorPoint[]>([])
+  const hasBarData = card.bars.some((bar) => bar.value !== null)
 
   const handleBarGeometryChange = useCallback((index: number, point: BarConnectorPoint) => {
     setBarPoints((currentPoints) => {
@@ -88,65 +93,59 @@ function ProductionCard({ card }: ProductionCardProps) {
             </h3>
           </div>
           <div className={styles.chartFrame}>
-            <ComparisonArrowLine className={styles.comparisonTrack} deltas={card.deltas} />
-            <ResponsiveContainer height={204} width="100%">
-              <BarChart
-                barCategoryGap="20%"
-                barSize={PRODUCTION_BAR_SIZE}
-                data={card.bars}
-                margin={{ top: 44, right: 20, left: 20, bottom: 0 }}
-              >
-                <XAxis
-                  axisLine={{ stroke: 'var(--palette-dashboard-card-border)' }}
-                  dataKey="label"
-                  height={42}
-                  interval={0}
-                  tick={renderProductionTick}
-                  tickLine={false}
-                />
-                <YAxis hide domain={[0, 'dataMax + 36']} />
-                <ProductionBarConnectorLine
-                  expectedPointCount={card.bars.length}
-                  points={barPoints}
-                />
-                <Bar
-                  dataKey="value"
-                  isAnimationActive={false}
-                  radius={[0, 0, 0, 0]}
-                  shape={(props: BarShapeProps) => (
-                    <ProductionBarShape {...props} onGeometryChange={handleBarGeometryChange} />
-                  )}
+            {card.deltas.length > 0 ? (
+              <ComparisonArrowLine className={styles.comparisonTrack} deltas={card.deltas} />
+            ) : null}
+            {!hasBarData ? (
+              <div className={styles.emptyBarValues}>
+                {card.bars.map((bar, index) => (
+                  <span key={`${bar.label}-${index}`}>-</span>
+                ))}
+              </div>
+            ) : null}
+            <ChartFrame className={styles.productionChartFrame}>
+              {({ width, height }) => (
+                <BarChart
+                  barCategoryGap="20%"
+                  barSize={PRODUCTION_BAR_SIZE}
+                  data={card.bars}
+                  height={height}
+                  margin={PRODUCTION_CHART_MARGIN}
+                  width={width}
                 >
-                  <LabelList
-                    content={(props) => {
-                      const { x, y, width, value } = props
-
-                      if (
-                        typeof x !== 'number' ||
-                        typeof y !== 'number' ||
-                        typeof width !== 'number' ||
-                        typeof value !== 'number'
-                      ) {
-                        return null
-                      }
-
-                      return (
-                        <text
-                          fill="var(--color-text-strong)"
-                          fontSize={16}
-                          fontWeight={600}
-                          textAnchor="middle"
-                          x={x + width / 2}
-                          y={y - 6}
-                        >
-                          {formatNumber(value)}
-                        </text>
-                      )
-                    }}
+                  <XAxis
+                    axisLine={{ stroke: 'var(--palette-dashboard-card-border)' }}
+                    dataKey="label"
+                    height={42}
+                    interval={0}
+                    tick={renderProductionTick}
+                    tickLine={false}
                   />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+                  <YAxis hide domain={[0, 'dataMax + 36']} />
+                  {hasBarData ? (
+                    <>
+                      <ProductionBarConnectorLine
+                        expectedPointCount={card.bars.length}
+                        points={barPoints}
+                      />
+                      <Bar
+                        dataKey="value"
+                        isAnimationActive={false}
+                        radius={[0, 0, 0, 0]}
+                        shape={(props: BarShapeProps) => (
+                          <ProductionBarShape
+                            {...props}
+                            onGeometryChange={handleBarGeometryChange}
+                          />
+                        )}
+                      >
+                        <LabelList content={renderProductionBarLabel} />
+                      </Bar>
+                    </>
+                  ) : null}
+                </BarChart>
+              )}
+            </ChartFrame>
           </div>
         </div>
         <div className={styles.textColumn}>
@@ -155,6 +154,45 @@ function ProductionCard({ card }: ProductionCardProps) {
         </div>
       </div>
     </article>
+  )
+}
+
+function getStageProductionCards(dataset: ReportingDataset, metrics: ReportingMetricOption[]) {
+  return metrics.flatMap((metric) => {
+    const card = dataset.productionCards.find((item) => item.metricKey === metric.key)
+
+    return card ? [card] : []
+  })
+}
+
+function renderProductionBarLabel(props: {
+  x?: unknown
+  y?: unknown
+  width?: unknown
+  value?: unknown
+}) {
+  const { x, y, width, value } = props
+
+  if (
+    typeof x !== 'number' ||
+    typeof y !== 'number' ||
+    typeof width !== 'number' ||
+    typeof value !== 'number'
+  ) {
+    return null
+  }
+
+  return (
+    <text
+      fill="var(--color-text-strong)"
+      fontSize={16}
+      fontWeight={600}
+      textAnchor="middle"
+      x={x + width / 2}
+      y={y - 6}
+    >
+      {formatNumber(value)}
+    </text>
   )
 }
 

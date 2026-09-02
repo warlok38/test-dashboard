@@ -171,6 +171,7 @@
   gap: var(--space-3) var(--space-6);
   max-width: 38rem;
   max-height: 4rem;
+  min-height: 3.75rem;
   margin-bottom: 0;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -269,11 +270,22 @@
   margin-top: 0;
 }
 
+.monthlyChartFrame {
+  width: 100%;
+  height: 7.375rem;
+}
+
 .donutChart {
   position: relative;
   min-width: 0;
   align-self: start;
   margin-top: 0;
+}
+
+.donutChartFrame {
+  width: 100%;
+  height: 8.5rem;
+  overflow: visible;
 }
 
 .donutChart :global(.recharts-wrapper),

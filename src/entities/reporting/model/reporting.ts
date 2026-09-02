@@ -47,20 +47,20 @@ export type ReportingStageOption = {
 
 export type ReportingKpiPoint = {
   label: string
-  value: number
+  value: number | null
   caption: string
 }
 
 export type ReportingMonthlyPoint = {
   month: string
-  fact: number
-  plan: number
-  forecast: number
+  fact: number | null
+  plan: number | null
+  forecast: number | null
 }
 
 export type ReportingBreakdownPoint = {
   name: string
-  value: number
+  value: number | null
 }
 
 export type ReportingOverview = {
@@ -68,7 +68,7 @@ export type ReportingOverview = {
   unit: string
   kpis: ReportingKpiPoint[]
   deltas: string[]
-  donutValue: number
+  donutValue: number | null
   donutUnit: string
   breakdown: ReportingBreakdownPoint[]
   monthly: ReportingMonthlyPoint[]
@@ -76,6 +76,7 @@ export type ReportingOverview = {
 
 export type ReportingProductionCard = {
   id: string
+  metricKey: ReportingMetricKey
   title: string
   unit: string
   bars: ReportingKpiPoint[]

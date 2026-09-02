@@ -30,6 +30,12 @@ function getMetricUnit(metric: ReportingMetricOption) {
 }
 
 const months = ['ЯНВ', 'ФЕВ', 'МАР', 'АПР', 'МАЙ', 'ИЮН', 'ИЮЛ', 'АВГ', 'СЕН', 'ОКТ', 'НОЯ', 'ДЕК']
+const emptyMonthlyMock = months.map((month) => ({
+  month,
+  fact: null,
+  plan: null,
+  forecast: null
+}))
 
 function createMonthlyMock(seed: number) {
   return months.map((month, index) => {
@@ -44,26 +50,51 @@ function createMonthlyMock(seed: number) {
   })
 }
 
-function createProductionCardMock(index: number, assetLabel: string) {
+function createProductionCardMock(
+  metric: ReportingMetricOption,
+  index: number,
+  assetLabel: string
+) {
+  const isEmptyMetric = metric.key.startsWith('processing-feed')
   const fact = 142 + index * 4
   const plan = fact + 7
   const forecast = plan - 3
 
   return {
-    id: `production-${index}`,
-    title: index % 2 === 0 ? 'Грузооборот' : 'Переработка руды',
-    unit: index % 2 === 0 ? 'млн ткм' : 'млн т',
+    id: `production-${metric.key}`,
+    metricKey: metric.key,
+    title: metric.label,
+    unit: getMetricUnit(metric),
     bars: [
-      { label: "Факт 1КВ'25", value: fact, caption: 'Факт' },
-      { label: "БП 1КВ'25", value: plan, caption: 'БП' },
-      { label: "Факт 1КВ'25", value: forecast, caption: 'Факт' }
+      { label: "Факт 1КВ'25", value: isEmptyMetric ? null : fact, caption: 'Факт' },
+      { label: "БП 1КВ'25", value: isEmptyMetric ? null : plan, caption: 'БП' },
+      { label: "Факт 1КВ'25", value: isEmptyMetric ? null : forecast, caption: 'Факт' }
     ],
-    deltas: ['+42%', '-6%'],
-    description: `Выше плана в основном за счет роста показателя на ${assetLabel}: увеличение объемов горных работ и рост среднего плеча транспортировки.`
+    deltas: isEmptyMetric ? [] : ['+42%', '-6%'],
+    description: isEmptyMetric
+      ? 'Данные по показателю временно отсутствуют.'
+      : `Выше плана в основном за счет роста показателя на ${assetLabel}: увеличение объемов горных работ и рост среднего плеча транспортировки.`
   }
 }
 
 function createOverviewMock(metric: ReportingMetricOption, seed: number, metricIndex: number) {
+  if (metric.key.startsWith('processing-feed')) {
+    return {
+      metricKey: metric.key,
+      unit: getMetricUnit(metric),
+      kpis: [
+        { label: 'Факт', value: null, caption: 'Авг 2025' },
+        { label: 'БП', value: null, caption: 'Авг 2025' },
+        { label: 'Факт', value: null, caption: 'Авг 2025' }
+      ],
+      deltas: [],
+      donutValue: null,
+      donutUnit: '%',
+      breakdown: [],
+      monthly: emptyMonthlyMock
+    }
+  }
+
   const fact = Number((4.72 + seed * 0.17 + metricIndex * 0.21).toFixed(2))
   const plan = Number((fact + 0.32).toFixed(2))
   const forecast = Number((plan + 0.06).toFixed(2))
@@ -96,8 +127,8 @@ function createDataset(assetKey: ReportingDataset['assetKey'], assetLabel: strin
     overviews: reportingMetricMockOptions.map((metric, metricIndex) =>
       createOverviewMock(metric, seed, metricIndex)
     ),
-    productionCards: Array.from({ length: 6 }, (_, index) =>
-      createProductionCardMock(index + seed, assetLabel)
+    productionCards: reportingMetricMockOptions.map((metric, metricIndex) =>
+      createProductionCardMock(metric, metricIndex + seed, assetLabel)
     )
   } satisfies ReportingDataset
 }
