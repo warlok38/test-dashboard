@@ -1,7 +1,7 @@
 import type { ModelAxisBounds, ModelAxisControls } from '../model/viewer'
 
 export const DEFAULT_AXIS_CONTROLS: ModelAxisControls = {
-  pointScale: 1,
+  pointScale: 1.25,
   x: 0,
   y: 0,
   z: 0
@@ -33,4 +33,17 @@ export function clampAxisControls(controls: ModelAxisControls, bounds: ModelAxis
     y: clampNumber(controls.y, bounds.minY, bounds.maxY),
     z: clampNumber(controls.z, bounds.minZ, bounds.maxZ)
   }
+}
+
+export function getDefaultAxisControls(bounds: ModelAxisBounds): ModelAxisControls {
+  const yRange = bounds.maxY - bounds.minY
+  const yCenter = bounds.minY + yRange / 2
+
+  return clampAxisControls(
+    {
+      ...DEFAULT_AXIS_CONTROLS,
+      y: yCenter + yRange * 0.25
+    },
+    bounds
+  )
 }

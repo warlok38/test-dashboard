@@ -6,7 +6,15 @@ import { clampNumber } from './axis-controls'
 export type AxisDragMode = 'horizontal' | 'vertical' | null
 
 export function getAxisDragMode(button: number): AxisDragMode {
-  return button === 2 ? 'vertical' : 'horizontal'
+  if (button === 0) {
+    return 'horizontal'
+  }
+
+  if (button === 2) {
+    return 'vertical'
+  }
+
+  return null
 }
 
 export function getHorizontalAxisDragControls(

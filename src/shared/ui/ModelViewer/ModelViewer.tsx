@@ -40,7 +40,7 @@ export function ModelViewer({
   showRotationAxis = false,
   src
 }: ModelViewerProps) {
-  const { containerRef, loadState, progress } = useModelViewerScene({
+  const { containerRef, loadState, pointerCoordinates, progress } = useModelViewerScene({
     axisControls,
     autoRotate,
     cameraDistanceMultiplier: cameraDistanceMultiplier ?? config?.cameraDistanceMultiplier,
@@ -59,6 +59,21 @@ export function ModelViewer({
 
   return (
     <div className={classNames(styles.modelViewer, className)} ref={containerRef}>
+      {pointerCoordinates ? (
+        <div
+          className={styles.coordinatesTooltip}
+          style={{
+            transform: `translate(${pointerCoordinates.left}px, ${pointerCoordinates.top}px)`
+          }}
+        >
+          <span>X</span>
+          <strong>{pointerCoordinates.point.x.toFixed(1)}</strong>
+          <span>Y</span>
+          <strong>{pointerCoordinates.point.y.toFixed(1)}</strong>
+          <span>Z</span>
+          <strong>{pointerCoordinates.point.z.toFixed(1)}</strong>
+        </div>
+      ) : null}
       {loadState === 'loading' || loadState === 'idle' ? (
         <div className={styles.state}>
           <Loader size="small" description={progressLabel} />

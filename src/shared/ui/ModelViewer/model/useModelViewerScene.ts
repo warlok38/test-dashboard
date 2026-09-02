@@ -8,7 +8,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import {
   areAxisControlsEqual,
   clampAxisControls,
-  DEFAULT_AXIS_CONTROLS
+  DEFAULT_AXIS_CONTROLS,
+  getDefaultAxisControls
 } from '../lib/axis-controls'
 import {
   createRotationAxis,
@@ -51,6 +52,16 @@ type UseModelViewerSceneParams = {
   src: string
 }
 
+export type ModelPointerCoordinates = {
+  left: number
+  point: {
+    x: number
+    y: number
+    z: number
+  }
+  top: number
+}
+
 export function useModelViewerScene({
   axisControls,
   autoRotate,
@@ -84,6 +95,7 @@ export function useModelViewerScene({
   const onAxisBoundsChangeRef = useRef(onAxisBoundsChange)
   const onAxisControlsChangeRef = useRef(onAxisControlsChange)
   const [loadState, setLoadState] = useState<ModelLoadState>('idle')
+  const [pointerCoordinates, setPointerCoordinates] = useState<ModelPointerCoordinates | null>(null)
   const [progress, setProgress] = useState<number | null>(null)
 
   useEffect(() => {
@@ -134,10 +146,12 @@ export function useModelViewerScene({
     let isAutoRotatePausedByInteraction = false
     let axisDragMode: AxisDragMode = null
     let axisBounds: ModelAxisBounds | null = null
+    let horizontalDragOffset: THREE.Vector3 | null = null
     const defaultCameraPosition = new THREE.Vector3()
     const defaultTarget = new THREE.Vector3()
-    const defaultAxisControls = { ...DEFAULT_AXIS_CONTROLS }
+    let defaultAxisControls = { ...DEFAULT_AXIS_CONTROLS }
     const defaultModelPivotPosition = new THREE.Vector3()
+    const horizontalPlaneNormal = new THREE.Vector3(0, 1, 0)
     const autoRotateConfig = config?.autoRotate
     const shouldPauseAutoRotateOnInteraction = autoRotateConfig?.pauseOnInteraction ?? false
     const autoRotateResumeDelayMs =
@@ -147,7 +161,7 @@ export function useModelViewerScene({
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
     const controls = new OrbitControls(camera, renderer.domElement)
     const loader = new GLTFLoader()
-    const horizontalDragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)
+    const horizontalDragPlane = new THREE.Plane(horizontalPlaneNormal, 0)
     const pointer = new THREE.Vector2()
     const raycaster = new THREE.Raycaster()
     const resizeObserver = new ResizeObserver(() => resizeRenderer(container, camera, renderer))
@@ -175,15 +189,27 @@ export function useModelViewerScene({
       onAxisControlsChangeRef.current?.(axisControlsRef.current)
     }
 
-    const updateModelPivot = (position: THREE.Vector3, targetY = axisControlsRef.current.y) => {
+    const clearPointerCoordinates = () => {
+      setPointerCoordinates(null)
+    }
+
+    const updateModelPivot = (
+      position: THREE.Vector3,
+      targetY = axisControlsRef.current.y,
+      preserveCurrentTransform = false
+    ) => {
+      const sourceModelWorldMatrix = preserveCurrentTransform
+        ? (modelRef.current?.matrixWorld.clone() ?? null)
+        : modelDefaultWorldMatrixRef.current
+
       applyAxisTransform({
         axis: rotationAxisRef.current,
         defaultModelPivotPosition,
-        defaultModelWorldMatrix: modelDefaultWorldMatrixRef.current,
         marker: rotationMarkerRef.current,
         model: modelRef.current,
         pivot: modelPivotRef.current,
         position,
+        sourceModelWorldMatrix,
         targetY
       })
     }
@@ -263,19 +289,51 @@ export function useModelViewerScene({
       }
 
       axisDragMode = null
+      horizontalDragOffset = null
       controls.enabled = true
       syncControlsTarget()
       commitAxisControlsChange()
-      resumeAutoRotateLater()
     }
 
     const getAxisIntersection = (event: PointerEvent) => {
-      if (!showRotationAxisRef.current || !rotationAxisRef.current) {
+      if (!showRotationAxisRef.current || !rotationMarkerRef.current) {
         return null
       }
 
       setPointerFromEvent(event)
-      return raycaster.intersectObjects(rotationAxisRef.current.children, false)[0] ?? null
+      return raycaster.intersectObject(rotationMarkerRef.current, false)[0] ?? null
+    }
+
+    const updatePointerCoordinates = (event: PointerEvent) => {
+      const model = modelRef.current
+
+      if (!model || axisDragMode) {
+        clearPointerCoordinates()
+        return
+      }
+
+      setPointerFromEvent(event)
+
+      const intersection = raycaster.intersectObject(model, true)[0]
+
+      if (!intersection) {
+        clearPointerCoordinates()
+        return
+      }
+
+      const rect = renderer.domElement.getBoundingClientRect()
+
+      const sourcePoint = model.worldToLocal(intersection.point.clone())
+
+      setPointerCoordinates({
+        left: event.clientX - rect.left,
+        point: {
+          x: sourcePoint.x,
+          y: sourcePoint.y,
+          z: sourcePoint.z
+        },
+        top: event.clientY - rect.top
+      })
     }
 
     const dragHorizontalAxis = (event: PointerEvent) => {
@@ -287,9 +345,15 @@ export function useModelViewerScene({
         return
       }
 
-      const nextControls = getHorizontalAxisDragControls(axisControlsRef.current, point, axisBounds)
+      const targetPoint = horizontalDragOffset ? point.add(horizontalDragOffset) : point
+      const nextControls = getHorizontalAxisDragControls(
+        axisControlsRef.current,
+        targetPoint,
+        axisBounds
+      )
 
-      updateModelPivot(new THREE.Vector3(nextControls.x, 0, nextControls.z), nextControls.y)
+      modelRef.current?.updateMatrixWorld(true)
+      updateModelPivot(new THREE.Vector3(nextControls.x, 0, nextControls.z), nextControls.y, true)
       setAxisControlsInScene(nextControls)
     }
 
@@ -314,7 +378,11 @@ export function useModelViewerScene({
     }
 
     const onPointerDown = (event: PointerEvent) => {
-      if (!interactive || !showRotationAxisRef.current || event.button > 2) {
+      if (
+        !interactive ||
+        !showRotationAxisRef.current ||
+        (event.button !== 0 && event.button !== 2)
+      ) {
         return
       }
 
@@ -324,24 +392,58 @@ export function useModelViewerScene({
         return
       }
 
+      const dragMode = getAxisDragMode(event.button)
+
+      if (!dragMode) {
+        return
+      }
+
       event.preventDefault()
       renderer.domElement.setPointerCapture(event.pointerId)
-      pauseAutoRotate()
+      clearPointerCoordinates()
       controls.enabled = false
-      axisDragMode = getAxisDragMode(event.button)
+      axisDragMode = dragMode
+
+      if (dragMode === 'horizontal') {
+        const point = new THREE.Vector3()
+
+        horizontalDragPlane.setFromNormalAndCoplanarPoint(horizontalPlaneNormal, intersection.point)
+
+        if (raycaster.ray.intersectPlane(horizontalDragPlane, point)) {
+          horizontalDragOffset = new THREE.Vector3(
+            axisControlsRef.current.x - point.x,
+            0,
+            axisControlsRef.current.z - point.z
+          )
+        }
+      }
     }
 
     const onPointerMove = (event: PointerEvent) => {
       if (axisDragMode === 'horizontal') {
         event.preventDefault()
+        clearPointerCoordinates()
         dragHorizontalAxis(event)
         return
       }
 
       if (axisDragMode === 'vertical') {
         event.preventDefault()
+        clearPointerCoordinates()
         dragVerticalMarker(event)
+        return
       }
+
+      updatePointerCoordinates(event)
+    }
+
+    const onPointerLeave = () => {
+      clearPointerCoordinates()
+      stopAxisDrag()
+    }
+
+    const onWheel = () => {
+      clearPointerCoordinates()
     }
 
     const onPointerUp = (event: PointerEvent) => {
@@ -377,6 +479,8 @@ export function useModelViewerScene({
       renderer.domElement.addEventListener('pointermove', onPointerMove)
       renderer.domElement.addEventListener('pointerup', onPointerUp)
       renderer.domElement.addEventListener('pointercancel', onPointerUp)
+      renderer.domElement.addEventListener('pointerleave', onPointerLeave)
+      renderer.domElement.addEventListener('wheel', onWheel)
     }
 
     setLoadState('loading')
@@ -421,6 +525,7 @@ export function useModelViewerScene({
         model.updateMatrixWorld(true)
         modelDefaultWorldMatrixRef.current = model.matrixWorld.clone()
         axisBounds = modelAxisBounds
+        defaultAxisControls = getDefaultAxisControls(axisBounds)
         onAxisBoundsChangeRef.current?.(axisBounds)
         camera.position.set(cameraDistance, cameraDistance * 0.45, cameraDistance)
         camera.lookAt(target)
@@ -479,6 +584,8 @@ export function useModelViewerScene({
       renderer.domElement.removeEventListener('pointermove', onPointerMove)
       renderer.domElement.removeEventListener('pointerup', onPointerUp)
       renderer.domElement.removeEventListener('pointercancel', onPointerUp)
+      renderer.domElement.removeEventListener('pointerleave', onPointerLeave)
+      renderer.domElement.removeEventListener('wheel', onWheel)
       controls.dispose()
       applyAxisControlsRef.current = null
       resetViewRef.current = null
@@ -510,6 +617,7 @@ export function useModelViewerScene({
   return {
     containerRef,
     loadState,
+    pointerCoordinates,
     progress
   }
 }
