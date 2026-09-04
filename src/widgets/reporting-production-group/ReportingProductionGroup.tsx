@@ -1,7 +1,9 @@
 'use client'
 
+import { CloseOutlined, UndoOutlined } from '@ant-design/icons'
+import { Button, Input } from 'antd'
 import { useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Bar,
   BarChart,
@@ -22,6 +24,7 @@ import {
   type ReportingProductionCard
 } from '@/entities/reporting'
 import { ChartFrame, ComparisonArrowLine } from '@/shared/ui'
+import { useClickOutside } from '@/shared/hooks'
 import { formatNumber } from '@/shared/utils'
 
 import { getBarConnectorSegments, type BarConnectorPoint } from './lib/bar-connector-line'
@@ -32,6 +35,7 @@ const STAGE_PARAM = 'stage'
 const DEFAULT_ASSET_KEY: ReportingAssetKey = 'group'
 const PRODUCTION_BAR_SIZE = 60
 const PRODUCTION_CHART_MARGIN = { top: 44, right: 20, left: 20, bottom: 0 } as const
+const DESCRIPTION_PLACEHOLDER = 'Введите комментарий по отклонениям'
 
 function getDataset(assetKey: string | null): ReportingDataset {
   return (
@@ -66,7 +70,18 @@ const productionBarColors = ['#c3cfe1', '#cfd0d2', 'var(--color-kpi-fact)'] as c
 
 function ProductionCard({ card }: ProductionCardProps) {
   const [barPoints, setBarPoints] = useState<BarConnectorPoint[]>([])
+  const [savedDescription, setSavedDescription] = useState(card.description)
+  const [draftDescription, setDraftDescription] = useState(card.description)
+  const [editingDescription, setEditingDescription] = useState(false)
+  const descriptionEditorRef = useRef<HTMLDivElement>(null)
   const hasBarData = card.bars.some((bar) => bar.value !== null)
+  const hasSavedDescription = savedDescription.trim().length > 0
+
+  useEffect(() => {
+    setSavedDescription(card.description)
+    setDraftDescription(card.description)
+    setEditingDescription(false)
+  }, [card.description])
 
   const handleBarGeometryChange = useCallback((index: number, point: BarConnectorPoint) => {
     setBarPoints((currentPoints) => {
@@ -82,6 +97,27 @@ function ProductionCard({ card }: ProductionCardProps) {
       return nextPoints
     })
   }, [])
+
+  const handleSaveDescription = () => {
+    setSavedDescription(draftDescription)
+    setEditingDescription(false)
+  }
+
+  const handleResetDescription = () => {
+    setSavedDescription(card.description)
+    setDraftDescription(card.description)
+  }
+
+  const handleCloseDescription = useCallback(() => {
+    setDraftDescription(savedDescription)
+    setEditingDescription(false)
+  }, [savedDescription])
+
+  useClickOutside(descriptionEditorRef, () => {
+    if (editingDescription) {
+      handleCloseDescription()
+    }
+  })
 
   return (
     <article className={styles.card}>
@@ -148,8 +184,54 @@ function ProductionCard({ card }: ProductionCardProps) {
           </div>
         </div>
         <div className={styles.textColumn}>
-          <div className={styles.description}>{card.description}</div>
-          {/* <div className={styles.editHint}>Нажмите, чтобы отредактировать</div> */}
+          {editingDescription ? (
+            <div className={styles.descriptionEditor} ref={descriptionEditorRef}>
+              <Input.TextArea
+                autoFocus
+                className={styles.descriptionTextarea}
+                placeholder={DESCRIPTION_PLACEHOLDER}
+                value={draftDescription}
+                onChange={(event) => setDraftDescription(event.target.value)}
+              />
+              <div className={styles.descriptionActions}>
+                <Button
+                  icon={<CloseOutlined />}
+                  size="small"
+                  title="Закрыть"
+                  onClick={handleCloseDescription}
+                />
+                <div className={styles.descriptionPrimaryActions}>
+                  <Button
+                    icon={<UndoOutlined />}
+                    size="small"
+                    title="Сбросить"
+                    onClick={handleResetDescription}
+                  />
+                  <Button
+                    className={styles.descriptionSaveButton}
+                    size="small"
+                    title="Сохранить"
+                    type="primary"
+                    onClick={handleSaveDescription}
+                  >
+                    Сохранить
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <button
+              className={styles.descriptionPreview}
+              type="button"
+              onClick={() => setEditingDescription(true)}
+            >
+              <span
+                className={hasSavedDescription ? styles.description : styles.descriptionPlaceholder}
+              >
+                {hasSavedDescription ? savedDescription : DESCRIPTION_PLACEHOLDER}
+              </span>
+            </button>
+          )}
         </div>
       </div>
     </article>
