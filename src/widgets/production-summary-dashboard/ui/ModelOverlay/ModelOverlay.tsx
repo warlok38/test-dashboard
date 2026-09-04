@@ -3,16 +3,14 @@
 import { ProductOutlined } from '@ant-design/icons'
 import { Modal } from 'antd'
 import classNames from 'classnames'
-import { useCallback, useRef } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-import { useClickOutside } from '@/shared/hooks'
 import { ModelViewer } from '@/shared/ui'
 
 import type { MediaModel } from '../../model'
 import styles from './ModelOverlay.module.css'
 import { useOverlayState } from './model/useOverlayState'
 import { ControlsPanel } from './ui/ControlsPanel'
-import { Preview } from './ui/Preview'
 
 type ModelOverlayProps = {
   className?: string
@@ -20,7 +18,24 @@ type ModelOverlayProps = {
   onClosePreview: () => void
 }
 
-const PREVIEW_CAMERA_DISTANCE_MULTIPLIER = 1.35
+const CONTROL_LINES = [
+  {
+    accent: 'ЛКМ + движение мыши',
+    text: '— вращать камеру относительно точки обзора'
+  },
+  {
+    accent: 'Колесо мыши',
+    text: '— зум, при максимальном зуме - вид от первого лица'
+  },
+  {
+    accent: 'ЛКМ + движение мыши за точку',
+    text: '— перемещение оси вращения по горизонтали'
+  },
+  {
+    accent: 'ПКМ + движение мыши за точку',
+    text: '— перемещение точки вращения по вертикали'
+  }
+] as const
 
 export function ModelToggleIcon() {
   return (
@@ -32,61 +47,71 @@ export function ModelToggleIcon() {
 }
 
 export function ModelOverlay({ className, models, onClosePreview }: ModelOverlayProps) {
-  const overlayState = useOverlayState()
-  const previewRef = useRef<HTMLDivElement>(null)
+  const { closeModal, controlsPanel, isModalOpen, openModel, selectedModel, viewerProps } =
+    useOverlayState()
+  const [showControlInfo, setShowControlInfo] = useState(false)
   const previewModel = models[0]
 
-  const closePreview = useCallback(
-    (event: MouseEvent | TouchEvent) => {
-      const target = event.target
-      const element = target instanceof Element ? target : null
+  useEffect(() => {
+    if (previewModel) {
+      openModel(previewModel)
+    }
+  }, [openModel, previewModel])
 
-      if (!overlayState.isModalOpen && !element?.closest('.ant-modal-root')) {
-        onClosePreview()
-      }
-    },
-    [overlayState.isModalOpen, onClosePreview]
-  )
-
-  useClickOutside(previewRef, closePreview)
-
-  if (!previewModel) {
-    return null
-  }
+  const closeModel = useCallback(() => {
+    closeModal()
+    onClosePreview()
+  }, [closeModal, onClosePreview])
 
   return (
-    <>
-      <div className={classNames(styles.modelOverlay, className)} ref={previewRef}>
-        <Preview
-          cameraDistanceMultiplier={PREVIEW_CAMERA_DISTANCE_MULTIPLIER}
-          model={previewModel}
-          onOpen={overlayState.openModel}
-        />
-      </div>
+    <div className={classNames(styles.modelOverlayHost, className)}>
       <Modal
         centered
         className={styles.modal}
         footer={null}
-        open={overlayState.isModalOpen}
-        title={overlayState.selectedModel?.name ?? '3D-модель'}
+        open={isModalOpen}
+        title={selectedModel?.name ?? '3D-модель'}
         width="92vw"
-        onCancel={overlayState.closeModal}
+        onCancel={closeModel}
       >
         <div className={styles.modalContent}>
           <div className={styles.viewerFrame}>
-            {overlayState.isModalOpen && overlayState.selectedModel ? (
+            {isModalOpen && selectedModel ? (
               <ModelViewer
-                {...overlayState.viewerProps}
-                config={overlayState.selectedModel.config}
+                {...viewerProps}
+                config={selectedModel.config}
                 interactive
                 loadingDescription="Загружаем модель..."
-                src={overlayState.selectedModel.src}
+                src={selectedModel.src}
               />
             ) : null}
-            <ControlsPanel state={overlayState.controlsPanel} />
+            <ControlsPanel state={controlsPanel} />
+            <div className={styles.controlInfoStack}>
+              {showControlInfo ? (
+                <div className={styles.controlsPanel}>
+                  <div className={styles.controlInfoContent}>
+                    <div className={styles.controlInfoTitle}>Управление</div>
+                    <div className={styles.controlInfoList}>
+                      {CONTROL_LINES.map((line) => (
+                        <p className={styles.controlInfoLine} key={line.accent}>
+                          <span>{line.accent}</span> {line.text}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+              <button
+                className={styles.controlsToggleButton}
+                type="button"
+                onClick={() => setShowControlInfo((isVisible) => !isVisible)}
+              >
+                {showControlInfo ? 'Скрыть управление' : 'Показать управление'}
+              </button>
+            </div>
           </div>
         </div>
       </Modal>
-    </>
+    </div>
   )
 }
