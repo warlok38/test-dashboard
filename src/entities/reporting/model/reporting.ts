@@ -51,6 +51,18 @@ export type ReportingKpiPoint = {
   caption: string
 }
 
+export type ReportingKpiSummaryItem = {
+  key: string
+  label: string
+  value: number | null
+  unit?: string
+  delta: number | null
+  target?: number
+  targetLabel: string
+  fractionDigits?: number
+  inverseDelta?: boolean
+}
+
 export type ReportingMonthlyPoint = {
   month: string
   fact: number | null
@@ -86,6 +98,7 @@ export type ReportingProductionCard = {
 
 export type ReportingDataset = {
   assetKey: ReportingAssetKey
+  kpiSummary: ReportingKpiSummaryItem[]
   overviews: ReportingOverview[]
   productionCards: ReportingProductionCard[]
 }

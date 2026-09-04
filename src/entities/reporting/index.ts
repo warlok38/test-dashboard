@@ -16,6 +16,7 @@ export type {
   ReportingBreakdownPoint,
   ReportingDataset,
   ReportingKpiPoint,
+  ReportingKpiSummaryItem,
   ReportingMetricKey,
   ReportingMetricOption,
   ReportingMode,

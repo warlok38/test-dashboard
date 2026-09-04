@@ -20,6 +20,11 @@
   box-shadow: var(--color-shadow-card);
 }
 
+.cardHeader {
+  display: flex;
+  gap: var(--space-1);
+}
+
 .cardHeader h3 {
   margin: 0;
   color: var(--color-text-strong);

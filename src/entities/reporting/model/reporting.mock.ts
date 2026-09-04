@@ -1,6 +1,7 @@
 import type {
   ReportingAssetOption,
   ReportingDataset,
+  ReportingKpiSummaryItem,
   ReportingMetricOption,
   ReportingModeOption
 } from './reporting'
@@ -121,9 +122,92 @@ function createOverviewMock(metric: ReportingMetricOption, seed: number, metricI
   }
 }
 
+function createKpiSummaryMock(seed: number): ReportingKpiSummaryItem[] {
+  return [
+    {
+      key: 'ore',
+      label: 'Руда',
+      value: 4741 + seed * 137,
+      unit: 'тыс. т',
+      delta: 4 + seed,
+      target: 4560 + seed * 120,
+      targetLabel: 'Цель'
+    },
+    {
+      key: 'grade',
+      label: 'Содержание',
+      value: Number((73.54 + seed * 0.68).toFixed(2)),
+      unit: 'г/т',
+      delta: -2 + seed,
+      target: Number((74.1 + seed * 0.6).toFixed(2)),
+      targetLabel: 'Цель',
+      fractionDigits: 2
+    },
+    {
+      key: 'drilling-volume',
+      label: 'Объем бурения',
+      value: 201 + seed * 8,
+      unit: 'тыс. п. м.',
+      delta: 1 + seed,
+      target: 198 + seed * 7,
+      targetLabel: 'Цель',
+      fractionDigits: 1
+    },
+    {
+      key: 'rock-mass',
+      label: 'Горная масса',
+      value: 853 + seed * 29,
+      unit: 'тыс. м3',
+      delta: 145 - seed * 7,
+      target: 348 + seed * 16,
+      targetLabel: 'Цель'
+    },
+    {
+      key: 'cargo-turnover',
+      label: 'Грузооборот',
+      value: 1096 + seed * 41,
+      unit: 'тыс. т-км',
+      delta: 38 - seed * 3,
+      target: 348 + seed * 20,
+      targetLabel: 'Цель'
+    },
+    {
+      key: 'processing-feed-zif',
+      label: 'Подача руды на ЗИФ',
+      value: 1659 + seed * 52,
+      unit: 'тыс. т',
+      delta: 38 + seed * 2,
+      target: 348 + seed * 18,
+      targetLabel: 'Цель'
+    },
+    {
+      key: 'au-grade',
+      label: 'Содержание Au',
+      value: Number((1.15 + seed * 0.04).toFixed(2)),
+      unit: 'г/т',
+      delta: null,
+      target: 3,
+      targetLabel: 'Порог',
+      fractionDigits: 2,
+      inverseDelta: true
+    },
+    {
+      key: 'au-output',
+      label: 'Выпуск Au',
+      value: Number((0 + seed * 0.08).toFixed(2)),
+      unit: 'кг',
+      delta: seed === 0 ? 0 : 3 + seed,
+      target: 0,
+      targetLabel: 'Цель',
+      fractionDigits: 2
+    }
+  ]
+}
+
 function createDataset(assetKey: ReportingDataset['assetKey'], assetLabel: string, seed: number) {
   return {
     assetKey,
+    kpiSummary: createKpiSummaryMock(seed),
     overviews: reportingMetricMockOptions.map((metric, metricIndex) =>
       createOverviewMock(metric, seed, metricIndex)
     ),

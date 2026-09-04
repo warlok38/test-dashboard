@@ -88,9 +88,8 @@ function ProductionCard({ card }: ProductionCardProps) {
       <div className={styles.cardBody}>
         <div className={styles.chartColumn}>
           <div className={styles.cardHeader}>
-            <h3>
-              {card.title}, <span>{card.unit}</span>
-            </h3>
+            <h3>{card.title}</h3>
+            {card.unit ? <span>{card.unit}</span> : null}
           </div>
           <div className={styles.chartFrame}>
             {card.deltas.length > 0 ? (
