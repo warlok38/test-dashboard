@@ -4,6 +4,22 @@
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+  scrollbar-color: var(--color-scrollbar-thumb-visible) transparent;
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+  height: var(--scrollbar-size);
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: var(--radius-pill);
+  background: var(--color-scrollbar-thumb-visible);
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 html,

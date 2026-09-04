@@ -1,0 +1,1 @@
+export { ReportingKpiPanel } from './ReportingKpiPanel'

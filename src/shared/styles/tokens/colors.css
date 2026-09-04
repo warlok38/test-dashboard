@@ -21,6 +21,7 @@
   --color-bg-sidebar-accent-hover: var(--palette-brand-700);
   --color-bg-sidebar-hover: var(--palette-accent-soft);
   --color-bg-kpi-active: #fffbf0;
+  --color-bg-kpi-panel: #f5f5f3;
   --color-text-sidebar: var(--color-text-inverse);
   --color-border-sidebar: rgb(255 255 255 / 20%);
   --color-scrollbar-sidebar-visible: rgb(255 255 255 / 45%);
@@ -31,6 +32,7 @@
   --color-shadow-card: var(--palette-shadow-card);
 
   --color-kpi-fact: var(--palette-accent-primary);
+  --color-kpi-label: #666666;
   --color-kpi-plan: #808080;
   --color-kpi-delta-positive: var(--palette-status-success);
   --color-kpi-delta-negative: var(--palette-status-danger);
@@ -65,11 +67,13 @@ html[data-theme='dark'] {
   --color-bg-sidebar-accent-hover: var(--palette-brand-700);
   --color-bg-sidebar-hover: var(--palette-accent-soft);
   --color-bg-kpi-active: #332d1c;
+  --color-bg-kpi-panel: #252522;
   --color-text-sidebar: var(--color-text-inverse);
   --color-border-sidebar: rgb(255 255 255 / 20%);
   --color-scrollbar-sidebar-visible: rgb(233 227 216 / 35%);
 
   --color-kpi-plan: #7f7f7f;
+  --color-kpi-label: #b7afa4;
   --color-chart-plan: #7f7f7f;
   --color-chart-tooltip-bg: #2b2b29;
 

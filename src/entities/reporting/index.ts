@@ -1,10 +1,17 @@
 export {
+  DEFAULT_REPORTING_ASSET_KEY,
+  REPORTING_ASSET_PARAM,
+  REPORTING_STAGE_PARAM,
+  getReportingProductionCards
+} from './model/reporting'
+export {
   DEFAULT_REPORTING_STAGE_KEY,
   getReportingStage,
   isReportingStageKey,
   reportingStageOptions
 } from './model/reporting-stage'
 export {
+  getReportingDataset,
   reportingAssetMockOptions,
   reportingMetricMockOptions,
   reportingMockData,
@@ -16,6 +23,7 @@ export type {
   ReportingBreakdownPoint,
   ReportingDataset,
   ReportingKpiPoint,
+  ReportingKpiSummaryItem,
   ReportingMetricKey,
   ReportingMetricOption,
   ReportingMode,

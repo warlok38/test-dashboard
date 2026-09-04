@@ -3,16 +3,7 @@
 import { useSearchParams } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import { Tag } from 'antd'
-import {
-  Bar,
-  BarChart,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  type PieLabelRenderProps
-} from 'recharts'
+import { Bar, BarChart, Pie, PieChart, XAxis, YAxis, type PieLabelRenderProps } from 'recharts'
 
 import {
   reportingAssetMockOptions,
@@ -22,7 +13,7 @@ import {
   type ReportingDataset,
   type ReportingMetricKey
 } from '@/entities/reporting'
-import { ComparisonArrowLine } from '@/shared/ui'
+import { ChartFrame, ComparisonArrowLine } from '@/shared/ui'
 import { formatNumber } from '@/shared/utils'
 
 import { ReportingMap } from './ui/ReportingMap'
@@ -31,7 +22,6 @@ import styles from './ReportingOverview.module.css'
 const ASSET_PARAM = 'asset'
 const STAGE_PARAM = 'stage'
 const DEFAULT_ASSET_KEY: ReportingAssetKey = 'group'
-const MONTHLY_CHART_HEIGHT = 118
 const MONTHLY_BAR_SIZE = 12
 const MONTHLY_BAR_GAP = 2
 const MONTHLY_Y_AXIS_HEADROOM = 0.35
@@ -69,12 +59,26 @@ export function ReportingOverview() {
   )
   const donutData = useMemo(
     () =>
-      overview.breakdown.map((entry, index) => ({
-        ...entry,
-        fill: index === 0 ? chartColors.fact : `rgba(250, 181, 41, ${0.18 + index * 0.1})`
-      })),
+      overview.breakdown
+        .filter((entry) => entry.value !== null)
+        .map((entry, index) => ({
+          ...entry,
+          value: entry.value,
+          fill: index === 0 ? chartColors.fact : `rgba(250, 181, 41, ${0.18 + index * 0.1})`
+        })),
     [overview.breakdown]
   )
+  const monthlyData = useMemo(
+    () =>
+      overview.monthly.some(
+        (point) => point.fact !== null || point.plan !== null || point.forecast !== null
+      )
+        ? overview.monthly
+        : [],
+    [overview.monthly]
+  )
+  const hasDonutData = donutData.length > 0
+  const hasMonthlyData = monthlyData.length > 0
 
   return (
     <section className={styles.section}>
@@ -100,12 +104,14 @@ export function ReportingOverview() {
             ))}
           </div>
           <div className={styles.kpiBlock}>
-            <ComparisonArrowLine className={styles.comparisonLine} deltas={overview.deltas} />
+            {overview.deltas.length > 0 ? (
+              <ComparisonArrowLine className={styles.comparisonLine} deltas={overview.deltas} />
+            ) : null}
             <div className={styles.kpiRow}>
               {overview.kpis.map((kpi, index) => (
                 <div className={styles.kpiItem} key={`${kpi.label}-${index}`}>
                   <span className={styles.kpiValue}>
-                    {formatNumber(kpi.value, { fractionDigits: 2 })}
+                    {kpi.value === null ? '-' : formatNumber(kpi.value, { fractionDigits: 2 })}
                   </span>
                   <span className={styles.kpiLabel}>{kpi.label}</span>
                   <span className={styles.kpiCaption}>{formatMonthCaption(kpi.caption)}</span>
@@ -115,42 +121,63 @@ export function ReportingOverview() {
           </div>
         </div>
         <div className={styles.donutChart}>
-          <ResponsiveContainer height={136} width="100%">
-            <PieChart margin={{ top: 8, right: 12, bottom: 8, left: 12 }}>
-              <Pie
-                data={donutData}
-                dataKey="value"
-                innerRadius={40}
-                isAnimationActive={false}
-                label={renderDonutLabel}
-                labelLine={false}
-                nameKey="name"
-                outerRadius={64}
-                paddingAngle={1}
-                stroke="none"
-              />
-            </PieChart>
-          </ResponsiveContainer>
+          <ChartFrame className={styles.donutChartFrame}>
+            {({ width, height }) => (
+              <PieChart
+                height={height}
+                margin={{ top: 8, right: 12, bottom: 8, left: 12 }}
+                width={width}
+              >
+                {hasDonutData ? (
+                  <Pie
+                    data={donutData}
+                    dataKey="value"
+                    innerRadius={40}
+                    isAnimationActive={false}
+                    label={renderDonutLabel}
+                    labelLine={false}
+                    nameKey="name"
+                    outerRadius={64}
+                    paddingAngle={1}
+                    stroke="none"
+                  />
+                ) : null}
+              </PieChart>
+            )}
+          </ChartFrame>
           <div className={styles.donutValue}>
-            {formatNumber(overview.donutValue, { fractionDigits: 1 })}
-            {overview.donutUnit}
+            {overview.donutValue === null
+              ? '-'
+              : `${formatNumber(overview.donutValue, { fractionDigits: 1 })}${overview.donutUnit}`}
           </div>
         </div>
         <div className={styles.monthlyChart}>
-          <ResponsiveContainer height={MONTHLY_CHART_HEIGHT} width="100%">
-            <BarChart barGap={MONTHLY_BAR_GAP} barSize={MONTHLY_BAR_SIZE} data={overview.monthly}>
-              <XAxis
-                dataKey="month"
-                interval={0}
-                tickLine={false}
-                tick={{ fill: 'var(--color-text-muted)', fontSize: 9, fontWeight: 600 }}
-              />
-              <YAxis hide domain={[0, `dataMax + ${MONTHLY_Y_AXIS_HEADROOM}`]} />
-              <Bar dataKey="forecast" fill={chartColors.forecast} isAnimationActive={false} />
-              <Bar dataKey="plan" fill={chartColors.plan} isAnimationActive={false} />
-              <Bar dataKey="fact" fill={chartColors.fact} isAnimationActive={false} />
-            </BarChart>
-          </ResponsiveContainer>
+          <ChartFrame className={styles.monthlyChartFrame}>
+            {({ width, height }) => (
+              <BarChart
+                barGap={MONTHLY_BAR_GAP}
+                barSize={MONTHLY_BAR_SIZE}
+                data={hasMonthlyData ? monthlyData : overview.monthly}
+                height={height}
+                width={width}
+              >
+                <XAxis
+                  dataKey="month"
+                  interval={0}
+                  tickLine={false}
+                  tick={{ fill: 'var(--color-text-muted)', fontSize: 9, fontWeight: 600 }}
+                />
+                <YAxis hide domain={[0, `dataMax + ${MONTHLY_Y_AXIS_HEADROOM}`]} />
+                {hasMonthlyData ? (
+                  <>
+                    <Bar dataKey="forecast" fill={chartColors.forecast} isAnimationActive={false} />
+                    <Bar dataKey="plan" fill={chartColors.plan} isAnimationActive={false} />
+                    <Bar dataKey="fact" fill={chartColors.fact} isAnimationActive={false} />
+                  </>
+                ) : null}
+              </BarChart>
+            )}
+          </ChartFrame>
         </div>
       </aside>
     </section>
