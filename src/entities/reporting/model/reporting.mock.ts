@@ -5,6 +5,7 @@ import type {
   ReportingMetricOption,
   ReportingModeOption
 } from './reporting'
+import { DEFAULT_REPORTING_ASSET_KEY } from './reporting'
 import { reportingStageOptions } from './reporting-stage'
 
 export const reportingAssetMockOptions: ReportingAssetOption[] = [
@@ -220,3 +221,11 @@ function createDataset(assetKey: ReportingDataset['assetKey'], assetLabel: strin
 export const reportingMockData: ReportingDataset[] = reportingAssetMockOptions.map((asset, index) =>
   createDataset(asset.key, asset.label, index)
 )
+
+export function getReportingDataset(assetKey: string | null): ReportingDataset {
+  return (
+    reportingMockData.find((dataset) => dataset.assetKey === assetKey) ??
+    reportingMockData.find((dataset) => dataset.assetKey === DEFAULT_REPORTING_ASSET_KEY) ??
+    reportingMockData[0]
+  )
+}

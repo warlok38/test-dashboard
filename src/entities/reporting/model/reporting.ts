@@ -6,6 +6,10 @@ export type ReportingAssetKey =
   | 'suhoy-log'
   | 'natalka'
 
+export const DEFAULT_REPORTING_ASSET_KEY: ReportingAssetKey = 'group'
+export const REPORTING_ASSET_PARAM = 'asset'
+export const REPORTING_STAGE_PARAM = 'stage'
+
 export type ReportingMode = 'period' | 'cumulative' | 'forecast'
 
 export type ReportingQuarter = {
@@ -101,4 +105,15 @@ export type ReportingDataset = {
   kpiSummary: ReportingKpiSummaryItem[]
   overviews: ReportingOverview[]
   productionCards: ReportingProductionCard[]
+}
+
+export function getReportingProductionCards(
+  dataset: ReportingDataset,
+  metrics: ReportingMetricOption[]
+): ReportingProductionCard[] {
+  return metrics.flatMap((metric) => {
+    const card = dataset.productionCards.find((item) => item.metricKey === metric.key)
+
+    return card ? [card] : []
+  })
 }
