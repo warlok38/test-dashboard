@@ -10,7 +10,7 @@ import {
   SettingOutlined,
   TruckOutlined
 } from '@ant-design/icons'
-import { Popover, Segmented, Tabs, Tooltip } from 'antd'
+import { Popover, Segmented, Select, Tabs, Tooltip } from 'antd'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 
 import {
@@ -112,6 +112,11 @@ const GRAPH_DETAIL_MODE_OPTIONS: Record<
     icon: <PartitionOutlined />,
     label: 'Этап',
     value: 'stage'
+  },
+  combinedStage: {
+    icon: <PartitionOutlined />,
+    label: 'Сводный этап',
+    value: 'combinedStage'
   },
   park: {
     icon: <CarOutlined />,
@@ -440,9 +445,13 @@ function GraphTabContent({
   seriesView: Record<GraphSeriesKey, GraphSeriesView>
   tab: GraphTab
 }) {
+  const isCombinedStageMode = detailMode === 'combinedStage'
+  const [activeCombinedStageIndicator, setActiveCombinedStageIndicator] = useState<
+    string | undefined
+  >()
   const mainGraphQuery = useMemo(
-    () => getBaseGraphQuery(parentGraphQuery, tab),
-    [parentGraphQuery, tab]
+    () => (isCombinedStageMode ? undefined : getBaseGraphQuery(parentGraphQuery, tab)),
+    [isCombinedStageMode, parentGraphQuery, tab]
   )
   const detailGraphQuery = useMemo(
     () => getDetailGraphQuery(parentGraphQuery, tab, detailMode),
@@ -502,6 +511,16 @@ function GraphTabContent({
     isDetailGraphFetching && Boolean(lastSuccessfulDetailData),
     GRAPH_LOADING_OVERLAY_DELAY_MS
   )
+  const selectedCombinedStageDetail =
+    detailGraphs.find((detail) => detail.indicator === activeCombinedStageIndicator) ??
+    detailGraphs[0]
+  const combinedStageChildren = selectedCombinedStageDetail?.children ?? EMPTY_MODE_DETAILS
+  const combinedStageChildrenValueRange = useMemo(
+    () => getSharedGraphValueRange(combinedStageChildren),
+    [combinedStageChildren]
+  )
+  const sharedCombinedStageChildrenValueRange =
+    detailScaleMode === 'comparison' ? combinedStageChildrenValueRange : undefined
 
   useEffect(() => {
     if (mainGraphData) {
@@ -524,10 +543,28 @@ function GraphTabContent({
   }, [detailGraphData, detailGraphDataKey, graphPeriod])
 
   useEffect(() => {
+    if (!isCombinedStageMode || detailGraphs.length === 0) {
+      setActiveCombinedStageIndicator(undefined)
+
+      return
+    }
+
+    setActiveCombinedStageIndicator((currentIndicator) =>
+      currentIndicator && detailGraphs.some((detail) => detail.indicator === currentIndicator)
+        ? currentIndicator
+        : detailGraphs[0].indicator
+    )
+  }, [detailGraphs, isCombinedStageMode])
+
+  useEffect(() => {
     onMeasureUnitChange?.(measureUnit)
   }, [measureUnit, onMeasureUnitChange])
 
   const renderGraphContent = () => {
+    if (isCombinedStageMode) {
+      return null
+    }
+
     if (!mainGraphQuery) {
       return <div className={styles.emptyState}>Нет показателя для графика</div>
     }
@@ -559,7 +596,109 @@ function GraphTabContent({
     )
   }
 
+  const renderCombinedStageContent = () => {
+    if (!detailGraphQuery) {
+      return null
+    }
+
+    if (detailGraphError) {
+      return (
+        <ApiErrorAlert
+          error={detailGraphError}
+          title="Не удалось загрузить графики"
+          endpointPath={PRODUCTION_SUMMARY_API_ROUTES.graphByMode}
+          onRetry={refetchDetailGraph}
+        />
+      )
+    }
+
+    if (!selectedCombinedStageDetail) {
+      if (isInitialDetailsLoading) {
+        return (
+          <div className={styles.graphMainChartArea}>
+            <GraphChart
+              data={EMPTY_GRAPH_DATA}
+              dataKey={`${detailGraphDataKey}:combined-stage-loading`}
+              emptyText="Нет данных для графика"
+              graphPeriod={graphPeriod}
+              isUpdating
+              seriesView={seriesView}
+              updatingText="Загрузка..."
+            />
+          </div>
+        )
+      }
+
+      return <Empty description="Нет данных для графика" />
+    }
+
+    return (
+      <>
+        <div className={styles.combinedStageHeader}>
+          <Select
+            className={styles.combinedStageSelect}
+            options={detailGraphs.map((detail) => ({
+              label: detail.indicator,
+              value: detail.indicator
+            }))}
+            popupMatchSelectWidth={false}
+            size="small"
+            variant="underlined"
+            value={selectedCombinedStageDetail.indicator}
+            onChange={setActiveCombinedStageIndicator}
+          />
+        </div>
+        <div className={styles.graphMainChartArea}>
+          <GraphChart
+            data={selectedCombinedStageDetail.points}
+            dataKey={`${displayedDetailDataKey}:combined-stage:${selectedCombinedStageDetail.indicator}`}
+            emptyText="Нет данных для графика"
+            graphPeriod={displayedDetailGraphPeriod}
+            isUpdating={isInitialDetailsLoading || shouldShowDetailsUpdatingOverlay}
+            normalizeValueRange
+            seriesView={seriesView}
+            updatingText={isInitialDetailsLoading ? 'Загрузка...' : 'Обновление...'}
+          />
+        </div>
+        <div className={styles.graphNestedSections}>
+          <section className={styles.graphNestedSection}>
+            <div className={styles.graphSectionBody}>
+              {combinedStageChildren.length > 0 ? (
+                <div className={styles.depositGraphGrid}>
+                  {combinedStageChildren.map((detail) => (
+                    <article className={styles.depositGraphCard} key={detail.gtk}>
+                      <h3 className={styles.depositGraphTitle}>
+                        {detail.display_name ?? detail.gtk}
+                      </h3>
+                      <GraphChart
+                        data={detail.points}
+                        dataKey={`${displayedDetailDataKey}:combined-stage:${selectedCombinedStageDetail.indicator}:${detail.gtk}`}
+                        graphPeriod={displayedDetailGraphPeriod}
+                        isUpdating={shouldShowDetailsUpdatingOverlay}
+                        normalizeValueRange
+                        normalizedValueRange={sharedCombinedStageChildrenValueRange}
+                        seriesView={seriesView}
+                        size="compact"
+                        updatingText="Обновление..."
+                      />
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <Empty description="Нет детальных данных" />
+              )}
+            </div>
+          </section>
+        </div>
+      </>
+    )
+  }
+
   const renderDetailsContent = () => {
+    if (isCombinedStageMode) {
+      return renderCombinedStageContent()
+    }
+
     if (!detailGraphQuery) {
       return null
     }

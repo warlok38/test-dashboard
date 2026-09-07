@@ -61,7 +61,14 @@ export type GraphQuery = {
 
 export type GraphPeriod = SummaryPeriod
 
-export type GraphMode = 'gtk' | 'park' | 'stage' | 'quarry' | 'parkPercent' | 'block'
+export type GraphMode =
+  | 'gtk'
+  | 'park'
+  | 'stage'
+  | 'combinedStage'
+  | 'quarry'
+  | 'parkPercent'
+  | 'block'
 
 export type GraphPoint = {
   date: string
@@ -103,6 +110,7 @@ export type GraphByModeDetail = {
   display_name?: string | null
   unit: string
   points: GraphPoint[]
+  children?: GraphByModeDetail[]
 }
 
 export type GraphByModeResponse = {
